@@ -1,0 +1,171 @@
+<template>
+  <v-row class="pa-9">
+    <v-col cols="12" md="8" class="d-flex flex-column ga-6">
+      <v-card :loading="loading" title="Ultimos 30 dias">
+        <v-card-text v-if="!loading" class="d-flex flex-column ga-1">
+          <div v-for="transaction in transactions.slice(0,3)">
+            <div :class="transaction.type === 1 ? 'text-success' : 'text-error'">
+              <v-icon>mdi-calendar-outline</v-icon> {{ getDate(transaction.date) }} - {{ transaction.type === 1 ? 'Entrada' : 'Saida' }} de R$ {{ transaction.amount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-text v-if="!loading" class="d-flex flex-column">
+          <Line :data="info" :options="options" :key="info.datasets[0].data.length" />
+        </v-card-text>
+        <v-card-text v-else>
+          <v-skeleton-loader
+            class="mx-auto border"
+            type="article"
+          ></v-skeleton-loader>
+          </v-card-text>
+      </v-card>
+      <v-card v-if="appointment && appointment.client" :loading="loading" title="Próximo cliente na agenda">
+        <v-card-text class="d-flex flex-column ga-6" v-if="!loading">
+          <div class="d-flex ga-6 align-center">
+            <v-avatar color="surface-variant" size="57">
+              <v-img :src="appointment.client.avatar ?? 'https://cdn.vuetifyjs.com/images/profiles/marcus.jpg'" cover></v-img>
+            </v-avatar>
+            <div class="d-flex flex-column ga-2">
+              <div class="d-flex ga-2 align-center">
+                <v-icon>mdi-calendar-outline</v-icon>
+                <div>{{ getDateTime(appointment.date) }}</div>
+              </div>
+              <div class="d-flex ga-2 align-center">
+                <v-icon>mdi-account-outline</v-icon>
+                <div>{{ appointment.client.name }}</div>
+              </div>
+              <div class="d-flex ga-2 align-center">
+                <v-icon>mdi-phone-outline</v-icon>
+                <div>{{ appointment.client.phone }}</div>
+              </div>
+            </div>
+          </div>
+          <v-btn color="primary" class="ml-auto" @click="view()">Ver Odontograma</v-btn>
+        </v-card-text>
+        <v-card-text v-else>
+          <v-skeleton-loader
+            class="mx-auto border"
+            type="article"
+          ></v-skeleton-loader>
+        </v-card-text>
+      </v-card>
+    </v-col>
+    <v-col>
+      <v-card :loading="loading" title="Agenda do dia">
+        <v-card-text class="text-error">
+          <calendar :show-header="false"/>
+        </v-card-text>
+      </v-card>
+    </v-col>
+  </v-row>
+</template>
+
+<script>
+  import userService from '../services/user.service'
+  import { format, parseISO } from 'date-fns'
+  import Calendar from '../components/Calendar.vue'
+  import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  } from 'chart.js'
+  import { Line } from 'vue-chartjs'
+
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  )
+
+  export default {
+    components: {
+      Line,
+      Calendar
+    },
+    data() {
+      return {
+        loading: true,
+        appointment: {},
+        transactions: [],
+        info: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Saldo',
+              backgroundColor: '#f87979',
+              data: []
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      }
+    },
+    mounted() {
+      this.getFinancialResume()
+      this.getNextAppointment()
+    },
+    methods: {
+      getFinancialResume() {
+        let balance = 0
+        let values = []
+        userService.getTransactions('page=1&itemsPerPage=10&sort=date&order=desc').then((response) => {
+          this.transactions = response.data.list.data
+          this.info.labels = response.data.list.data.map((transaction) => this.getDate(transaction.date))
+          this.transactions.forEach((transaction) => {
+            if (transaction.type === 1) {
+              balance = balance + transaction.amount
+            } else {
+              balance = balance - transaction.amount
+            }
+            values.push(balance)
+          })
+          this.info.datasets[0].data = values
+        })
+      },
+      getNextAppointment() {
+        userService.getNextAppointment().then((response) => {
+          this.appointment = response.data
+          this.loading = false
+        })
+      },
+      getDateTime(date) {
+        return format(parseISO(date), 'dd/MM/yyyy kk:mm')
+      },
+      getDate(date) {
+        return format(parseISO(date), 'dd/MM/yyyy')
+      },
+      view () {
+        this.$router.push({
+          name: 'client-details',
+          params: { id: this.appointment.client.id }
+        })
+      },
+    }
+  }
+</script>
+
+<style scoped>
+.sx__calendar-header-content:last-of-type {
+  display: none !important;
+}
+
+.sx__week-header-content {
+  display: none !important;
+}
+
+.sx__calendar-header {
+  padding-top: 0 !important;
+}
+</style>

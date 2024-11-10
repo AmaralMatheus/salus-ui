@@ -8,17 +8,37 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@schedule-x/events-service": "^2.4.1",
+    "@schedule-x/theme-default": "^2.4.0",
+    "@schedule-x/vue": "^2.3.0",
+    "chart.js": "^4.4.6",
     "core-js": "^3.8.3",
-    "vue": "^3.2.13"
+    "date-fns": "^4.1.0",
+    "local-cors-proxy": "^1.1.0",
+    "maska": "^3.0.3",
+    "v-mask": "^2.3.0",
+    "v-money3": "^3.24.1",
+    "vee-validate": "^4.13.2",
+    "vue": "^3.2.13",
+    "vue-chartjs": "^5.3.1",
+    "vue-currency-input": "^3.1.0",
+    "vue-flatpickr-component": "^11.0.5",
+    "vue-router": "^4.4.5",
+    "vuetify": "^3.7.3",
+    "vuetify-datetime-picker": "^1.0.1",
+    "vuex": "^4.1.0",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
+    "@mdi/font": "^7.4.47",
     "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "axios": "^1.7.7",
     "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "eslint-plugin-vue": "^8.0.3",
+    "material-design-icons-iconfont": "^6.7.0"
   },
   "eslintConfig": {
     "root": true,
