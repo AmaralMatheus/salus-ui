@@ -1,5 +1,5 @@
 <template>
-  <div class="py-md-9">
+  <div class="pa-md-9">
     <v-card :loading="loadingInfo" :title="!id ? 'Cadastrar cliente' : 'Editar Cliente'" :subtitle="client.name">
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >

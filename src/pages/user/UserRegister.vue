@@ -1,6 +1,6 @@
 <template>
   <div class="pa-md-9">
-    <v-card :loading="loadingInfo" class="ma-9 w-100" :title="!id ? 'Cadastrar usuário' : 'Editar Usere'" :subtitle="user.name">
+    <v-card :loading="loadingInfo" :title="!id ? 'Cadastrar usuário' : 'Editar Usere'" :subtitle="user.name">
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
           <v-row>
@@ -72,13 +72,10 @@
 
 <script>
   import userService from '../../services/user.service'
-  import { VDateInput } from 'vuetify/labs/VDateInput'
   import { vMaska } from "maska/vue"
 
   export default {
-    components: {
-      VDateInput,
-    },
+    name: 'UserForm',
     directives: { maska: vMaska },
     computed: {
       id() {

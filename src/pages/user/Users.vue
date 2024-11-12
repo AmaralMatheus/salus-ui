@@ -54,7 +54,7 @@
             item-value="name"
             @update:options="loadItems"
           >
-            <template #item.actions="{ item }">
+            <template v-slot:[`item.actions`]="{ item }">
               <div class="d-flex ga-3">
                 <v-icon :disabled="loading" color="warning" @click="update(item)">mdi-pencil</v-icon>
                 <v-icon :disabled="loading" color="error" @click="selectedItem = item; dialog = true">mdi-delete</v-icon>
@@ -110,15 +110,10 @@
 
   <script>
     import userService from '../../services/user.service'
-    import { VDateInput } from 'vuetify/labs/VDateInput'
     import { format, parseISO } from 'date-fns'
-    import { VTimePicker } from 'vuetify/labs/VTimePicker'
 
     export default {
-      components: {
-        VDateInput,
-        VTimePicker
-      },
+      name: 'UserList',
       data: () => ({
         format,
         parseISO,
@@ -141,7 +136,6 @@
           { title: 'E-mail', key: 'email', align: 'end', sortable: true },
           { title: '', key: 'actions', align: 'end', sortable: true },
         ],
-        search: '',
         rules: [
           value => {
             if (value) return true

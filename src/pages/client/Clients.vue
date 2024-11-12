@@ -34,18 +34,18 @@
           item-value="name"
           @update:options="loadItems"
         >
-          <template #item.avatar="{ item }">
+          <template v-slot:[`item.avatar`]="{ item }">
             <v-avatar color="surface-variant ma-auto" size="30">
               <v-img :src="item.avatar ?? 'https://ui-avatars.com/api/?name='+item.name.replaceAll(' ', '+') + '&background=random'" cover></v-img>
             </v-avatar>
           </template>
-          <template #item.last_appointment="{ item }">
+          <template v-slot:[`item.last_appointment`]="{ item }">
             {{ item.last_appointment.length > 0 ? getDateTime(item.last_appointment[0].date) : 'Sem consultas cadastradas' }}
           </template>
-          <template #item.next_appointment="{ item }">
+          <template v-slot:[`item.next_appointment`]="{ item }">
             {{ item.next_appointment.length > 0 ? getDateTime(item.next_appointment[0].date) : 'Sem consultas cadastradas' }}
           </template>
-          <template #item.actions="{ item }">
+          <template v-slot:[`item.actions`]="{ item }">
             <div class="d-flex ga-3">
               <v-icon :disabled="loading" class="ml-auto" color="info" @click="selectedItem = item; schedulerDialog = true">mdi-calendar-edit-outline</v-icon>
               <v-icon :disabled="loading" color="info" v-if="currentUser.type === 1" @click="view(item)">mdi-eye</v-icon>
@@ -53,7 +53,7 @@
               <v-icon :disabled="loading" color="error" @click="selectedItem = item; dialog = true">mdi-delete</v-icon>
             </div>
           </template>
-          <template #item.status="{ item }">
+          <template v-slot:[`item.status`]="{ item }">
             {{ getStatusType(item.status) }}
           </template>
         </v-data-table-server>
@@ -118,6 +118,7 @@
   import { format, parseISO } from 'date-fns'
 
   export default {
+    name: 'ClientList',
     components: {
       Scheduler
     },

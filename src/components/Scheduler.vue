@@ -97,7 +97,7 @@
         <v-btn
         text="Agendar"
         color="primary"
-        :disabled="loading || !valid"
+        :disabled="loading || !valid || !scheduleDate || !scheduleTime"
         :loading="loading"
         @click="schedule"
         ></v-btn>
