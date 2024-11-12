@@ -1,5 +1,5 @@
 <template>
-  <div class="pa-9">
+  <div class="pa-md-9">
     <v-row>
       <v-col cols="12" sm="4">
         <v-card title="Saldo">
@@ -53,16 +53,16 @@
             item-value="name"
             @update:options="loadItems"
           >
-            <template #item.type="{ item }">
+            <template v-slot:[`item.type`]="{ item }">
               {{ item.type === 1 ? 'Entrada' : 'Saída' }}
             </template>
-            <template #item.method="{ item }">
+            <template v-slot:[`item.method`]="{ item }">
               {{ item.type === 1 ? 'Dinheiro' : item.type === 2 ? 'Cartão' : 'Pix' }}
             </template>
-            <template #item.date="{ item }">
+            <template v-slot:[`item.date`]="{ item }">
               {{ getDateTime(item.date) }}
             </template>
-            <template #item.amount="{ item }">
+            <template v-slot:[`item.amount`]="{ item }">
               <div :class="item.type === 1 ? 'text-success' : 'text-error'">
                 R$ {{ item.amount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}
               </div>
@@ -173,7 +173,7 @@
                       append-inner-icon="$calendar"
                       label="Selecione a data"
                     >
-                      <template slot="dateIcon">
+                      <template #dateIcon>
                         <v-icon>mdi mdi-calendar-outline</v-icon>
                       </template>
                     </v-date-input>
@@ -187,7 +187,6 @@
                       v-model="client"
                       :loading="loading"
                       :disabled="loading"
-                      :rules="rules"
                       variant="outlined"
                       density="compact"
                       label="Cliente"
@@ -211,14 +210,14 @@
                 class="ms-auto"
                 text="Cancelar"
                 :disabled="loading"
-                @click="transactionDialog = false; scheduleDate = null; description = ''; type = 1; amount = null; formattedValue = null"
+                @click="transactionDialog = false; scheduleDate = null; description = ''; type = 1; amount = null; formattedValue = null; client = null"
                 ></v-btn>
                 <v-btn
                 text="Salvar"
                 color="primary"
                 :disabled="loading || !valid"
                 :loading="loading"
-                @click="addTransaction(); transactionDialog = false; scheduleDate = null; description = ''; type = 1; amount = null; formattedValue = null"
+                @click="addTransaction(); transactionDialog = false; scheduleDate = null; description = ''; type = 1; amount = null; formattedValue = null; client = null"
                 ></v-btn>
               </template>
             </v-card>
@@ -246,7 +245,7 @@
 
 <script setup>
   import { useCurrencyInput } from 'vue-currency-input'
-  import { watch } from 'vue'
+  import { watch, defineProps } from 'vue'
 
   const props = defineProps({ modelValue: Number })
 
@@ -278,6 +277,7 @@
 
 
   export default {
+    name: "FinancePage",
     components: {
       VDateInput,
     },
@@ -299,7 +299,6 @@
       snackbar: false,
       message: false,
       itemsPerPage: 5,
-      dialog: false,
       transactionDialog: false,
       selectedItem: null,
       totalAmount: 0,
@@ -316,7 +315,6 @@
         { title: 'Forma de Pagamento', key: 'method', align: 'end' },
         { title: 'Descrição', key: 'description', align: 'end' },
       ],
-      search: '',
       rules: [
         value => {
           if (value) return true

@@ -11,11 +11,15 @@ import '@schedule-x/theme-default/dist/index.css'
 import userService from '../services/user.service'
 import { createEventsServicePlugin } from '@schedule-x/events-service'
 import { format, parseISO, add } from "date-fns"
-import { ref } from 'vue'
+import { ref, defineProps, defineComponent } from 'vue'
 import { auth } from '../store/auth.module'
 
-const dark = localStorage.getItem('dark')
+defineComponent({
+  name: 'CalendarComponent'
+})
+
 const props = defineProps({ showHeader: Boolean })
+props
 const dialog = ref(false)
 const snackbar = ref(false)
 const message = ref('')
@@ -79,22 +83,41 @@ function getName(type) {
 
 function remove () {
   loading.value = true
-  userService.deleteAppointment(selectedEvent.value.id).then(() => {
-    dialog.value = false
-    selectedEvent.value = {}
-    loading.value = false
-    calendarApp.eventsService.remove(selectedEvent.value.id)
-  },
-    (error) => {
+  if (selectedEvent.value.title === 'Agendamento Google') {
+    userService.deleteGoogleAppointment(auth.state.user.calendar, selectedEvent.value.id).then(() => {
+      dialog.value = false
+      selectedEvent.value = {}
       loading.value = false
-      snackbar.value = true
-      message.value =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString()
-    })
+      calendarApp.eventsService.remove(selectedEvent.value.id)
+    },
+      (error) => {
+        loading.value = false
+        snackbar.value = true
+        message.value =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString()
+      })
+  } else {
+    userService.deleteAppointment(selectedEvent.value.id).then(() => {
+      dialog.value = false
+      selectedEvent.value = {}
+      loading.value = false
+      calendarApp.eventsService.remove(selectedEvent.value.id)
+    },
+      (error) => {
+        loading.value = false
+        snackbar.value = true
+        message.value =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString()
+      })
+  }
 }
 
 function load() {
@@ -134,10 +157,10 @@ load()
 
 <template>
   <ScheduleXCalendar :calendar-app="calendarApp">
-    <template v-if="!showHeader" style="display: none !important;" #headerContent="{ calendarEvent }">
+    <template v-if="showHeader" #headerContent="{ }">
     </template>
-    <template class="h-fill" #timeGridEvent="{ calendarEvent }">
-      <div :class="calendarEvent.title !== 'Agendamento Google' ? 'border-red ' : 'border-info'" class="d-flex pa-1 justify-space-between border-t-lg text-truncate">
+    <template #timeGridEvent="{ calendarEvent }">
+      <div :class="calendarEvent.title !== 'Agendamento Google' ? 'border-red ' : 'border-info'" class="d-flex h-fill pa-1 justify-space-between border-t-lg text-truncate">
         <div>
           {{ calendarEvent.title }}
           <div class="d-flex ga-2 mt-1 align-center">
@@ -194,13 +217,20 @@ load()
   --sx-color-primary-container: rgb(var(--v-theme-primary)) !important;
   --sx-color-on-primary-container: rgb(var(--v-theme-on-surface)) !important;
   --sx-color-surface-container-low: rgb(var(--v-theme-surface)) !important;
-  border:none;
+  border: none;
+  border-radius: 0;
   background-color: rgb(var(--sx-color-background));
+}
+
+.sx__view-container {
+  border: solid 1px var(--sx-color-outline-variant) !important;
+  border-radius: var(--sx-rounding-extra-small);
 }
 
 .sx__calendar-header .sx__date-input {
   padding: 9px;
 }
+
 .sx__view-selection-selected-item {
   padding: 9px;
 }
@@ -218,5 +248,9 @@ load()
 
 .sx__month-grid-day__events {
   margin-left: 8px;
+}
+
+.sx__week-grid__date-number {
+  color: white !important;
 }
 </style>

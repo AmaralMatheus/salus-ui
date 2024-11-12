@@ -1,5 +1,5 @@
 <template>
-  <div class="pa-9">
+  <div class="pa-md-9">
     <v-card :loading="loadingInfo" class="ma-9 w-100" :title="!id ? 'Cadastrar usuário' : 'Editar Usere'" :subtitle="user.name">
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >

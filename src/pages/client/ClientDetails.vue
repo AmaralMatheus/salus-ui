@@ -1,39 +1,37 @@
 <template>
-  <v-row class="pa-9">
+  <v-row class="pa-md-9">
     <v-col cols="12" sm="6" md="7" lg="8">
       <v-card v-if="!loading" title="Odontograma">
         <v-card-text>
           <div class="d-flex flex-column ga-3">
             <div class="d-flex justify-space-between align-baseline">
-              <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]">
-                <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'">
+              <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :key="tooth">
+                  <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
                   <v-tooltip
                     activator="parent"
                     location="bottom"
                     :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
                   >{{ getToothStatus(client.teeth[tooth].status) }}
-                    <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between">
+                    <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
                       <div>{{ evolution.description }}</div>
                       <div>{{ getDateTime(evolution.created_at) }}</div>
                     </div>
                   </v-tooltip>
-                </img>
               </div>
             </div>
             <div class="d-flex justify-space-between">
-              <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]">
-                <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'">
+              <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :key="tooth">
+                  <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
                   <v-tooltip
                     activator="parent"
                     location="bottom"
                     :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
                   >{{ getToothStatus(client.teeth[tooth].status) }}
-                    <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between">
+                    <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
                       <div>{{ evolution.description }}</div>
                       <div>{{ getDateTime(evolution.created_at) }}</div>
                     </div>
                   </v-tooltip>
-                </img>
               </div>
             </div>
           </div>
@@ -51,7 +49,7 @@
         Não há evoluções cadastradas!
       </div>
       <div class="d-flex flex-column ga-6">
-        <v-card v-for="evolution in client.evolutions">
+        <v-card v-for="evolution in client.evolutions" :key="evolution.id">
           <v-card-title>
             <div class="d-flex ga-2 align-baseline">
               <div class="d-flex ga-2 align-baseline">
@@ -109,12 +107,12 @@
           <v-card-text>
             <div class="d-flex flex-column ga-3 mb-3" v-if="descriptionAction === 'evolutions'">
               <div class="d-flex justify-space-between align-baseline">
-                <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]">
+                <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :key="tooth">
                   <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
                 </div>
               </div>
               <div class="d-flex justify-space-between">
-                <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]">
+                <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :key="tooth">
                   <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
                 </div>
               </div>
@@ -176,6 +174,7 @@
               :items-length="client.prescriptions.length"
               item-value="id"
             >
+              // eslint-disable-next-line vue/valid-v-slot
               <template #item.created_at="{ item }">
                 {{ getDateTime(item.created_at) }}
               </template>
@@ -239,7 +238,7 @@
               hide-delimiter-background
             >
               <v-carousel-item
-                v-for="image in client.images"
+                v-for="image in client.images" :key="image"
               >
                 <v-sheet
                   height="100%"
@@ -341,7 +340,7 @@
           </div>
         </v-card-title>
         <v-card-text v-if="client.prescriptions && client.prescriptions.length > 0" class="d-flex flex-column ga-3">
-          <div v-for="prescription in client.prescriptions" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none bg-surface">
+          <div v-for="prescription in client.prescriptions" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none bg-surface" :key="prescription.id">
             <div class="text-error">{{ getDateTime(prescription.created_at) }}</div>
             <div>{{prescription.title}}</div>
           </div>
@@ -368,7 +367,7 @@
             hide-delimiter-background
           >
             <v-carousel-item
-              v-for="image in client.images"
+              v-for="image in client.images" :key="image"
             >
               <v-sheet
                 height="100%"
@@ -382,7 +381,7 @@
             </v-carousel-item>
           </v-carousel>
           <div v-else>Não existem imagens cadastradas</div>
-          <v-btn v-if="client.images.length > 0" @click="imageDialog = true" variant="tonal" color="primary"class="text-none">Ver todas as imagens</v-btn>
+          <v-btn v-if="client.images.length > 0" @click="imageDialog = true" variant="tonal" color="primary" class="text-none">Ver todas as imagens</v-btn>
         </v-card-text>
       </v-card>
       <v-skeleton-loader
@@ -536,7 +535,6 @@
       updateToothStatus(tooth) {
         if (this.client.teeth[tooth].status < 3) {
           this.client.teeth[tooth].status = this.client.teeth[tooth].status + 1
-          console.log(this.client.teeth[tooth].status)
         } else {
           this.client.teeth[tooth].status = 0
         }

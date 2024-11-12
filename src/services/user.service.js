@@ -86,6 +86,9 @@ class UserService {
   deleteAppointment(id) {
     return axios.delete(API_URL + 'appointments/' + id, { headers: authHeader() })
   }
+  deleteGoogleAppointment(calendarId, id) {
+    return axios.delete(G_CALENDAR_API_URL + calendarId + '/events/' + id + '?key=' + G_CALENDAR_TOKEN)  
+  }
 }
 
 export default new UserService()

@@ -1,9 +1,9 @@
 <template>
-  <v-row class="pa-9">
+  <v-row class="pa-md-9">
     <v-col cols="12" md="8" class="d-flex flex-column ga-6">
       <v-card :loading="loading" title="Ultimos 30 dias">
         <v-card-text v-if="!loading" class="d-flex flex-column ga-1">
-          <div v-for="transaction in transactions.slice(0,3)">
+          <div v-for="transaction in transactions.slice(0,3)" :key="transaction.id">
             <div :class="transaction.type === 1 ? 'text-success' : 'text-error'">
               <v-icon>mdi-calendar-outline</v-icon> {{ getDate(transaction.date) }} - {{ transaction.type === 1 ? 'Entrada' : 'Saida' }} de R$ {{ transaction.amount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}
             </div>
@@ -51,9 +51,12 @@
       </v-card>
     </v-col>
     <v-col>
-      <v-card :loading="loading" title="Agenda do dia">
-        <v-card-text class="text-error">
-          <calendar :show-header="false"/>
+      <v-card :loading="loading">
+        <v-card-title>
+          <div class="text-h6">Agenda do dia</div>
+        </v-card-title>
+        <v-card-text>
+          <calendar :show-header="true"/>
         </v-card-text>
       </v-card>
     </v-col>
@@ -87,6 +90,7 @@
   )
 
   export default {
+    name: "HomePage",
     components: {
       Line,
       Calendar
@@ -120,7 +124,7 @@
       getFinancialResume() {
         let balance = 0
         let values = []
-        userService.getTransactions('page=1&itemsPerPage=10&sort=date&order=desc').then((response) => {
+        userService.getTransactions('page=1&itemsPerPage=10&sort=date&order=asc').then((response) => {
           this.transactions = response.data.list.data
           this.info.labels = response.data.list.data.map((transaction) => this.getDate(transaction.date))
           this.transactions.forEach((transaction) => {

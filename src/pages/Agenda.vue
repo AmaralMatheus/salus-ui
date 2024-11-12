@@ -2,6 +2,7 @@
 import Calendar from '../components/Calendar.vue';
 
 export default {
+  name: "DefaultAgenda",
 	components: {
       Calendar
 	},
@@ -9,9 +10,9 @@ export default {
 </script>
 
 <template>
-  <v-card title="Agenda" class="ma-9">
+  <v-card title="Agenda" class="ma-md-9">
     <v-card-text>
-      <Calendar :show-header="true"/>
+      <Calendar :show-header="false"/>
     </v-card-text>
   </v-card>
 </template>

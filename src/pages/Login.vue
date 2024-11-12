@@ -1,6 +1,6 @@
 <template>
-  <div class="d-flex">
-    <v-card class="pa-5 ma-auto w-25">
+  <div class="d-flex h-screen">
+    <v-card class="pa-5 ma-auto" width="350">
       <v-form @submit.prevent="handleLogin" v-model="valid" class="d-flex flex-column ga-3">
         <v-text-field
           variant="outlined"
@@ -57,7 +57,7 @@
 <script>
 
 export default {
-  name: "Login",
+  name: "LoginPage",
   data() {
     return {
       login: true,

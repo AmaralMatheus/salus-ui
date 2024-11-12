@@ -1,8 +1,9 @@
 <template>
   <v-layout>
-    <v-navigation-drawer class="bg-transparent" rail floating expand-on-hover v-if="currentUser">
+    <v-navigation-drawer mobile-breakpoint="md" class="bg-transparent" floating :width="expanded ? 250 : 55" v-if="currentUser">
       <v-list>
         <v-list-item
+          class="pa-2"
           @click="$router.push('/profile')"
           :prepend-avatar="currentUser.avatar ?? 'https://ui-avatars.com/api/?name='+currentUser.user_name.replaceAll(' ', '+') + '&background=random'"
           :title="currentUser.user_name"
@@ -14,6 +15,7 @@
         <v-list-item active-class="text-white bg-primary" value="clientes" :active="path ==='client'" @click="$router.push('/clientes')" prepend-icon="mdi-account-multiple-outline" title="Clientes"></v-list-item>
         <v-list-item active-class="text-white bg-primary" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')" prepend-icon="mdi-calendar-outline" title="Agenda"></v-list-item>
         <v-list-item active-class="text-white bg-primary" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')" prepend-icon="mdi-finance" title="Financeiro"></v-list-item>
+        <v-list-item @click="expanded = !expanded" :prepend-icon="!expanded ? 'mdi-arrow-right' : 'mdi-arrow-left'" title=""></v-list-item>
       </v-list>
       <template v-slot:append>
         <v-list density="compact" nav>
@@ -54,9 +56,13 @@
 
 <script>
 export default {
+  data() {
+    return {
+      expanded: false
+    }
+  },
   created() {
     localStorage.setItem('dark', this.$vuetify.theme.current.dark);
-    console.log(this.$vuetify.display.mobile)
   },
   computed: {
     currentUser() {

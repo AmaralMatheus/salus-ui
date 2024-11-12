@@ -56,9 +56,10 @@
             </v-text-field>
           </v-col>
           <v-col cols="12">
-            <div class="d-md-flex border">
+            <div class="d-sm-flex justify-space-around border">
               <v-date-picker
                 v-model="scheduleDate"
+                :rules="rules"
                 :loading="loading"
                 :disabled="loading"
                 label="Selecione a data"
@@ -66,6 +67,7 @@
               </v-date-picker>
               <v-time-picker
                 v-model="scheduleTime"
+                :rules="rules"
                 :loading="loading"
                 :disabled="loading"
                 title="Selecione o horário"
@@ -121,14 +123,13 @@
 
 <script>
   import userService from '../services/user.service'
-  import { VDateInput } from 'vuetify/labs/VDateInput'
   import { vMaska } from "maska/vue"
   import { format, parseISO, setHours, setMinutes } from 'date-fns'
   import { VTimePicker } from 'vuetify/labs/VTimePicker'
 
   export default {
+    name: 'ClientScheduler',
     components: {
-      VDateInput,
       VTimePicker
     },
     directives: { maska: vMaska },
@@ -140,8 +141,8 @@
       valid: false,
       users: [],
       user: null,
-      scheduleDate: new Date(),
-      scheduleTime: new Date(),
+      scheduleDate: null,
+      scheduleTime: null,
       description: '',
       type: 1,
       duration: 60,

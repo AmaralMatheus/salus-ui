@@ -1,6 +1,6 @@
 <template>
-  <div class="pa-9">
-    <v-card :loading="loadingInfo" class="ma-9" :title="!id ? 'Cadastrar cliente' : 'Editar Cliente'" :subtitle="client.name">
+  <div class="py-md-9">
+    <v-card :loading="loadingInfo" :title="!id ? 'Cadastrar cliente' : 'Editar Cliente'" :subtitle="client.name">
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
           <v-row>
@@ -178,8 +178,13 @@
       ],
       phoneRule: [
         value => {
-          if (value.length === 0) return true
-          if (value.length < 15) return 'Informe o telefone completo.'
+          if (value) {
+            if (value.length < 15) return 'Informe o telefone completo.'
+            if (value.length === 0) return true
+            return true
+          } else {
+            return true
+          }
         },
       ],
       dateRule: [

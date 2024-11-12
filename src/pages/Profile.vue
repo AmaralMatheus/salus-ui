@@ -1,6 +1,6 @@
 <template>
-  <div class="pa-9">
-    <v-card title="Meu perfil" :subtitle="currentUser.user_name + ' | ' + (currentUser.type === 1 ? 'Administrador' : 'Secretaria')" class="ma-9">
+  <div class="pa-md-9">
+    <v-card title="Meu perfil" :subtitle="currentUser.user_name + ' | ' + (currentUser.type === 1 ? 'Administrador' : 'Secretaria')">
       <v-card-text>
         <div v-if="currentUser.type === 1" class="d-flex flex-column ga-4 mb-4">
           <div class="d-flex ga-3">
