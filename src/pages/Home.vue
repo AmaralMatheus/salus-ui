@@ -5,7 +5,7 @@
         <v-card-text v-if="!loading" class="d-flex flex-column ga-1">
           <div v-for="transaction in transactions.slice(0,3)" :key="transaction.id">
             <div :class="transaction.type === 1 ? 'text-success' : 'text-error'">
-              <v-icon>mdi-calendar-outline</v-icon> {{ getDate(transaction.date) }} - {{ transaction.type === 1 ? 'Entrada' : 'Saida' }} de R$ {{ transaction.amount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}
+              <v-icon>mdi-calendar-outline</v-icon> {{ transaction.type === 1 ? 'Entrada' : 'Saida' }} de R$ {{ transaction.amount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}
             </div>
           </div>
         </v-card-text>
@@ -19,11 +19,11 @@
           ></v-skeleton-loader>
           </v-card-text>
       </v-card>
-      <v-card v-if="appointment && appointment.client" :loading="loading" title="Próximo cliente na agenda">
+      <v-card v-if="appointment && appointment.client" :loading="loading" title="Próximo cliente na agenda" class="next-appointment">
         <v-card-text class="d-flex flex-column ga-6" v-if="!loading">
           <div class="d-flex ga-6 align-center">
             <v-avatar color="surface-variant" size="57">
-              <v-img :src="appointment.client.avatar ?? 'https://cdn.vuetifyjs.com/images/profiles/marcus.jpg'" cover></v-img>
+              <v-img :src="appointment.client.avatar ?? 'https://ui-avatars.com/api/?name='+appointment.client.name.replaceAll(' ', '+') + '&background=random'" cover></v-img>
             </v-avatar>
             <div class="d-flex flex-column ga-2">
               <div class="d-flex ga-2 align-center">
@@ -36,11 +36,11 @@
               </div>
               <div class="d-flex ga-2 align-center">
                 <v-icon>mdi-phone-outline</v-icon>
-                <div>{{ appointment.client.phone }}</div>
+                <div>{{ appointment.client.phone ?? 'Nenhum telefone cadastrado'  }}</div>
               </div>
             </div>
           </div>
-          <v-btn color="primary" class="ml-auto" @click="view()">Ver Odontograma</v-btn>
+          <v-btn color="primary" class="ml-auto text-white" variant="tonal" @click="view()">Ver Odontograma</v-btn>
         </v-card-text>
         <v-card-text v-else>
           <v-skeleton-loader
@@ -171,5 +171,10 @@
 
 .sx__calendar-header {
   padding-top: 0 !important;
+}
+
+.next-appointment {
+  background: linear-gradient(134.56deg, #D6C3C3 -6.74%, #DBA5D5 105.74%);
+  color: white;
 }
 </style>

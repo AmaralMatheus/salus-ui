@@ -1,6 +1,25 @@
 <template>
+  <v-toolbar density="compact">
+    <v-app-bar-nav-icon><v-img src="/favicon.svg" cover></v-img></v-app-bar-nav-icon>
+
+    <v-toolbar-title>Dental Salus</v-toolbar-title>
+
+    <v-spacer></v-spacer>
+
+    <v-btn icon>
+      <v-icon>mdi-magnify</v-icon>
+    </v-btn>
+
+    <v-btn icon>
+      <v-icon>mdi-heart</v-icon>
+    </v-btn>
+
+    <v-btn icon>
+      <v-icon>mdi-dots-vertical</v-icon>
+    </v-btn>
+  </v-toolbar>
   <v-layout>
-    <v-navigation-drawer mobile-breakpoint="md" class="bg-transparent" floating :width="expanded ? 250 : 55" v-if="currentUser">
+    <v-navigation-drawer mobile-breakpoint="md" class="bg-transparent mt-10" floating :width="expanded ? 250 : 55" v-if="currentUser">
       <v-list>
         <v-list-item
           class="pa-2"
@@ -12,14 +31,14 @@
       </v-list>
       <v-list density="compact" nav>
         <v-list-item active-class="text-white bg-primary" value="home" :active="path === undefined" @click="$router.push('/home')" prepend-icon="mdi-home-outline" title="Home"></v-list-item>
-        <v-list-item active-class="text-white bg-primary" value="clientes" :active="path ==='client'" @click="$router.push('/clientes')" prepend-icon="mdi-account-multiple-outline" title="Clientes"></v-list-item>
+        <v-list-item active-class="text-white bg-primary" value="clientes" :active="path && path.toString().includes('client')" @click="$router.push('/clientes')" prepend-icon="mdi-account-multiple-outline" title="Clientes"></v-list-item>
         <v-list-item active-class="text-white bg-primary" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')" prepend-icon="mdi-calendar-outline" title="Agenda"></v-list-item>
         <v-list-item active-class="text-white bg-primary" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')" prepend-icon="mdi-finance" title="Financeiro"></v-list-item>
         <v-list-item @click="expanded = !expanded" :prepend-icon="!expanded ? 'mdi-arrow-right' : 'mdi-arrow-left'" title=""></v-list-item>
       </v-list>
       <template v-slot:append>
         <v-list density="compact" nav>
-          <v-list-item v-if="currentUser.type === 1" active-class="text-white bg-primary" value="ajustes" :active="path ==='user'" @click="$router.push('/ajustes')" prepend-icon="mdi-cog-outline" title="Configurações"></v-list-item>
+          <v-list-item v-if="currentUser.type === 1" active-class="text-white bg-primary" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')" prepend-icon="mdi-cog-outline" title="Configurações"></v-list-item>
           <v-list-item prepend-icon="mdi-exit-to-app" @click.prevent="logOut" title="Logout"></v-list-item>
         </v-list>
       </template>

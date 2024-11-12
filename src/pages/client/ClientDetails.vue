@@ -175,7 +175,7 @@
               item-value="id"
             >
               // eslint-disable-next-line vue/valid-v-slot
-              <template #item.created_at="{ item }">
+              <template v-slot:[`item.created_at`]="{ item }">
                 {{ getDateTime(item.created_at) }}
               </template>
             </v-data-table-server>
