@@ -51,7 +51,7 @@
       </v-card>
     </v-col>
     <v-col>
-      <v-card :loading="loading" style="height: calc(100vh - 208px) !important" class="overflow-y-scroll">
+      <v-card :loading="loading" style="height: calc(100vh - 228px) !important" class="overflow-y-scroll">
         <v-card-title>
           <div class="text-h6">Agenda do dia</div>
         </v-card-title>

@@ -103,7 +103,7 @@ export default {
         </v-col>
       </v-row>
     </v-card-title>
-    <v-card-text v-if="!list" style="height: calc(100vh - 260px) !important" class="overflow-y-scroll">
+    <v-card-text v-if="!list" style="height: calc(100vh - 300px) !important" class="overflow-y-scroll">
       <Calendar :show-header="false" :grid-height="1500"/>
     </v-card-text>
     <v-card-text v-else>
