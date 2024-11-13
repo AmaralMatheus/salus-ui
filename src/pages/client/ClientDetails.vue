@@ -313,7 +313,7 @@
               </div>
               <div class="d-flex ga-2 align-center">
                 <v-icon>mdi-alert-outline</v-icon>
-                <div>{{ client.comorbities ?? 'Nenhuma comorbidade' }}</div>
+                <div>{{ client.comorbities ?? 'Nenhum alerta de segurança de saúde' }}</div>
               </div>
               <div class="d-flex ga-2 align-center">
                 <v-icon>mdi-clock-outline</v-icon>

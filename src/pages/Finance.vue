@@ -33,10 +33,10 @@
                       placeholder="Buscar Transação">
                     </v-text-field>
                   </v-col>
-                  <v-col cols="7" sm="5" md="5" lg="4">
+                  <v-col cols="12" sm="5" md="5" lg="4">
                     <v-btn block append-icon="mdi-plus" @click="transactionDialog = true" class="py-1" color="primary">Adicionar Transação</v-btn>
                   </v-col>
-                  <v-col cols="5" sm="3" md="3" lg="3">
+                  <v-col cols="12" sm="3" md="3" lg="3">
                     <v-btn block append-icon="mdi-table" @click="dialog = true" class="py-1" color="primary">Exportar</v-btn>
                   </v-col>
                 </v-row>

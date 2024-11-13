@@ -4,7 +4,7 @@
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
           <v-row>
-            <v-col :cols="user.type === 1 ? 3 : 4">
+            <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
               <v-text-field
                 v-model="user.name"
                 :loading="loadingInfo"
@@ -16,7 +16,7 @@
                 label="Nome">
               </v-text-field>
             </v-col>
-            <v-col :cols="user.type === 1 ? 3 : 4">
+            <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
               <v-text-field
                 v-model="user.email"
                 :loading="loadingInfo"
@@ -27,7 +27,7 @@
                 label="E-mail">
               </v-text-field>
             </v-col>
-            <v-col :cols="user.type === 1 ? 3 : 4" v-if="user.type === 1">
+            <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4" v-if="user.type === 1">
               <v-text-field
                 v-model="user.cro"
                 :loading="loadingInfo"
@@ -38,7 +38,7 @@
                 label="CRO">
               </v-text-field>
             </v-col>
-            <v-col :cols="user.type === 1 ? 3 : 4">
+            <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
               <v-select
               :items="[
                   {label: 'Administrador', id: 1},

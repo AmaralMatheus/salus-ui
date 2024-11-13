@@ -1,7 +1,7 @@
 <template>
   <v-toolbar density="compact" class="bg-transparent" v-if="currentUser">
     <v-app-bar-nav-icon><img width="20" src="/favicon.svg" /></v-app-bar-nav-icon>
-    <v-toolbar-title>Dental Salus</v-toolbar-title>
+    <v-toolbar-title class="d-md-block">Dental Salus</v-toolbar-title>
     <v-spacer></v-spacer>
     <div class="d-flex ml-auto ga-3 mr-10">
       <div class="text-h6">Olá, {{ currentUser.user_name }}</div>
@@ -34,27 +34,15 @@
         </v-list>
       </template>
     </v-navigation-drawer>
-    <v-bottom-navigation color="primary" v-if="currentUser" class="d-md-none pa-2">
-      <v-btn @click="$router.push('/profile')" class="ml-10">
-        <v-avatar color="surface-variant ma-auto" size="30">
-          <v-img :src="currentUser.avatar ?? 'https://ui-avatars.com/api/?name='+currentUser.user_name.replaceAll(' ', '+') + '&background=random'" cover></v-img>
-        </v-avatar>
-      </v-btn>
-      <v-btn :class="path === undefined ? 'bg-primary text-white' : ''" class="rounded-lg" @click="$router.push('/home')">
-        <v-icon>mdi-home-outline</v-icon>
-      </v-btn>
-      <v-btn :class="path === 'client' ? 'bg-primary text-white' : ''" class="rounded-lg" @click="$router.push('/clientes')">
-        <v-icon>mdi-account-multiple-outline</v-icon>
-      </v-btn>
-      <v-btn :class="path === 'agenda' ? 'bg-primary text-white' : ''" class="rounded-lg" @click="$router.push('/agenda')">
-        <v-icon>mdi-calendar-outline</v-icon>
-      </v-btn>
-      <v-btn :class="path === 'financeiro' ? 'bg-primary text-white' : ''" class="rounded-lg" @click="$router.push('/financeiro')">
-        <v-icon>mdi-finance</v-icon>
-      </v-btn>
-      <v-btn @click="logOut" class="mr-9">
-        <v-icon>mdi-exit-to-app</v-icon>
-      </v-btn>
+    <v-bottom-navigation color="primary" v-if="currentUser" class="d-md-none align-center">
+      <div class="d-flex justify-space-between ga-3">
+        <v-icon :class="path === undefined ? 'bg-primary text-white' : ''" class="pa-5 rounded-lg" @click="$router.push('/home')">mdi-home-outline</v-icon>
+        <v-icon :class="path && path.toString().includes('client') ? 'bg-primary text-white' : ''" class="pa-5 rounded-lg" @click="$router.push('/clientes')">mdi-account-multiple-outline</v-icon>
+        <v-icon :class="path === 'agenda' ? 'bg-primary text-white' : ''" class="pa-5 rounded-lg" @click="$router.push('/agenda')">mdi-calendar-outline</v-icon>
+        <v-icon :class="path === 'financeiro' ? 'bg-primary text-white' : ''" class="pa-5 rounded-lg" @click="$router.push('/financeiro')">mdi-finance</v-icon>
+        <v-icon :class="path && path.toString().includes('user') ? 'bg-primary text-white' : ''" class="pa-5 rounded-lg" @click="$router.push('/ajustes')" v-if="currentUser.type === 1">mdi-cog-outline</v-icon>
+        <v-icon class="pa-5" @click="logOut">mdi-exit-to-app</v-icon>
+      </div>
     </v-bottom-navigation>
     <v-main>
       <v-container max-width="1500">
