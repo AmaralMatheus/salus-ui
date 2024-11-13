@@ -8,9 +8,11 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@schedule-x/event-modal": "^2.5.0",
     "@schedule-x/events-service": "^2.4.1",
     "@schedule-x/theme-default": "^2.4.0",
     "@schedule-x/vue": "^2.3.0",
+    "@vueup/vue-quill": "^1.2.0",
     "chart.js": "^4.4.6",
     "core-js": "^3.8.3",
     "date-fns": "^4.1.0",

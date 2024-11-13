@@ -2,12 +2,12 @@
   <v-form @submit.prevent="schedule" v-model="valid" >
     <v-card
       prepend-icon="mdi-calendar-edit-outline"
-      :text="getName(type) + ' para ' + client.name"
+      :subtitle="client ? getName(type) + ' para ' + client.name : customClient ? getName(type) + ' para ' + clients.filter((client) => customClient === client.id)[0].name : ''"
       title="Novo agendamento"
     >
     <v-card-text>
         <v-row>
-          <v-col cols="12" :md="currentUser.type === 1 ? '6' : '4'">
+          <v-col cols="12" :md="currentUser.type === 1 && client ? '6' : currentUser.type === 1 && !client ? '4' : '3'">
             <v-select
               :items="[
                 {label: 'Consulta', id: 1},
@@ -26,7 +26,7 @@
               label="Tipo de agendamento"
             ></v-select>
           </v-col>
-          <v-col cols="12" md="4" v-if="currentUser.type !== 1">
+          <v-col cols="12" :md="client  ? '6' : '3'" v-if="currentUser.type !== 1">
             <v-select
               :items="users"
               item-title="name"
@@ -41,7 +41,22 @@
               label="Doutor"
             ></v-select>
           </v-col>
-          <v-col cols="12" :md="currentUser.type === 1 ? '6' : '4'">
+          <v-col cols="12" :md="currentUser.type === 1 && client ? '6' : currentUser.type === 1 && !client ? '4' : '3'" v-if="!client">
+            <v-select
+              :items="clients"
+              item-title="name"
+              item-value="id"
+              hide-details="auto"
+              v-model="customClient"
+              :loading="loading"
+              :disabled="loading"
+              :rules="rules"
+              variant="outlined"
+              density="compact"
+              label="Cliente"
+            ></v-select>
+          </v-col>
+          <v-col cols="12" :md="currentUser.type === 1 && client ? '6' : currentUser.type === 1 && !client ? '4' : '3'">
             <v-text-field
               v-model="duration"
               :rules="rules"
@@ -70,6 +85,7 @@
                 :rules="rules"
                 :loading="loading"
                 :disabled="loading"
+                format="24hr"
                 title="Selecione o horário"
               >
               </v-time-picker>
@@ -80,6 +96,7 @@
               v-model="description"
               :loading="loading"
               :disabled="loading"
+              hide-details="auto"
               variant="outlined"
               density="compact"
               label="Descrição">
@@ -141,6 +158,8 @@
       valid: false,
       users: [],
       user: null,
+      clients: [],
+      customClient: null,
       scheduleDate: null,
       scheduleTime: null,
       description: '',
@@ -165,6 +184,9 @@
       userService.getAllUsers().then((response) => {
         this.users = response.data
       })
+      userService.getAllClients().then((response) => {
+        this.clients = response.data
+      })
     },
     methods: {
       schedule () {
@@ -173,8 +195,8 @@
           this.scheduleDate = setHours(this.scheduleDate,this.scheduleTime.split(':')[0])
           this.scheduleDate = setMinutes(this.scheduleDate,this.scheduleTime.split(':')[1])
           const data = {
-            client_id: this.client.id,
-            user_id: this.user ? this.user.id : null,
+            client_id: this.customClient ?? this.client.id,
+            user_id: this.user,
             date: this.scheduleDate.toISOString(),
             description: this.description,
             type: this.type,
@@ -217,7 +239,7 @@
   padding-top:16px !important;
 }
 
-.v-time-picker-controls__time__btn.v-btn--density-default.v-btn.v-time-picker-controls__time--with-ampm__btn {
+.v-time-picker-controls__time__btn.v-btn--density-default.v-btn {
   height: 80px !important;
 }
 </style>

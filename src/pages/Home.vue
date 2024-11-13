@@ -51,12 +51,12 @@
       </v-card>
     </v-col>
     <v-col>
-      <v-card :loading="loading">
+      <v-card :loading="loading" style="height: calc(100vh - 208px) !important" class="overflow-y-scroll">
         <v-card-title>
           <div class="text-h6">Agenda do dia</div>
         </v-card-title>
         <v-card-text>
-          <calendar :show-header="true"/>
+          <calendar :show-header="true" :grid-height="1300"/>
         </v-card-text>
       </v-card>
     </v-col>

@@ -33,6 +33,7 @@
           :search="search"
           item-value="name"
           @update:options="loadItems"
+          @click:row="viewRow"
         >
           <template v-slot:[`item.avatar`]="{ item }">
             <v-avatar color="surface-variant ma-auto" size="30">
@@ -46,12 +47,19 @@
             {{ item.next_appointment.length > 0 ? getDateTime(item.next_appointment[0].date) : 'Sem consultas cadastradas' }}
           </template>
           <template v-slot:[`item.actions`]="{ item }">
-            <div class="d-flex ga-3">
-              <v-icon :disabled="loading" class="ml-auto" color="info" @click="selectedItem = item; schedulerDialog = true">mdi-calendar-edit-outline</v-icon>
-              <v-icon :disabled="loading" color="info" v-if="currentUser.type === 1" @click="view(item)">mdi-eye</v-icon>
-              <v-icon :disabled="loading" color="warning" @click="update(item)">mdi-pencil</v-icon>
-              <v-icon :disabled="loading" color="error" @click="selectedItem = item; dialog = true">mdi-delete</v-icon>
-            </div>
+            <v-menu>
+              <template v-slot:activator="{ props }">
+                <v-icon :disabled="loading" v-bind="props">mdi-dots-vertical</v-icon>
+              </template>
+        
+              <v-list>
+                <v-list-item prepend-icon="mdi-whatsapp" density="comfortable" target="_blank" :disabled="!item.phone" :href="'https://wa.me/' + (!!item.phone ? item.phone.replaceAll('(','').replaceAll(')','').replaceAll('-','').replaceAll(' ','') : '')" title="Enviar Mensagem"></v-list-item>
+                <v-list-item prepend-icon="mdi-calendar-edit-outline" density="comfortable" @click="selectedItem = item; schedulerDialog = true" title="Agendar"></v-list-item>
+                <v-list-item prepend-icon="mdi-eye" density="comfortable" v-if="currentUser.type === 1" @click="view(item)" title="Visualizar"></v-list-item>
+                <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="update(item)" title="Editar"></v-list-item>
+                <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
+              </v-list>
+            </v-menu>
           </template>
           <template v-slot:[`item.status`]="{ item }">
             {{ getStatusType(item.status) }}
@@ -143,9 +151,9 @@
           sortable: true,
           key: 'name',
         },
-        { title: 'Ultima Consulta', key: 'last_appointment', align: 'end', sortable: true },
-        { title: 'Próxima Consulta', key: 'next_appointment', align: 'end', sortable: true },
-        { title: 'Status', key: 'status', align: 'end', sortable: true },
+        { title: 'Ultima Consulta', key: 'last_appointment', align: 'start', sortable: true },
+        { title: 'Próxima Consulta', key: 'next_appointment', align: 'start', sortable: true },
+        { title: 'Status', key: 'status', align: 'start', sortable: true },
         { title: '', key: 'actions', align: 'end', sortable: true },
       ],
       rules: [
@@ -184,6 +192,12 @@
         this.$router.push({
           name: 'client-details',
           params: { id: row.id }
+        })
+      },
+      viewRow (event, row) {
+        this.$router.push({
+          name: 'client-details',
+          params: { id: row.item.id }
         })
       },
       create () {

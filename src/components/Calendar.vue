@@ -13,12 +13,15 @@ import { createEventsServicePlugin } from '@schedule-x/events-service'
 import { format, parseISO, add } from "date-fns"
 import { ref, defineProps, defineComponent } from 'vue'
 import { auth } from '../store/auth.module'
+import { createEventModalPlugin } from '@schedule-x/event-modal'
 
 defineComponent({
   name: 'CalendarComponent'
 })
 
-const props = defineProps({ showHeader: Boolean })
+const eventModal = createEventModalPlugin()
+
+const props = defineProps({ showHeader: Boolean, gridHeight: Number })
 props
 const dialog = ref(false)
 const snackbar = ref(false)
@@ -33,11 +36,39 @@ const eventsServicePlugin = createEventsServicePlugin()
 const calendarApp = createCalendar(
   {
     locale: 'pt-BR',
+    calendars: {
+      salus: {
+        colorName: 'personal',
+        lightColors: {
+          main: '#C62424',
+          container: '#eeeeee',
+          onContainer: '#111111',
+        },
+        darkColors: {
+          main: '#C62424',
+          onContainer: '#ffdee6',
+          container: '#a24258',
+        },
+      },
+      google: {
+        colorName: 'work',
+        lightColors: {
+          main: '#2196F3',
+          container: '#eeeeee',
+          onContainer: '#111111',
+        },
+        darkColors: {
+          main: '#2196F3',
+          onContainer: '#fff5de',
+          container: '#a29742',
+        },
+      },
+    },
     weekOptions: {
       /**
       * The total height in px of the week grid (week- and day views)
       * */
-      gridHeight: 1500,
+      gridHeight: props.gridHeight,
 
       /**
       * The number of days to display in week view
@@ -49,6 +80,8 @@ const calendarApp = createCalendar(
       * Defaults to 100, but can be used to leave a small margin to the right of the event
       */
       eventWidth: 100,
+      
+      isResponsive: true,
 
       /**
       * Intl.DateTimeFormatOptions used to format the hour labels on the time axis
@@ -65,7 +98,7 @@ const calendarApp = createCalendar(
     isDark: false,
     events: []
   },
-  [eventsServicePlugin]
+  [eventsServicePlugin, eventModal]
 )
 
 function getName(type) {
@@ -130,7 +163,8 @@ function load() {
         end: format(add(parseISO(event.date), {
           minutes: event.duration,
         }), 'yyyy-MM-dd kk:mm'),
-        id: event.id
+        id: event.id,
+        calendarId: "salus"
       })
     })
   })
@@ -141,10 +175,11 @@ function load() {
         if (event.start && event.end) {
           calendarApp.eventsService.add({
             title: 'Agendamento Google',
-            people: event.attendees ? event.attendees.map((people) => people.email) : 'Sem pacientes vinculadas',
+            people: event.attendees ? event.attendees.map((people) => people.email) : ['Sem pacientes vinculados'],
             start: format(parseISO(event.start.dateTime), 'yyyy-MM-dd kk:mm'),
             end: format(parseISO(event.end.dateTime), 'yyyy-MM-dd kk:mm'),
-            id: event.id
+            id: event.id,
+            calendarId: "google"
           })
         }
       })
@@ -153,29 +188,13 @@ function load() {
 }
 
 load()
+
+eventModal.close(); // close the modal
 </script>
 
 <template>
   <ScheduleXCalendar :calendar-app="calendarApp">
     <template v-if="showHeader" #headerContent="{ }">
-    </template>
-    <template #timeGridEvent="{ calendarEvent }">
-      <div :class="calendarEvent.title !== 'Agendamento Google' ? 'border-red ' : 'border-info'" class="d-flex h-fill pa-1 justify-space-between border-t-lg text-truncate">
-        <div>
-          {{ calendarEvent.title }}
-          <div class="d-flex ga-2 mt-1 align-center">
-            <v-icon>mdi-clock-outline</v-icon>
-            <div>{{ format(parseISO(calendarEvent.start), 'dd/MM/yyyy kk:mm') }}</div>
-          </div>
-          <div class="d-flex ga-2 align-center">
-            <v-icon>mdi-account-outline</v-icon>
-            <div>{{ calendarEvent.people.toString() }}</div>
-          </div>
-        </div>
-        <div class="d-flex ga-1 h-auto">
-          <v-btn size="small" density="compact" icon="mdi-delete" @click="dialog = true; selectedEvent = calendarEvent" color="error" variant="text"/>
-        </div>
-      </div>
     </template>
   </ScheduleXCalendar>
   <v-dialog
@@ -252,5 +271,17 @@ load()
 
 .sx__week-grid__date-number {
   color: white !important;
+}
+
+.sx__event {
+  transition: ease-in-out .3s;
+}
+
+.sx__event:has(.event:hover) {
+  height: fit-content !important;
+}
+
+.sx__event-modal.is-open {
+  overflow: hidden;
 }
 </style>

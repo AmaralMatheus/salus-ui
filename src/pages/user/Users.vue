@@ -53,12 +53,19 @@
             :search="search"
             item-value="name"
             @update:options="loadItems"
+            @click:row="viewRow"
           >
             <template v-slot:[`item.actions`]="{ item }">
-              <div class="d-flex ga-3">
-                <v-icon :disabled="loading" color="warning" @click="update(item)">mdi-pencil</v-icon>
-                <v-icon :disabled="loading" color="error" @click="selectedItem = item; dialog = true">mdi-delete</v-icon>
-              </div>
+              <v-menu>
+                <template v-slot:activator="{ props }">
+                  <v-icon :disabled="loading" v-bind="props">mdi-dots-vertical</v-icon>
+                </template>
+          
+                <v-list>
+                  <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="update(item)" title="Editar"></v-list-item>
+                  <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
+                </v-list>
+              </v-menu>
             </template>
           </v-data-table-server>
         </v-card>
@@ -133,7 +140,7 @@
             sortable: true,
             key: 'name',
           },
-          { title: 'E-mail', key: 'email', align: 'end', sortable: true },
+          { title: 'E-mail', key: 'email', align: 'start', sortable: true },
           { title: '', key: 'actions', align: 'end', sortable: true },
         ],
         rules: [
@@ -166,8 +173,15 @@
         },
         view (row) {
           this.$router.push({
-            name: 'user-details',
+            name: 'user-register',
             params: { id: row.id }
+          })
+        },
+        viewRow (event, row) {
+          console.log(row)
+          this.$router.push({
+            name: 'user-register',
+            params: { id: row.item.id }
           })
         },
         create () {

@@ -1,35 +1,27 @@
 <template>
-  <v-toolbar density="compact">
-    <v-app-bar-nav-icon><v-img src="/favicon.svg" cover></v-img></v-app-bar-nav-icon>
-
+  <v-toolbar density="compact" class="bg-transparent" v-if="currentUser">
+    <v-app-bar-nav-icon><img width="20" src="/favicon.svg" /></v-app-bar-nav-icon>
     <v-toolbar-title>Dental Salus</v-toolbar-title>
-
     <v-spacer></v-spacer>
-
-    <v-btn icon>
-      <v-icon>mdi-magnify</v-icon>
-    </v-btn>
-
-    <v-btn icon>
-      <v-icon>mdi-heart</v-icon>
-    </v-btn>
-
-    <v-btn icon>
-      <v-icon>mdi-dots-vertical</v-icon>
-    </v-btn>
+    <div class="d-flex ml-auto ga-3 mr-10">
+      <div class="text-h6">Olá, {{ currentUser.user_name }}</div>
+      <v-menu>
+        <template v-slot:activator="{ props }">
+          <v-avatar color="surface-variant" size="30" v-bind="props">
+            <v-img :src="currentUser.avatar ?? 'https://ui-avatars.com/api/?name='+currentUser.user_name.replaceAll(' ', '+') + '&background=random'" cover></v-img>
+          </v-avatar>
+        </template>
+  
+        <v-list>
+          <v-list-item prepend-icon="mdi-account-outline" density="comfortable" @click.prevent="$router.push('/profile')" title="Perfil"></v-list-item>
+          <v-list-item prepend-icon="mdi-exit-to-app" density="comfortable" @click.prevent="logOut" title="Logout"></v-list-item>
+        </v-list>
+      </v-menu>
+    </div>
   </v-toolbar>
   <v-layout>
     <v-navigation-drawer mobile-breakpoint="md" class="bg-transparent mt-10" floating :width="expanded ? 250 : 55" v-if="currentUser">
-      <v-list>
-        <v-list-item
-          class="pa-2"
-          @click="$router.push('/profile')"
-          :prepend-avatar="currentUser.avatar ?? 'https://ui-avatars.com/api/?name='+currentUser.user_name.replaceAll(' ', '+') + '&background=random'"
-          :title="currentUser.user_name"
-          :subtitle="currentUser.email"
-        ></v-list-item>
-      </v-list>
-      <v-list density="compact" nav>
+      <v-list density="compact" class="mt-3" nav>
         <v-list-item active-class="text-white bg-primary" value="home" :active="path === undefined" @click="$router.push('/home')" prepend-icon="mdi-home-outline" title="Home"></v-list-item>
         <v-list-item active-class="text-white bg-primary" value="clientes" :active="path && path.toString().includes('client')" @click="$router.push('/clientes')" prepend-icon="mdi-account-multiple-outline" title="Clientes"></v-list-item>
         <v-list-item active-class="text-white bg-primary" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')" prepend-icon="mdi-calendar-outline" title="Agenda"></v-list-item>
@@ -37,9 +29,8 @@
         <v-list-item @click="expanded = !expanded" :prepend-icon="!expanded ? 'mdi-arrow-right' : 'mdi-arrow-left'" title=""></v-list-item>
       </v-list>
       <template v-slot:append>
-        <v-list density="compact" nav>
+        <v-list density="compact" class="mb-10" nav>
           <v-list-item v-if="currentUser.type === 1" active-class="text-white bg-primary" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')" prepend-icon="mdi-cog-outline" title="Configurações"></v-list-item>
-          <v-list-item prepend-icon="mdi-exit-to-app" @click.prevent="logOut" title="Logout"></v-list-item>
         </v-list>
       </template>
     </v-navigation-drawer>
@@ -65,8 +56,8 @@
         <v-icon>mdi-exit-to-app</v-icon>
       </v-btn>
     </v-bottom-navigation>
-    <v-main class="bg-app h-screen overflow-y-scroll">
-      <v-container max-width="1200">
+    <v-main>
+      <v-container max-width="1500">
         <router-view />
       </v-container>
     </v-main>

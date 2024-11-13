@@ -114,7 +114,18 @@
                 variant="outlined"
                 density="compact"
                 hide-details="auto"
-                label="Comorbidades">
+                label="Alerta de Segurance de Saude">
+              </v-textarea>
+            </v-col>
+            <v-col cols="12">
+              <v-textarea
+                v-model="client.description"
+                :loading="loadingInfo"
+                :disabled="loadingInfo"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                label="Anaminese">
               </v-textarea>
             </v-col>
           </v-row>

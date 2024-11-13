@@ -1,11 +1,12 @@
 <template>
   <v-row class="pa-md-9">
     <v-col cols="12" sm="6" md="7" lg="8">
-      <v-card v-if="!loading" title="Odontograma">
+      <v-card v-if="!descriptionDialog && !loading" title="Odontograma">
         <v-card-text>
           <div class="d-flex flex-column ga-3">
             <div class="d-flex justify-space-between align-baseline">
-              <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :key="tooth">
+              <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
+                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
                   <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
                   <v-tooltip
                     activator="parent"
@@ -20,8 +21,9 @@
               </div>
             </div>
             <div class="d-flex justify-space-between">
-              <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :key="tooth">
+              <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
                   <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
+                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
                   <v-tooltip
                     activator="parent"
                     location="bottom"
@@ -37,35 +39,85 @@
           </div>
         </v-card-text>
       </v-card>
+      <v-card
+        v-else-if="descriptionDialog"
+        :title="'Adicionar ' +  (descriptionAction === 'evolutions' ? 'Evolução' : 'Receita')"
+      >
+        <v-card-text>
+          <div class="d-flex flex-column ga-3 mb-3" v-if="descriptionAction === 'evolutions'">
+            <div class="d-flex justify-space-between align-baseline">
+              <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
+                <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
+              </div>
+            </div>
+            <div class="d-flex justify-space-between">
+              <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
+                <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
+                <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+              </div>
+            </div>
+          </div>
+          <v-row dense>
+            <v-col cols="12">
+              <v-text-field
+                v-if="descriptionAction !== 'evolutions'"
+                label="Título"
+                required
+                :disabled="loading"
+                variant="outlined"
+                density="compact"
+                v-model="title"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <quill-editor style="height:200px" placeholder="Descrição" contentType="html" v-model:content="description" theme="snow"></quill-editor>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            text="Cancelar"
+            variant="plain"
+            @click="descriptionDialog = false; description = '', teeth = []"
+          ></v-btn>
+
+          <v-btn
+            color="primary"
+            text="Salvar"
+            variant="tonal"
+            :disabled="loading || description === ''"
+            :loading="loading"
+            @click="saveDescription"
+          ></v-btn>
+        </v-card-actions>
+      </v-card>
       <v-skeleton-loader
-        v-else
+        v-if="loading"
         class="mx-auto border"
         type="article"
       ></v-skeleton-loader>
       <div class="d-flex ma-6">
-        <v-btn v-if="!loading" @click="descriptionDialog = true; descriptionAction = 'evolutions'" class="ma-auto">Adicionar Evolução</v-btn>
+        <v-btn v-if="!loading && !descriptionDialog" @click="descriptionDialog = true; descriptionAction = 'evolutions'" class="ma-auto">Adicionar Evolução</v-btn>
       </div>
       <div v-if="client.evolutions && client.evolutions.length < 1" class="d-flex ma-auto" style="width: max-content">
         Não há evoluções cadastradas!
       </div>
-      <div class="d-flex flex-column ga-6">
+      <div v-if="!loading" class="d-flex flex-column ga-6">
         <v-card v-for="evolution in client.evolutions" :key="evolution.id">
-          <v-card-title>
-            <div class="d-flex ga-2 align-baseline">
+          <v-card-text>
+            <div class="mx-5" v-html="evolution.description"></div>
+            <v-divider class="my-3"/>
+            <div class="d-flex flex-column align-baseline">
               <div class="d-flex ga-2 align-baseline">
-                <h4 class="text-h6">Dr. {{evolution.user.name}}</h4>
-                <div class="text-subtitle-2">CRO 80123</div>
+                <div>Dr. {{evolution.user.name}}</div>
+                <div class="text-medium-emphasis">CRO 80123</div>
               </div>
-              <div class="ml-auto text-subtitle-2">
-                <div class="d-flex ga-2 align-center">
-                  <v-icon>mdi-calendar-outline</v-icon>
-                  <div>{{ getDateTime(evolution.created_at) }}</div>
-                </div>
+              <div class="text-medium-emphasis">
+                <div>{{ getDateTime(evolution.created_at) }}</div>
               </div>
             </div>
-          </v-card-title>
-          <v-card-text>
-            {{ evolution.description }}
           </v-card-text>
         </v-card>
       </div>
@@ -97,68 +149,6 @@
         </v-card>
       </v-dialog>
       <v-dialog
-        v-model="descriptionDialog"
-        max-width="600"
-      >
-        <v-card
-          prepend-icon="mdi-account"
-          :title="'Adicionar ' +  (descriptionAction === 'evolutions' ? 'Evolução' : 'Receita')"
-        >
-          <v-card-text>
-            <div class="d-flex flex-column ga-3 mb-3" v-if="descriptionAction === 'evolutions'">
-              <div class="d-flex justify-space-between align-baseline">
-                <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :key="tooth">
-                  <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
-                </div>
-              </div>
-              <div class="d-flex justify-space-between">
-                <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :key="tooth">
-                  <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
-                </div>
-              </div>
-            </div>
-            <v-row dense>
-              <v-col>
-                <v-text-field
-                  v-if="descriptionAction !== 'evolutions'"
-                  label="Título"
-                  required
-                  :disabled="loading"
-                  variant="outlined"
-                  density="compact"
-                  v-model="title"
-                ></v-text-field>
-                <v-textarea
-                  label="Descrição"
-                  required
-                  :disabled="loading"
-                  variant="outlined"
-                  density="compact"
-                  v-model="description"
-                ></v-textarea>
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              text="Cancelar"
-              variant="plain"
-              @click="descriptionDialog = false; description = ''"
-            ></v-btn>
-
-            <v-btn
-              color="primary"
-              text="Salvar"
-              variant="tonal"
-              :disabled="loading"
-              :loading="loading"
-              @click="saveDescription"
-            ></v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-dialog
         max-width="600"
         v-model="prescriptionDialog"
       >
@@ -174,7 +164,9 @@
               :items-length="client.prescriptions.length"
               item-value="id"
             >
-              // eslint-disable-next-line vue/valid-v-slot
+              <template v-slot:[`item.description`]="{ item }">
+                <div v-html="item.description"></div>
+              </template>
               <template v-slot:[`item.created_at`]="{ item }">
                 {{ getDateTime(item.created_at) }}
               </template>
@@ -404,6 +396,8 @@
   import userService from '../../services/user.service'
   import { format, parseISO, differenceInYears } from 'date-fns'
   import Scheduler from '../../components/Scheduler.vue'
+  import { QuillEditor } from '@vueup/vue-quill'
+  import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
   export default {
     computed: {
@@ -412,12 +406,14 @@
       },
     },
     components: {
-      Scheduler
+      Scheduler,
+      QuillEditor
     },
     data () {
       return {
         format,
         parseISO,
+        teethNumber: [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28,48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38],
         schedulerDialog: false,
         addImageDialog: false,
         title: '',

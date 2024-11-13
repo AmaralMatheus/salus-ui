@@ -161,7 +161,7 @@
                   </v-col>
                   <v-col cols="12" sm="6">
                     <v-date-input
-                      v-model="scheduleDate"
+                      v-model="transactionDate"
                       :rules="rules"
                       :loading="loading"
                       :disabled="loading"
@@ -210,14 +210,14 @@
                 class="ms-auto"
                 text="Cancelar"
                 :disabled="loading"
-                @click="transactionDialog = false; scheduleDate = null; description = ''; type = 1; amount = null; formattedValue = null; client = null"
+                @click="transactionDialog = false; transactionDate = new Date(); description = ''; type = null; amount = null; formattedValue = null; client = null"
                 ></v-btn>
                 <v-btn
                 text="Salvar"
                 color="primary"
                 :disabled="loading || !valid"
                 :loading="loading"
-                @click="addTransaction(); transactionDialog = false; scheduleDate = null; description = ''; type = 1; amount = null; formattedValue = null; client = null"
+                @click="addTransaction(); transactionDialog = false; transactionDate = new Date(); description = ''; type = null; amount = null; formattedValue = null; client = null"
                 ></v-btn>
               </template>
             </v-card>
@@ -288,10 +288,10 @@
       valid: false,
       clients: [],
       client: null,
-      scheduleDate: null,
+      transactionDate: new Date(),
       dialog: false,
       description: '',
-      type: 1,
+      type: null,
       method: 1,
       amount: 0.00,
       incoming: 0.00,
@@ -310,10 +310,10 @@
           sortable: true,
           key: 'type',
         },
-        { title: 'Valor', key: 'amount', align: 'end' },
-        { title: 'Data', key: 'date', align: 'end' },
-        { title: 'Forma de Pagamento', key: 'method', align: 'end' },
-        { title: 'Descrição', key: 'description', align: 'end' },
+        { title: 'Valor', key: 'amount', align: 'start' },
+        { title: 'Data', key: 'date', align: 'start' },
+        { title: 'Forma de Pagamento', key: 'method', align: 'start' },
+        { title: 'Descrição', key: 'description', align: 'start' },
       ],
       rules: [
         value => {
@@ -361,7 +361,7 @@
         if (this.valid) {
           this.loading = true
           const data = {
-            date: this.scheduleDate,
+            date: this.transactionDate,
             description: this.description,
             type: this.type,
             amount: this.amount,
