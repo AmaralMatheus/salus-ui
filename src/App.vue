@@ -22,7 +22,7 @@
   <v-layout>
     <v-navigation-drawer mobile-breakpoint="md" class="bg-transparent" floating :width="expanded ? 250 : 55" v-if="currentUser">
       <v-list density="compact" nav>
-        <v-list-item @click="$router.push('/home')">    
+        <v-list-item value="" @click="$router.push('/home')">    
           <v-app-bar-nav-icon><img width="20" src="/favicon.svg" /></v-app-bar-nav-icon>
         </v-list-item>
         <v-list-item active-class="text-white bg-primary" value="home" :active="path === undefined" @click="$router.push('/home')" prepend-icon="mdi-home-outline" title="Home"></v-list-item>

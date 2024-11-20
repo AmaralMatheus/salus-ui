@@ -154,7 +154,7 @@ function remove () {
 }
 
 function load() {
-  userService.getAppointments().then((response) => {
+  userService.getAllAppointments().then((response) => {
     response.data.forEach((event) => {
       calendarApp.eventsService.add({
         title: getName(event.type),
