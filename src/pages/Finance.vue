@@ -20,10 +20,10 @@
         <v-card>
           <v-card-title>
             <v-row class="mt-0">
-              <v-col cols="12" md="3" class="text-h6">Financeiro</v-col>
-              <v-col cols="12" md="9">
+              <v-col cols="12" md="3" lg="2" class="text-h6">Financeiro</v-col>
+              <v-col cols="12" md="9" lg="10">
                 <v-row>
-                  <v-col cols="12" sm="4" md="3" lg="3">
+                  <v-col cols="12" sm="2" md="3" lg="3">
                     <v-text-field
                       v-model="search"
                       variant="outlined"
@@ -33,7 +33,7 @@
                       placeholder="Buscar Transação">
                     </v-text-field>
                   </v-col>
-                  <v-col cols="12" sm="6" md="3" lg="3">
+                  <v-col cols="12" sm="2" md="3" lg="3">
                     <v-date-input
                       v-model="dateFilter"
                       multiple="range"
@@ -51,10 +51,10 @@
                       </template>
                     </v-date-input>
                   </v-col>
-                  <v-col cols="12" sm="5" md="3" lg="3">
+                  <v-col cols="12" sm="5" md="3" lg="4">
                     <v-btn block append-icon="mdi-plus" @click="transactionDialog = true" class="py-1" color="primary">Adicionar Transação</v-btn>
                   </v-col>
-                  <v-col cols="12" sm="3" md="3" lg="3">
+                  <v-col cols="12" sm="3" md="3" lg="2">
                     <v-btn block append-icon="mdi-table" @click="dialog = true" class="py-1" color="primary">Exportar</v-btn>
                   </v-col>
                 </v-row>
