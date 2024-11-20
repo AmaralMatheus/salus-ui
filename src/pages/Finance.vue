@@ -23,7 +23,7 @@
               <v-col cols="12" md="3" class="text-h6">Financeiro</v-col>
               <v-col cols="12" md="9">
                 <v-row>
-                  <v-col cols="12" sm="4" md="4" lg="5">
+                  <v-col cols="12" sm="4" md="3" lg="3">
                     <v-text-field
                       v-model="search"
                       variant="outlined"
@@ -33,7 +33,25 @@
                       placeholder="Buscar Transação">
                     </v-text-field>
                   </v-col>
-                  <v-col cols="12" sm="5" md="5" lg="4">
+                  <v-col cols="12" sm="6" md="3" lg="3">
+                    <v-date-input
+                      v-model="dateFilter"
+                      multiple="range"
+                      hide-details="auto"
+                      variant="outlined"
+                      density="compact"
+                      prepend-icon=""
+                      v-maska="'##/##/####'"
+                      append-inner-icon="$calendar"
+                      label="Selecione a data"
+                      clearable
+                    >
+                      <template #dateIcon>
+                        <v-icon>mdi mdi-calendar-outline</v-icon>
+                      </template>
+                    </v-date-input>
+                  </v-col>
+                  <v-col cols="12" sm="5" md="3" lg="3">
                     <v-btn block append-icon="mdi-plus" @click="transactionDialog = true" class="py-1" color="primary">Adicionar Transação</v-btn>
                   </v-col>
                   <v-col cols="12" sm="3" md="3" lg="3">
@@ -285,6 +303,7 @@
     data: () => ({
       format,
       parseISO,
+      dateFilter: [],
       valid: false,
       clients: [],
       client: null,
@@ -335,6 +354,11 @@
         return this.$store.state.auth.user
       },
     },
+    watch: {
+      dateFilter() {
+        this.loadItems ({ page:1, itemsPerPage: 10, sortBy: []})
+      }
+    },
     methods: {
       setAmount(value) {
         const formatValue = value.replaceAll('R$ ', '').replaceAll('.', '').replaceAll(',', '')
@@ -348,7 +372,9 @@
             key: 'id'
           })
         }
-        userService.getTransactions(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
+
+        const dates = this.dateFilter.map((date) => date.toISOString())
+        userService.getTransactions(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}` + (this.dateFilter.length > 0 ? `&search=${this.search}&startDate=${dates[0]}&finishDate=${dates[dates.length-1]}` : '')).then((response) => {
           this.serverItems = response.data.list.data
           this.totalItems = response.data.list.total
           this.incoming = response.data.incoming
