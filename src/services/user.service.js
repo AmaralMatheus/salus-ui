@@ -56,6 +56,9 @@ class UserService {
   getAppointments() {
     return axios.get(API_URL + 'appointments', { headers: authHeader() })
   }
+  getAllAppointments() {
+    return axios.get(API_URL + 'appointments/all', { headers: authHeader() })
+  }
   saveDescription(data, action) {
     return axios.post(API_URL + action, data, { headers: authHeader() })
   }
@@ -73,6 +76,9 @@ class UserService {
   }
   schedule(data) {
     return axios.post(API_URL + 'appointments/', data, { headers: authHeader() })
+  }
+  updateSchedule(id, data) {
+    return axios.put(API_URL + 'appointments/' + id, data, { headers: authHeader() })
   }
   getNextAppointment() {
     return axios.get(API_URL + 'appointments/next', { headers: authHeader() })

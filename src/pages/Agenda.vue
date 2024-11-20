@@ -43,6 +43,10 @@ export default {
     },
   },
   methods: {
+    update(item) {
+      this.selectedItem = item
+      this.schedulerDialog = true
+    },
     loadItems ({ page, itemsPerPage, sortBy }) {
       this.loading = true
       if (sortBy.length <= 1) {
@@ -52,8 +56,8 @@ export default {
         })
       }
       userService.getAppointments(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
-        this.serverItems = response.data
-        this.totalItems = response.data.length
+        this.serverItems = response.data.data
+        this.totalItems = response.data.total
         this.loading = false
       })
     },
@@ -92,11 +96,11 @@ export default {
         <v-col cols="12" sm="3" class="text-h6">Agenda</v-col>
         <v-col cols="12" sm="9">
           <v-row>
-            <v-col cols="12" sm="4" md="6"></v-col>
-            <v-col cols="12" sm="4" md="3">
+            <v-spacer/>
+            <v-col cols="6" sm="4" md="3">
               <v-btn block @click="list = !list" color="primary">Ver {{ !list ? 'Lista' : 'Agenda'}}</v-btn>
             </v-col>
-            <v-col cols="12" sm="4" md="3">
+            <v-col cols="6" sm="4" md="3">
               <v-btn block append-icon="mdi-plus" @click="schedulerDialog = true" color="primary">Agendar</v-btn>
             </v-col>
           </v-row>
@@ -175,7 +179,7 @@ export default {
     v-model="schedulerDialog"
     max-width="800"
   >
-    <scheduler @cancel="schedulerDialog = false" @reload="loadItems({page:1,
+    <scheduler @cancel="schedulerDialog = false; selectedItem = null" :event="selectedItem" :client="selectedItem ? selectedItem.client : null" @reload="loadItems({page:1,
       itemsPerPage: 10,
       sortBy: []})"/>
   </v-dialog>

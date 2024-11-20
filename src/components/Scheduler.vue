@@ -3,7 +3,7 @@
     <v-card
       prepend-icon="mdi-calendar-edit-outline"
       :subtitle="client ? getName(type) + ' para ' + client.name : customClient ? getName(type) + ' para ' + clients.filter((client) => customClient === client.id)[0].name : ''"
-      title="Novo agendamento"
+      :title="event ? 'Alterar agendamento' : 'Novo agendamento'"
     >
     <v-card-text>
         <v-row>
@@ -150,7 +150,7 @@
       VTimePicker
     },
     directives: { maska: vMaska },
-    props: {client: Object},
+    props: {client: Object, event: Object},
     emits: ['cancel', 'reload'],
     data: () => ({
       format,
@@ -181,6 +181,15 @@
       }
     },
     created() {
+      if (this.event) {
+        console.log(this.event)
+        this.scheduleDate = parseISO(this.event.date)
+        this.scheduleTime = parseISO(this.event.date)
+        this.user = this.event.user_id
+        this.type = this.event.type
+        this.duration = this.event.duration
+        this.description = this.event.description
+      }
       userService.getAllUsers().then((response) => {
         this.users = response.data
       })
@@ -202,20 +211,37 @@
             type: this.type,
             duration: this.duration,
           }
-          userService.schedule(data).then(() => {
-            this.$emit('reload')
-            this.$emit('cancel')
-          },
-            (error) => {
-              this.loading = false
-              this.snackbar = true
-              this.message =
-                (error.response &&
-                  error.response.data &&
-                  error.response.data.message) ||
-                error.message ||
-                error.toString()
-            })
+          if (this.event) {
+            userService.updateSchedule(this.event.id, data).then(() => {
+              this.$emit('reload')
+              this.$emit('cancel')
+            },
+              (error) => {
+                this.loading = false
+                this.snackbar = true
+                this.message =
+                  (error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString()
+              })
+          } else {
+            userService.schedule(data).then(() => {
+              this.$emit('reload')
+              this.$emit('cancel')
+            },
+              (error) => {
+                this.loading = false
+                this.snackbar = true
+                this.message =
+                  (error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString()
+              })
+          }
         }
       },
       getName(type) {

@@ -32,6 +32,7 @@
                 v-model="user.cro"
                 :loading="loadingInfo"
                 :disabled="loadingInfo"
+                :rules="rules"
                 variant="outlined"
                 density="compact"
                 hide-details="auto"

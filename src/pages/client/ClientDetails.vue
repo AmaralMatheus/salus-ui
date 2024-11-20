@@ -112,7 +112,7 @@
             <div class="d-flex flex-column align-baseline">
               <div class="d-flex ga-2 align-baseline">
                 <div>Dr. {{evolution.user.name}}</div>
-                <div class="text-medium-emphasis">CRO 80123</div>
+                <div class="text-medium-emphasis">CRO {{ evolution.user.cro }}</div>
               </div>
               <div class="text-medium-emphasis">
                 <div>{{ getDateTime(evolution.created_at) }}</div>
