@@ -1,5 +1,5 @@
 <template>
-  <v-row class="pa-md-9">
+  <v-row>
     <v-col cols="12">
       <v-card>
         <v-card-title>
@@ -35,10 +35,11 @@
           @update:options="loadItems"
           @click:row="viewRow"
         >
-          <template v-slot:[`item.avatar`]="{ item }">
-            <v-avatar color="surface-variant ma-auto" size="30">
+          <template v-slot:[`item.name`]="{ item }">
+            <v-avatar color="surface-variant mr-3" size="30">
               <v-img :src="item.avatar ?? 'https://ui-avatars.com/api/?name='+item.name.replaceAll(' ', '+') + '&background=random'" cover></v-img>
             </v-avatar>
+            {{ item.name }}
           </template>
           <template v-slot:[`item.last_appointment`]="{ item }">
             {{ item.last_appointment.length > 0 ? getDateTime(item.last_appointment[0].date) : 'Sem consultas cadastradas' }}
@@ -139,12 +140,6 @@
       selectedItem: null,
       search: '',
       headers: [
-        {
-          title: '',
-          align: 'start',
-          sortable: true,
-          key: 'avatar',
-        },
         {
           title: 'Nome Completo',
           align: 'start',

@@ -1,5 +1,5 @@
 <template>
-  <div class="pa-md-9">
+  <div >
     <v-row>
       <v-col cols="12" sm="4">
         <v-card title="Saldo">

@@ -1,85 +1,87 @@
 <template>
-  <div class="pa-md-9">
-    <v-card :loading="loadingInfo" :title="!id ? 'Cadastrar usuário' : 'Editar Usere'" :subtitle="user.name">
-      <v-card-text>
-        <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
-          <v-row>
-            <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
-              <v-text-field
-                v-model="user.name"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                :rules="rules"
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                label="Nome">
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
-              <v-text-field
-                v-model="user.email"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                label="E-mail">
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4" v-if="user.type === 1">
-              <v-text-field
-                v-model="user.cro"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                :rules="rules"
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                label="CRO">
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
-              <v-select
-              :items="[
-                  {label: 'Administrador', id: 1},
-                  {label: 'Secretaria', id: 2},
-                ]"
-                item-title="label"
-                item-value="id"
-                v-model="user.type"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                :rules="rules"
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                label="Tipo de acesso">
-              </v-select>
-            </v-col>
-          </v-row>
-          <div>
-            <v-btn type="submit" class="text-none" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">Salvar</v-btn>
-          </div>
-        </v-form>
-      </v-card-text>
-      <v-snackbar
-        v-model="snackbar"
-      >
-        {{ message }}
-        <template v-slot:actions>
-          <v-btn
-            color="red"
-            variant="text"
-            class="text-none"
-            @click="snackbar = false"
-          >
-            Fechar
-          </v-btn>
-        </template>
-      </v-snackbar>
-    </v-card>
-  </div>
+  <v-row>
+    <v-col>
+      <v-card :loading="loadingInfo" :title="!id ? 'Cadastrar usuário' : 'Editar Usere'" :subtitle="user.name">
+        <v-card-text>
+          <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
+            <v-row>
+              <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
+                <v-text-field
+                  v-model="user.name"
+                  :loading="loadingInfo"
+                  :disabled="loadingInfo"
+                  :rules="rules"
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  label="Nome">
+                </v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
+                <v-text-field
+                  v-model="user.email"
+                  :loading="loadingInfo"
+                  :disabled="loadingInfo"
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  label="E-mail">
+                </v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4" v-if="user.type === 1">
+                <v-text-field
+                  v-model="user.cro"
+                  :loading="loadingInfo"
+                  :disabled="loadingInfo"
+                  :rules="rules"
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  label="CRO">
+                </v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
+                <v-select
+                :items="[
+                    {label: 'Administrador', id: 1},
+                    {label: 'Secretaria', id: 2},
+                  ]"
+                  item-title="label"
+                  item-value="id"
+                  v-model="user.type"
+                  :loading="loadingInfo"
+                  :disabled="loadingInfo"
+                  :rules="rules"
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  label="Tipo de acesso">
+                </v-select>
+              </v-col>
+            </v-row>
+            <div>
+              <v-btn type="submit" class="text-none" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">Salvar</v-btn>
+            </div>
+          </v-form>
+        </v-card-text>
+        <v-snackbar
+          v-model="snackbar"
+        >
+          {{ message }}
+          <template v-slot:actions>
+            <v-btn
+              color="red"
+              variant="text"
+              class="text-none"
+              @click="snackbar = false"
+            >
+              Fechar
+            </v-btn>
+          </template>
+        </v-snackbar>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>
 
 <script>

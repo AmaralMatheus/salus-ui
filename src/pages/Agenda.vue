@@ -90,64 +90,68 @@ export default {
 </script>
 
 <template>
-  <v-card class="ma-md-9">
-    <v-card-title>
-      <v-row class="mt-0">
-        <v-col cols="12" sm="3" class="text-h6">Agenda</v-col>
-        <v-col cols="12" sm="9">
-          <v-row>
-            <v-spacer/>
-            <v-col cols="6" sm="4" md="3">
-              <v-btn block @click="list = !list" color="primary">Ver {{ !list ? 'Lista' : 'Agenda'}}</v-btn>
-            </v-col>
-            <v-col cols="6" sm="4" md="3">
-              <v-btn block append-icon="mdi-plus" @click="schedulerDialog = true" color="primary">Agendar</v-btn>
+  <v-row>
+    <v-col>
+      <v-card>
+        <v-card-title>
+          <v-row class="mt-0">
+            <v-col cols="12" sm="3" class="text-h6">Agenda</v-col>
+            <v-col cols="12" sm="9">
+              <v-row>
+                <v-spacer/>
+                <v-col cols="6" sm="4" md="3">
+                  <v-btn block @click="list = !list" color="primary">Ver {{ !list ? 'Lista' : 'Agenda'}}</v-btn>
+                </v-col>
+                <v-col cols="6" sm="4" md="3">
+                  <v-btn block append-icon="mdi-plus" @click="schedulerDialog = true" color="primary">Agendar</v-btn>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
-        </v-col>
-      </v-row>
-    </v-card-title>
-    <v-card-text v-if="!list" style="height: calc(100vh - 300px) !important" class="overflow-y-scroll">
-      <Calendar :show-header="false" :grid-height="1500"/>
-    </v-card-text>
-    <v-card-text v-else>
-      <v-data-table-server
-        v-model:items-per-page="itemsPerPage"
-        :headers="headers"
-        :items="serverItems"
-        :items-length="totalItems"
-        :loading="loading"
-        :search="search"
-        item-value="name"
-        @update:options="loadItems"
-      >
-        <template v-slot:[`item.client.name`]="{ item }">
-          {{ item.client.name }}
-        </template>
-        <template v-slot:[`item.date`]="{ item }">
-          {{ getDateTime(item.date) }}
-        </template>
-        <template v-slot:[`item.duration`]="{ item }">
-          {{ item.duration }} Minutos
-        </template>
-        <template v-slot:[`item.actions`]="{ item }">
-          <v-menu>
-            <template v-slot:activator="{ props }">
-              <v-icon :disabled="loading" v-bind="props">mdi-dots-vertical</v-icon>
+        </v-card-title>
+        <v-card-text v-if="!list" style="height: calc(100vh - 300px) !important" class="overflow-y-scroll">
+          <Calendar :show-header="false" :grid-height="1500"/>
+        </v-card-text>
+        <v-card-text v-else>
+          <v-data-table-server
+            v-model:items-per-page="itemsPerPage"
+            :headers="headers"
+            :items="serverItems"
+            :items-length="totalItems"
+            :loading="loading"
+            :search="search"
+            item-value="name"
+            @update:options="loadItems"
+          >
+            <template v-slot:[`item.client.name`]="{ item }">
+              {{ item.client.name }}
             </template>
-      
-            <v-list>
-              <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="update(item)" title="Editar"></v-list-item>
-              <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
-            </v-list>
-          </v-menu>
-        </template>
-        <template v-slot:[`item.status`]="{ item }">
-          {{ getStatusType(item.status) }}
-        </template>
-      </v-data-table-server>
-    </v-card-text>
-  </v-card>
+            <template v-slot:[`item.date`]="{ item }">
+              {{ getDateTime(item.date) }}
+            </template>
+            <template v-slot:[`item.duration`]="{ item }">
+              {{ item.duration }} Minutos
+            </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <v-menu>
+                <template v-slot:activator="{ props }">
+                  <v-icon :disabled="loading" v-bind="props">mdi-dots-vertical</v-icon>
+                </template>
+          
+                <v-list>
+                  <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="update(item)" title="Editar"></v-list-item>
+                  <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
+                </v-list>
+              </v-menu>
+            </template>
+            <template v-slot:[`item.status`]="{ item }">
+              {{ getStatusType(item.status) }}
+            </template>
+          </v-data-table-server>
+        </v-card-text>
+      </v-card>
+    </v-col>
+  </v-row>
   <v-dialog
     v-model="dialog"
     width="auto"

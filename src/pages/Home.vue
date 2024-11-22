@@ -1,5 +1,5 @@
 <template>
-  <v-row class="pa-md-9">
+  <v-row>
     <v-col cols="12" md="8" class="d-flex flex-column ga-6">
       <v-card :loading="loading" title="Ultimos 30 dias">
         <v-card-text v-if="!loading" class="d-flex flex-column ga-1">

@@ -1,5 +1,5 @@
 <template>
-  <v-row class="pa-md-9">
+  <v-row>
     <v-col cols="12" sm="6" md="7" lg="8">
       <v-card v-if="!descriptionDialog && !loading" title="Odontograma">
         <v-card-text>
@@ -290,12 +290,12 @@
             <v-avatar color="surface-variant ma-auto" size="57">
               <v-img :src="client.avatar ?? 'https://ui-avatars.com/api/?name='+client.name.replaceAll(' ', '+') + '&background=random'" cover></v-img>
             </v-avatar>
-            <div class="d-flex flex-column ga-2">
-              <div class="d-flex ga-2 align-center">
+            <div class="d-flex flex-column profile-card ga-2">
+              <div class="d-flex ga-2 align-center" v-if="expanded">
                 <v-icon>mdi-gender-male-female-variant</v-icon>
                 <div>{{ client.gender === 1 ? 'Homem' : client.gender === 2 ? 'Mulher' : 'Gênero alternativo' }}</div>
               </div>
-              <div class="d-flex ga-2 align-center">
+              <div class="d-flex ga-2 align-center" v-if="expanded">
                 <v-icon>mdi-calendar-outline</v-icon>
                 <div>{{ client.birthday ? getBirthday(client.birthday) : 'Nenhum aniversário cadastrado' }} {{ client.birthday ? '(' + getAge() + ' Anos)' : '' }}</div>
               </div>
@@ -303,15 +303,15 @@
                 <v-icon>mdi-phone-outline</v-icon>
                 <div>{{ client.phone ?? 'Nenhum telefone cadastrado' }}</div>
               </div>
-              <div class="d-flex ga-2 align-center">
+              <div class="d-flex ga-2 align-center" v-if="expanded">
                 <v-icon>mdi-map-marker-outline</v-icon>
                 <div>{{ client.address ?? 'Nenhum endereço cadastrado' }}</div>
               </div>
-              <div class="d-flex ga-2 align-center">
+              <div class="d-flex ga-2 align-center" v-if="expanded">
                 <v-icon>mdi-email-outline</v-icon>
                 <div>{{ client.email ?? 'Nenhum e-mail cadastrado' }}</div>
               </div>
-              <div class="d-flex ga-2 align-center">
+              <div class="d-flex ga-2 align-center" v-if="expanded">
                 <v-icon>mdi-alert-outline</v-icon>
                 <div>{{ client.comorbities ?? 'Nenhum alerta de segurança de saúde' }}</div>
               </div>
@@ -319,6 +319,7 @@
                 <v-icon>mdi-clock-outline</v-icon>
                 <div>{{ client.next_appointment.length > 0 ? 'Próxima consulta dia ' + getDateTime(client.next_appointment[0].date) : 'Sem consultas agendadas' }}</div>
               </div>
+              <div @click="expanded = !expanded" class="cursor-pointer text-primary font-weight-bold">{{ !expanded ? 'Ver mais' : 'Ver menos' }}</div>
             </div>
           </div>
         </v-card-text>
@@ -413,6 +414,7 @@
       return {
         format,
         parseISO,
+        expanded: false,
         teethNumber: [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28,48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38],
         schedulerDialog: false,
         addImageDialog: false,
@@ -613,5 +615,9 @@
 
 .tooth-extracted {
   filter: invert(42%) sepia(90%) saturate(1952%) hue-rotate(320.4deg) brightness(89%) contrast(119%);
+}
+
+.profile-card {
+  transition: ease-in-out 0.2s !important;
 }
 </style>
