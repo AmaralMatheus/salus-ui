@@ -7,7 +7,7 @@
             <div class="d-flex justify-space-between align-baseline">
               <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
                   <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                  <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
+                  <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
                   <v-tooltip
                     activator="parent"
                     location="bottom"
@@ -22,7 +22,7 @@
             </div>
             <div class="d-flex justify-space-between">
               <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
-                  <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
+                  <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
                   <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
                   <v-tooltip
                     activator="parent"
@@ -41,19 +41,19 @@
       </v-card>
       <v-card
         v-else-if="descriptionDialog"
-        :title="'Adicionar ' +  (descriptionAction === 'evolutions' ? 'Evolução' : 'Receita')"
+        :title="'Adicionar ' +  (descriptionAction === 'evolutions' ? 'Evolução' : descriptionAction === 'plans' ? 'Plano' : 'Receita')"
       >
         <v-card-text>
           <div class="d-flex flex-column ga-3 mb-3" v-if="descriptionAction === 'evolutions'">
             <div class="d-flex justify-space-between align-baseline">
               <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
                 <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
+                <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
               </div>
             </div>
             <div class="d-flex justify-space-between">
               <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
-                <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="'https://lizard-clean-singularly.ngrok-free.app/assets/Vector-'+tooth+'.svg'"/>
+                <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
                 <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
               </div>
             </div>
@@ -98,8 +98,8 @@
         class="mx-auto border"
         type="article"
       ></v-skeleton-loader>
-      <div class="d-flex ma-6">
-        <v-btn v-if="!loading && !descriptionDialog" @click="descriptionDialog = true; descriptionAction = 'evolutions'" class="ma-auto">Adicionar Evolução</v-btn>
+      <div class="d-flex mt-6">
+        <v-btn v-if="!loading && !descriptionDialog" @click="descriptionDialog = true; descriptionAction = 'evolutions'" class="ma-auto mb-6">Adicionar Evolução</v-btn>
       </div>
       <div v-if="client.evolutions && client.evolutions.length < 1" class="d-flex ma-auto" style="width: max-content">
         Não há evoluções cadastradas!
@@ -178,6 +178,40 @@
               text="Fechar"
               variant="plain"
               @click="prescriptionDialog = false;"
+            ></v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog
+        max-width="600"
+        v-model="planDialog"
+      >
+        <v-card
+          prepend-icon="mdi-text"
+          title="Planos"
+        >
+          <v-card-text>
+            <v-data-table-server
+              v-model:items-per-page="itemsPerPage"
+              :headers="headers"
+              :items="client.plans"
+              :items-length="client.plans.length"
+              item-value="id"
+            >
+              <template v-slot:[`item.description`]="{ item }">
+                <div v-html="item.description"></div>
+              </template>
+              <template v-slot:[`item.created_at`]="{ item }">
+                {{ getDateTime(item.created_at) }}
+              </template>
+            </v-data-table-server>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              text="Fechar"
+              variant="plain"
+              @click="planDialog = false;"
             ></v-btn>
           </v-card-actions>
         </v-card>
@@ -344,6 +378,24 @@
         </v-card-text>
         <v-card-title>
           <div class="d-flex ga-2 align-center">
+            <h4 class="text-h6">Planos de Tratamento</h4>
+            <div class="d-flex ga-2 ml-auto">
+              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true;  descriptionAction = 'plans'" color="primary" variant="tonal"/>
+            </div>
+          </div>
+        </v-card-title>
+        <v-card-text v-if="client.plans && client.plans.length > 0" class="d-flex flex-column ga-3">
+          <div v-for="plan in client.plans" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none bg-surface" :key="plan.id">
+            <div class="text-error">{{ getDateTime(plan.created_at) }}</div>
+            <div>{{plan.name}}</div>
+          </div>
+          <v-btn @click="planDialog = true" variant="tonal" color="primary" class="text-none" >Ver todos os planos</v-btn>
+        </v-card-text>
+        <v-card-text v-else class="d-flex flex-column ga-3">
+          Não existem planos cadastradas!
+        </v-card-text>
+        <v-card-title>
+          <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Imagens</h4>
             <div class="d-flex ga-2 ml-auto">
               <v-btn size="small" icon="mdi-plus" @click="addImageDialog = true" color="primary" variant="tonal"/>
@@ -431,6 +483,7 @@
           },
           { title: 'Data', key: 'created_at', align: 'end' },
         ],
+        planDialog: false,
         prescriptionDialog: false,
         imageDialog: false,
         descriptionAction: '',
@@ -468,6 +521,7 @@
             response.data.birthday = new Date(response.data.birthday);
           }
           this.client = response.data
+          this.$store.dispatch('auth/updateEntityName', this.client.name)
           this.loading = false
         })
       },
@@ -500,6 +554,7 @@
           client_id: this.id,
           description: this.description,
           title: this.title,
+          name: this.title,
           teeth: this.teeth
         }
         userService.saveDescription(data, this.descriptionAction).then(() => {
@@ -531,7 +586,7 @@
         }
       },
       updateToothStatus(tooth) {
-        if (this.client.teeth[tooth].status < 3) {
+        if (this.client.teeth[tooth].status < 1) {
           this.client.teeth[tooth].status = this.client.teeth[tooth].status + 1
         } else {
           this.client.teeth[tooth].status = 0

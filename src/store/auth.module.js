@@ -2,7 +2,7 @@ import AuthService from '../services/auth.service'
 
 const user = JSON.parse(localStorage.getItem('user'))
 const initialState = user
-  ? { status: { loggedIn: true }, user }
+  ? { status: { loggedIn: true }, user, entityName: null }
   : { status: { loggedIn: false }, user: null }
 
 export const auth = {
@@ -42,6 +42,9 @@ export const auth = {
     },
     updateCalendar({ commit }, calendar) {
       commit('updateCalendar', calendar)
+    },
+    updateEntityName({ commit }, name) {
+      commit('setEntityName', name)
     }
   },
   mutations: {
@@ -70,6 +73,10 @@ export const auth = {
     updateCalendar(state, calendar) {
       state.user.calendar = calendar
       localStorage.setItem('user', JSON.stringify(state.user))
+    },
+    setEntityName(state, name) {
+      state.entityName = name
+      localStorage.setItem('name', JSON.stringify(state.entityName))  
     }
   }
 }

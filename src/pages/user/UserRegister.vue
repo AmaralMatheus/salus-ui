@@ -135,6 +135,7 @@
         userService.getUser(this.id).then((response) => {
           response.data.birthday = new Date(response.data.birthday);
           this.user = response.data
+          this.$store.dispatch('auth/updateEntityName', this.user.name)
           this.loadingInfo = false
         })
       },

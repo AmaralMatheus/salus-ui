@@ -32,14 +32,23 @@
         </div>
       </v-bottom-navigation>
       <v-main class="d-flex ga-5">
-        <v-list class="bg-transparent custom-navbar" density="compact" nav>
+        <v-list class="bg-transparent custom-navbar" density="compact" nav v-if="currentUser">
           <v-list-item active-class="text-white bg-primary" value="home" :active="path === undefined" @click="$router.push('/home')" prepend-icon="mdi-home-outline" title="Home"></v-list-item>
           <v-list-item active-class="text-white bg-primary" value="clientes" :active="path && path.toString().includes('client')" @click="$router.push('/clientes')" prepend-icon="mdi-account-multiple-outline" title="Clientes"></v-list-item>
           <v-list-item active-class="text-white bg-primary" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')" prepend-icon="mdi-calendar-outline" title="Agenda"></v-list-item>
           <v-list-item active-class="text-white bg-primary" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')" prepend-icon="mdi-finance" title="Financeiro"></v-list-item>
-          <v-list-item v-if="currentUser.type === 1" active-class="text-white bg-primary" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')" prepend-icon="mdi-cog-outline" title="Configurações"></v-list-item>
+          <v-list-item v-if="currentUser && currentUser.type === 1" active-class="text-white bg-primary" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')" prepend-icon="mdi-cog-outline" title="Configurações"></v-list-item>
         </v-list>
-        <router-view class="w-100" />
+        <div class="w-100">
+          <v-breadcrumbs v-if="currentUser" divider=">" :items="route.fullPath.split('/').map((link) => {
+            if (link !== '') {
+              return { href: '/'+link, title: link.length < 5 ? name : link, disabled: link.length < 5 || link === 'registro' }
+            } else {
+              return { href: '/home', title: 'Home', disabled: false }  
+            }
+          })"></v-breadcrumbs>   
+          <router-view />
+        </div>
       </v-main>
     </v-layout>
   </v-container>
@@ -54,6 +63,7 @@ export default {
   },
   created() {
     localStorage.setItem('dark', this.$vuetify.theme.current.dark);
+    this.$store.dispatch('auth/updateEntityName', '')
   },
   computed: {
     currentUser() {
@@ -75,6 +85,12 @@ export default {
     },
     path() {
       return this.$route.name
+    },
+    route() {
+      return this.$route
+    },
+    name() {
+      return this.$store.state.auth.entityName
     }
   },
   methods: {
