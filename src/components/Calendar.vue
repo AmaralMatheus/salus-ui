@@ -21,8 +21,7 @@ defineComponent({
 
 const eventModal = createEventModalPlugin()
 
-const props = defineProps({ showHeader: Boolean, gridHeight: Number })
-props
+const props = defineProps({ showHeader: Boolean, gridHeight: Number, limits: Object })
 const dialog = ref(false)
 const snackbar = ref(false)
 const message = ref('')
@@ -64,6 +63,7 @@ const calendarApp = createCalendar(
         },
       },
     },
+    dayBoundaries: props.limits,
     weekOptions: {
       /**
       * The total height in px of the week grid (week- and day views)

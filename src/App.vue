@@ -23,21 +23,50 @@
     <v-layout>
       <v-bottom-navigation color="primary" v-if="currentUser" class="d-md-none align-center">
         <div class="d-flex justify-space-between ga-3">
-          <v-icon :class="path === undefined ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/home')">mdi-home-outline</v-icon>
-          <v-icon :class="path && path.toString().includes('client') ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/clientes')">mdi-account-multiple-outline</v-icon>
-          <v-icon :class="path === 'agenda' ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/agenda')">mdi-calendar-outline</v-icon>
-          <v-icon :class="path === 'financeiro' ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/financeiro')">mdi-finance</v-icon>
-          <v-icon :class="path && path.toString().includes('user') ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/ajustes')" v-if="currentUser.type === 1">mdi-cog-outline</v-icon>
+          <v-icon :class="path === undefined ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/home')"><img class="cursor-pointer" :src="require('./assets/home-6-line.svg')"/></v-icon>
+          <v-icon :class="path && path.toString().includes('client') ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/clientes')"><img class="cursor-pointer" :src="require('./assets/clientes.svg')"/></v-icon>
+          <v-icon :class="path === 'agenda' ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/agenda')"><img class="cursor-pointer" :src="require('./assets/calendar-event-fill.svg')"/></v-icon>
+          <v-icon :class="path === 'financeiro' ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/financeiro')"><img class="cursor-pointer" :src="require('./assets/coins-line.svg')"/></v-icon>
+          <v-icon :class="path && path.toString().includes('user') ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/ajustes')" v-if="currentUser.type === 1"><img class="cursor-pointer" :src="require('./assets/settings-3-line.svg')"/></v-icon>
           <v-icon class="pa-5" @click="logOut">mdi-exit-to-app</v-icon>
         </div>
       </v-bottom-navigation>
       <v-main class="d-flex ga-5">
         <v-list class="bg-transparent custom-navbar" density="compact" nav v-if="currentUser">
-          <v-list-item active-class="text-white bg-primary" value="home" :active="path === undefined" @click="$router.push('/home')" prepend-icon="mdi-home-outline" title="Home"></v-list-item>
-          <v-list-item active-class="text-white bg-primary" value="clientes" :active="path && path.toString().includes('client')" @click="$router.push('/clientes')" prepend-icon="mdi-account-multiple-outline" title="Clientes"></v-list-item>
-          <v-list-item active-class="text-white bg-primary" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')" prepend-icon="mdi-calendar-outline" title="Agenda"></v-list-item>
-          <v-list-item active-class="text-white bg-primary" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')" prepend-icon="mdi-finance" title="Financeiro"></v-list-item>
-          <v-list-item v-if="currentUser && currentUser.type === 1" active-class="text-white bg-primary" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')" prepend-icon="mdi-cog-outline" title="Configurações"></v-list-item>
+          <v-breadcrumbs v-if="currentUser" divider=">" style="color: transparent" :items="['s']"></v-breadcrumbs>
+          <v-list-item active-class="text-white bg-primary" value="home" :active="path === undefined" @click="$router.push('/home')">
+            <div class="d-flex ga-3 align-center">
+              <img class="cursor-pointer" :src="require('./assets/home-6-line.svg')"/>
+              <div>Home</div>
+            </div>
+          </v-list-item>
+          <v-list-item active-class="text-white bg-primary" value="clientes" :active="path && path.toString().includes('client')" @click="$router.push('/clientes')">
+            <div class="d-flex ga-3 align-center">
+              <img class="cursor-pointer" :src="require('./assets/clientes.svg')"/>
+              <div>Clientes</div>
+            </div>
+          </v-list-item>
+          <v-list-item active-class="text-white bg-primary" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')">
+            <div class="d-flex ga-3 align-center">
+              <img class="cursor-pointer" :src="require('./assets/calendar-event-fill.svg')"/>
+              <div>Agenda</div>
+            </div>
+          </v-list-item>
+          <v-list-item active-class="text-white bg-primary" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')">
+            <div class="d-flex ga-3 align-center">
+              <img class="cursor-pointer" :src="require('./assets/coins-line.svg')"/>
+              <div>Financeiro</div>
+            </div>
+          </v-list-item>
+          <div class="my-2">
+            <v-divider></v-divider>
+          </div>
+          <v-list-item class="mt-auto" v-if="currentUser && currentUser.type === 1" active-class="text-white bg-primary" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
+            <div class="d-flex ga-3 align-center">
+              <img class="cursor-pointer" :src="require('./assets/settings-3-line.svg')"/>
+              <div>Configurações</div>
+            </div>
+          </v-list-item>
         </v-list>
         <div class="w-100">
           <v-breadcrumbs v-if="currentUser" divider=">" :items="route.fullPath.split('/').map((link) => {
@@ -156,8 +185,15 @@ td {
 
 .custom-navbar {
   width: 40px;
+  height: -webkit-fill-;
   overflow: hidden;
   transition: ease-in-out .2s;
+}
+
+@media (max-width: 959px) {
+  .custom-navbar {
+    display: none;
+  }
 }
 
 .custom-navbar:hover {

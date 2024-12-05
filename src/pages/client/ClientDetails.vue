@@ -43,7 +43,7 @@
         v-else-if="descriptionDialog"
         :title="'Adicionar ' +  (descriptionAction === 'evolutions' ? 'Evolução' : descriptionAction === 'plans' ? 'Plano' : 'Receita')"
       >
-        <v-card-text>
+        <v-card-text  v-if="descriptionAction === 'evolutions' || descriptionAction === 'prescriptions'">
           <div class="d-flex flex-column ga-3 mb-3" v-if="descriptionAction === 'evolutions'">
             <div class="d-flex justify-space-between align-baseline">
               <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
@@ -58,7 +58,7 @@
               </div>
             </div>
           </div>
-          <v-row dense>
+          <v-row dense >
             <v-col cols="12">
               <v-text-field
                 v-if="descriptionAction !== 'evolutions'"
@@ -75,7 +75,65 @@
             </v-col>
           </v-row>
         </v-card-text>
+        <v-card-text v-else>
+          <v-form v-model="planForm">
+            <v-text-field
+              label="Título"
+              :rules="rules"
+              :disabled="loading"
+              variant="outlined"
+              density="compact"
+              v-model="title"
+            ></v-text-field>
+            <draggable 
+              v-model="newPlan.actions"
+              @start="drag=true" 
+              @end="drag=false" 
+              item-key="order">
+              <!-- the row will go here -->
+               
+              <template #item="{element}">
+                <v-row dense>
+                  <v-col cols="12" sm="6" md="6">
+                    <v-combobox
+                      :items="actionSuggestions"
+                      item-title="label"
+                      item-value="id"
+                      v-model="element.description"
+                      :loading="loading"
+                      :disabled="loading"
+                      variant="outlined"
+                      density="compact"
+                      hide-details="auto"
+                      label="Ação">
+                    </v-combobox>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <CurrencyInput v-model="element.price"></CurrencyInput>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="2">
+                    <v-text-field
+                      label="Quantidade"
+                      :rules="rules"
+                      :disabled="loading"
+                      variant="outlined"
+                      density="compact"
+                      type="number"
+                      v-model="element.quantity"
+                    ></v-text-field>  
+                  </v-col>
+                </v-row>
+              </template>
+            </draggable>
+          </v-form>
+        </v-card-text>
         <v-card-actions>
+          <v-btn
+            text="Adicionar Ação"
+            v-if="descriptionAction === 'plans'"
+            variant="plain"
+            @click="newPlan.actions.push({price: 0, description: '', quantity: null, order: newPlan.actions.length})"
+          ></v-btn>
           <v-spacer></v-spacer>
           <v-btn
             text="Cancelar"
@@ -87,7 +145,7 @@
             color="primary"
             text="Salvar"
             variant="tonal"
-            :disabled="loading || description === ''"
+            :disabled="loading || !planForm"
             :loading="loading"
             @click="saveDescription"
           ></v-btn>
@@ -110,11 +168,11 @@
             <div class="mx-5" v-html="evolution.description"></div>
             <v-divider class="my-3"/>
             <div class="d-flex flex-column align-baseline">
-              <div class="d-flex ga-2 align-baseline">
+              <div class="d-flex ml-auto ga-2 align-baseline">
                 <div>Dr. {{evolution.user.name}}</div>
                 <div class="text-medium-emphasis">CRO {{ evolution.user.cro }}</div>
               </div>
-              <div class="text-medium-emphasis">
+              <div class="ml-auto text-medium-emphasis">
                 <div>{{ getDateTime(evolution.created_at) }}</div>
               </div>
             </div>
@@ -193,7 +251,7 @@
           <v-card-text>
             <v-data-table-server
               v-model:items-per-page="itemsPerPage"
-              :headers="headers"
+              :headers="planHeaders"
               :items="client.plans"
               :items-length="client.plans.length"
               item-value="id"
@@ -450,7 +508,9 @@
   import { format, parseISO, differenceInYears } from 'date-fns'
   import Scheduler from '../../components/Scheduler.vue'
   import { QuillEditor } from '@vueup/vue-quill'
-  import '@vueup/vue-quill/dist/vue-quill.snow.css';
+  import '@vueup/vue-quill/dist/vue-quill.snow.css'
+  import CurrencyInput from '../../components/CurrencyInput.vue'
+  import draggable from "vuedraggable"
 
   export default {
     computed: {
@@ -460,13 +520,21 @@
     },
     components: {
       Scheduler,
-      QuillEditor
+      QuillEditor,
+      CurrencyInput,
+      draggable
     },
     data () {
       return {
         format,
         parseISO,
         expanded: false,
+        actionSuggestions: [],
+        planForm: false,
+        newPlan: {
+          actions: [],
+          name: ''
+        },
         teethNumber: [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28,48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38],
         schedulerDialog: false,
         addImageDialog: false,
@@ -483,6 +551,15 @@
           },
           { title: 'Data', key: 'created_at', align: 'end' },
         ],
+        planHeaders: [
+          {
+            title: 'Título',
+            align: 'start',
+            sortable: true,
+            key: 'name',
+          },
+          { title: 'Data', key: 'created_at', align: 'end' },
+        ],
         planDialog: false,
         prescriptionDialog: false,
         imageDialog: false,
@@ -494,6 +571,12 @@
         message: false,
         loading: false,
         client: {},
+        rules: [
+          value => {
+            if (value) return true
+            return 'Este campo não pode estar vazio.'
+          },
+        ],
         colors: [
           'indigo',
           'warning',
@@ -555,6 +638,7 @@
           description: this.description,
           title: this.title,
           name: this.title,
+          actions: this.newPlan.actions,
           teeth: this.teeth
         }
         userService.saveDescription(data, this.descriptionAction).then(() => {
