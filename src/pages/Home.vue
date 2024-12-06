@@ -273,7 +273,7 @@
 
 .next-appointment {
   background: linear-gradient(134.56deg, #D6C3C3 -6.74%, #DBA5D5 105.74%);
-  color: white;
+  color: white !important;
 }
 
 .next-appointment-height {

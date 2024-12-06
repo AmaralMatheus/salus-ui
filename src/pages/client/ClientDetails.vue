@@ -75,7 +75,7 @@
             </v-col>
           </v-row>
         </v-card-text>
-        <v-card-text v-else>
+        <v-card-text v-else :class="newPlan.actions.length === 0 ? 'pb-0' : ''">
           <v-form v-model="planForm">
             <v-text-field
               label="Título"
@@ -85,6 +85,7 @@
               density="compact"
               v-model="title"
             ></v-text-field>
+            <div class="text-center" v-if="newPlan.actions.length === 0">Cadastre ações para este plano de tratamento!</div>
             <draggable 
               v-model="newPlan.actions"
               @start="drag=true" 
@@ -94,11 +95,13 @@
                
               <template #item="{element}">
                 <v-row dense>
-                  <v-col cols="12" sm="6" md="6">
+                  <v-col class="d-flex ga-2" cols="12" sm="6" md="6">
+                    <v-btn size="small" icon="mdi-delete" @click="newPlan.actions = newPlan.actions.filter((action) => action !== element)" color="error" variant="plain"/>
                     <v-combobox
                       :items="actionSuggestions"
                       item-title="label"
                       item-value="id"
+                      :rules="rules"
                       v-model="element.description"
                       :loading="loading"
                       :disabled="loading"
@@ -115,6 +118,7 @@
                     <v-text-field
                       label="Quantidade"
                       :rules="rules"
+                      hide-details="auto"
                       :disabled="loading"
                       variant="outlined"
                       density="compact"
@@ -254,6 +258,7 @@
               :headers="planHeaders"
               :items="client.plans"
               :items-length="client.plans.length"
+              @click:row="viewRow"
               item-value="id"
             >
               <template v-slot:[`item.description`]="{ item }">
@@ -443,7 +448,7 @@
           </div>
         </v-card-title>
         <v-card-text v-if="client.plans && client.plans.length > 0" class="d-flex flex-column ga-3">
-          <div v-for="plan in client.plans" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none bg-surface" :key="plan.id">
+          <div @click="planView = true; currentPlan = plan" v-for="plan in client.plans" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none bg-surface cursor-pointer" :key="plan.id">
             <div class="text-error">{{ getDateTime(plan.created_at) }}</div>
             <div>{{plan.name}}</div>
           </div>
@@ -501,6 +506,37 @@
   >
     <scheduler :client="this.client" @cancel="schedulerDialog = false" @reload="getClient"/>
   </v-dialog>
+  <v-dialog
+    v-model="planView"
+    width="auto"
+  >
+    <v-card
+      width="600"
+      :title="'Plano de tratamento ' + currentPlan.name"
+    >
+      <v-card-text>
+        <v-row>
+          <v-col class="pa-1" cols="6"><div class="px-2 ma-0">Atividade</div></v-col>
+          <v-col class="pa-1" cols="3"><div class="px-2 ma-0">Quantidade</div></v-col>
+          <v-col class="pa-1" cols="3"><div class="px-2 ma-0">Preço</div></v-col>
+        </v-row>
+        <v-row v-for="action in currentPlan.actions" :key="action">
+          <v-col class="pa-1" cols="6"><div class="bg-grey-lighten-3 pa-2 ma-0">{{ action.description }}</div></v-col>
+          <v-col class="pa-1" cols="3"><div class="bg-grey-lighten-3 pa-2 ma-0">{{ action.quantity }}</div></v-col>
+          <v-col class="pa-1" cols="3"><div class="bg-grey-lighten-3 pa-2 ma-0">{{ action.price.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }} R$</div></v-col>
+        </v-row>
+      </v-card-text>
+      <v-card-actions>
+        <div class="ml-2">Total: R$ {{ getTotal().toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}</div>
+        <v-spacer></v-spacer>
+        <v-btn
+          text="Fechar"
+          variant="plain"
+          @click="planView = false"
+        ></v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -531,6 +567,8 @@
         expanded: false,
         actionSuggestions: [],
         planForm: false,
+        planView: false,
+        currentPlan: null,
         newPlan: {
           actions: [],
           name: ''
@@ -597,11 +635,18 @@
       this.getClient()
     },
     methods: {
+      getTotal() {
+        let total = 0
+        this.currentPlan.actions.forEach((action) => {
+          total += action.price * action.quantity
+        })
+        return total
+      },
       getClient() {
         this.loading = true
         userService.getClient(this.id).then((response) => {
           if (response.data.birthday) {
-            response.data.birthday = new Date(response.data.birthday);
+            response.data.birthday = new Date(response.data.birthday)
           }
           this.client = response.data
           this.$store.dispatch('auth/updateEntityName', this.client.name)
@@ -722,7 +767,11 @@
         reader.readAsDataURL(file)
         reader.onload = () => {
           this.image = reader.result
-        };
+        }
+      },
+      viewRow (event, row) {
+        this.planView = true
+        this.currentPlan = row.item
       },
       getAge() {
         return differenceInYears(new Date(), this.client.birthday)

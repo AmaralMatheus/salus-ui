@@ -4,7 +4,7 @@
       <v-app-bar-nav-icon><img width="20" src="/favicon.svg" /></v-app-bar-nav-icon>
       <v-toolbar-title class="d-md-block">Dental Salus</v-toolbar-title>
       <v-spacer></v-spacer>
-      <div class="d-flex ml-auto ga-3 mr-5">
+      <div class="d-flex ml-auto ga-3">
         <div class="text-h6">Olá, {{ currentUser.user_name }}</div>
         <v-menu>
           <template v-slot:activator="{ props }">
@@ -36,25 +36,25 @@
           <v-breadcrumbs v-if="currentUser" divider=">" style="color: transparent" :items="['s']"></v-breadcrumbs>
           <v-list-item active-class="text-white bg-primary" value="home" :active="path === undefined" @click="$router.push('/home')">
             <div class="d-flex ga-3 align-center">
-              <img class="cursor-pointer" :src="require('./assets/home-6-line.svg')"/>
+              <img class="cursor-pointer" :class="path === undefined ? 'active' : ''" :src="require('./assets/home-6-line.svg')"/>
               <div>Home</div>
             </div>
           </v-list-item>
           <v-list-item active-class="text-white bg-primary" value="clientes" :active="path && path.toString().includes('client')" @click="$router.push('/clientes')">
             <div class="d-flex ga-3 align-center">
-              <img class="cursor-pointer" :src="require('./assets/clientes.svg')"/>
+              <img class="cursor-pointer" :class="path && path.toString().includes('client') ? 'active' : ''" :src="require('./assets/clientes.svg')"/>
               <div>Clientes</div>
             </div>
           </v-list-item>
           <v-list-item active-class="text-white bg-primary" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')">
             <div class="d-flex ga-3 align-center">
-              <img class="cursor-pointer" :src="require('./assets/calendar-event-fill.svg')"/>
+              <img class="cursor-pointer" :class="path ==='agenda' ? 'active' : ''" :src="require('./assets/calendar-event-fill.svg')"/>
               <div>Agenda</div>
             </div>
           </v-list-item>
           <v-list-item active-class="text-white bg-primary" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')">
             <div class="d-flex ga-3 align-center">
-              <img class="cursor-pointer" :src="require('./assets/coins-line.svg')"/>
+              <img class="cursor-pointer" :class="path ==='financeiro' ? 'active' : ''" :src="require('./assets/coins-line.svg')"/>
               <div>Financeiro</div>
             </div>
           </v-list-item>
@@ -63,7 +63,7 @@
           </div>
           <v-list-item class="mt-auto" v-if="currentUser && currentUser.type === 1" active-class="text-white bg-primary" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
             <div class="d-flex ga-3 align-center">
-              <img class="cursor-pointer" :src="require('./assets/settings-3-line.svg')"/>
+              <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
               <div>Configurações</div>
             </div>
           </v-list-item>
@@ -161,9 +161,16 @@ html {
   color: #969696;
 }
 
+.v-card {
+  color: #969696;
+}
+
 .v-card-title {
   font-family: 'montserrat' !important;
-  color: #969696 !important;
+}
+
+.text-h6 {
+  font-family: 'montserrat' !important;
 }
 
 td {
@@ -206,5 +213,13 @@ td {
 
 .v-list-item__prepend {
   padding-right: 10px;
+}
+
+.active {
+  filter: invert(0%) sepia(100%) saturate(1000%) hue-rotate(180deg) brightness(300%) contrast(110%);
+}
+
+.v-app-bar-nav-icon {
+  width: 15px !important;
 }
 </style>
