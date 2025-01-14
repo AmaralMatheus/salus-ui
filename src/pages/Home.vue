@@ -41,7 +41,7 @@
                 </div>
               </v-card-text>
               <v-card-text v-if="!loading" class="d-flex pa-0 flex-column">
-                <Line :data="info" :options="options" :key="info.datasets[0].data.length" />
+                <Line style="height: 225px;" :data="info" :options="options" :key="info.datasets[0].data.length" />
               </v-card-text>
               <v-card-text v-else>
                 <v-skeleton-loader

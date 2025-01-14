@@ -19,11 +19,11 @@
 
 <script setup>
   import { useCurrencyInput } from 'vue-currency-input'
-  import { watchEffect, defineProps } from 'vue'
+  import { watchEffect, defineProps, watch } from 'vue'
 
   const props = defineProps({ modelValue: Number, loading: Boolean })
 
-  const { inputRef, formattedValue } = useCurrencyInput({
+  const { inputRef, formattedValue, setValue } = useCurrencyInput({
     currency: 'BRL',
     hideCurrencySymbolOnFocus: false,
     hideGroupingSeparatorOnFocus: false,
@@ -31,10 +31,17 @@
     narrowSymbol: 'R$ ',
     autoDecimalDigits: true,
     locale: 'pt-BR',
-    valueRange: { min: 0 }
+    valueRange: { min: 0 },
   })
 
   watchEffect(
+    () => props.modelValue
+  )
+
+  watch(
     () => props.modelValue,
+    async (newValue) => {
+      setValue(newValue)
+    }
   )
 </script>

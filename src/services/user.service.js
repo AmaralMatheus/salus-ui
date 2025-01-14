@@ -23,6 +23,21 @@ class UserService {
   getUsers(params) {
     return axios.get(API_URL + 'users?' + params, { headers: authHeader() })
   }
+  getProcedures(params) {
+    return axios.get(API_URL + 'procedures?' + params, { headers: authHeader() })
+  }
+  saveProcedure(data) {
+    return axios.post(API_URL + 'procedures', data, { headers: authHeader() })
+  }
+  getProcedure(id) {
+    return axios.get(API_URL + 'procedures/' + id, { headers: authHeader() })
+  }
+  updateProcedure(id, data) {
+    return axios.put(API_URL + 'procedures/' + id, data, { headers: authHeader() })
+  }
+  getAllProcedures() {
+    return axios.get(API_URL + 'procedures/all', { headers: authHeader() })
+  }
   getAllUsers() {
     return axios.get(API_URL + 'users/all', { headers: authHeader() })
   }
@@ -94,6 +109,18 @@ class UserService {
   }
   deleteGoogleAppointment(calendarId, id) {
     return axios.delete(G_CALENDAR_API_URL + calendarId + '/events/' + id + '?key=' + G_CALENDAR_TOKEN)  
+  }
+  getEvents(params) {
+    return axios.get(API_URL + 'events?' + params, { headers: authHeader() })
+  }
+  saveEvents(data) {
+    return axios.post(API_URL + 'events', data, { headers: authHeader() })
+  }
+  getEvent(id) {
+    return axios.get(API_URL + 'events/' + id, { headers: authHeader() })
+  }
+  updateEvents(id, data) {
+    return axios.put(API_URL + 'events/' + id, data, { headers: authHeader() })
   }
 }
 

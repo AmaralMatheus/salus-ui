@@ -6,6 +6,7 @@ import Register from "./pages/Register.vue"
 const Profile = () => import("./pages/Profile.vue")
 const Users = () => import("./pages/user/Users.vue")
 const UserRegister = () => import("./pages/user/UserRegister.vue")
+const Procedures = () => import("./pages/Procedures.vue")
 const Clients = () => import("./pages/client/Clients.vue")
 const ClientDetails = () => import("./pages/client/ClientDetails.vue")
 const ClientRegister = () => import("./pages/client/ClientRegister.vue")
@@ -77,6 +78,12 @@ const routes = [
     name: "user-register",
     // lazy-loaded
     component: UserRegister,
+  },
+  {
+    path: "/procedimentos",
+    name: "procedures",
+    // lazy-loaded
+    component: Procedures,
   },
 ]
 

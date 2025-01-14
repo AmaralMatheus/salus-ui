@@ -40,7 +40,7 @@
         </v-card-text>
       </v-card>
       <v-card
-        v-else-if="descriptionDialog"
+        v-else-if="descriptionDialog && !loading"
         :title="'Adicionar ' +  (descriptionAction === 'evolutions' ? 'Evolução' : descriptionAction === 'plans' ? 'Plano' : 'Receita')"
       >
         <v-card-text  v-if="descriptionAction === 'evolutions' || descriptionAction === 'prescriptions'">
@@ -85,9 +85,10 @@
               density="compact"
               v-model="title"
             ></v-text-field>
-            <div class="text-center" v-if="newPlan.actions.length === 0">Cadastre ações para este plano de tratamento!</div>
+            <div class="text-center" v-if="newPlan.actions.length === 0">Cadastre os procedimentos para este plano de tratamento!</div>
             <draggable 
               v-model="newPlan.actions"
+              v-if="!loading"
               @start="drag=true" 
               @end="drag=false" 
               item-key="order">
@@ -98,9 +99,9 @@
                   <v-col class="d-flex ga-2" cols="12" sm="6" md="6">
                     <v-btn size="small" icon="mdi-delete" @click="newPlan.actions = newPlan.actions.filter((action) => action !== element)" color="error" variant="plain"/>
                     <v-combobox
-                      :items="actionSuggestions"
-                      item-title="label"
-                      item-value="id"
+                      :items="procedures"
+                      item-title="name"
+                      item-value="name"
                       :rules="rules"
                       v-model="element.description"
                       :loading="loading"
@@ -108,7 +109,8 @@
                       variant="outlined"
                       density="compact"
                       hide-details="auto"
-                      label="Ação">
+                      @update:modelValue="setProcedure($event, element)"
+                      label="Peocedimento">
                     </v-combobox>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
@@ -133,7 +135,7 @@
         </v-card-text>
         <v-card-actions>
           <v-btn
-            text="Adicionar Ação"
+            text="Adicionar Procedimento"
             v-if="descriptionAction === 'plans'"
             variant="plain"
             @click="newPlan.actions.push({price: 0, description: '', quantity: null, order: newPlan.actions.length})"
@@ -443,7 +445,7 @@
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Planos de Tratamento</h4>
             <div class="d-flex ga-2 ml-auto">
-              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true;  descriptionAction = 'plans'" color="primary" variant="tonal"/>
+              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true;  descriptionAction = 'plans'; getProcedures()" color="primary" variant="tonal"/>
             </div>
           </div>
         </v-card-title>
@@ -564,6 +566,7 @@
       return {
         format,
         parseISO,
+        procedures: [],
         expanded: false,
         actionSuggestions: [],
         planForm: false,
@@ -692,6 +695,7 @@
           this.description = ''
           this.title = ''
           this.getClient()
+          this.newPlan.actions = []
         },
         (error) => {
           this.loading = false
@@ -775,6 +779,18 @@
       },
       getAge() {
         return differenceInYears(new Date(), this.client.birthday)
+      },
+      getProcedures() {
+        userService.getAllProcedures().then((response) => {
+          this.procedures = response.data
+        })
+      },
+      setProcedure(event, element) {
+        console.log(event)
+        if(typeof event === 'object') {
+          element.price = event.price
+          element.description = event.name
+        }
       },
       getStatusType(status) {
         switch(status) {

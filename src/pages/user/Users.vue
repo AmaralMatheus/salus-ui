@@ -69,6 +69,7 @@
             </template>
           </v-data-table-server>
         </v-card>
+        <Procedures/>
         <v-dialog
           v-model="dialog"
           width="auto"
@@ -117,10 +118,14 @@
 
   <script>
     import userService from '../../services/user.service'
+    import Procedures from '../Procedures.vue'
     import { format, parseISO } from 'date-fns'
 
     export default {
       name: 'UserList',
+      components: {
+        Procedures
+      },
       data: () => ({
         format,
         parseISO,
