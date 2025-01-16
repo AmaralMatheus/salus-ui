@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = 'https://lizard-clean-singularly.ngrok-free.app/api/'
+const API_URL = 'https://salus-682523916a3b.herokuapp.com/api/'
 
 class AuthService {
   login(user) {
