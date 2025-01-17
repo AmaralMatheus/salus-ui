@@ -83,7 +83,7 @@
               class="ms-auto"
               text="Cancelar"
               :disabled="loading"
-              @click="procedureDialog = false"
+              @click="procedureDialog = false; procedure = { name: '', price: 0 }"
             ></v-btn>
             <v-btn
               text="Salvar"

@@ -151,7 +151,7 @@
             color="primary"
             text="Salvar"
             variant="tonal"
-            :disabled="loading || !planForm"
+            :disabled="loading || (descriptionAction === 'evolutions' && !description) || (descriptionAction === 'plans' && !planForm) || (descriptionAction === 'prescriptions' && (!description || title === '' || (!description && title === '')))"
             :loading="loading"
             @click="saveDescription"
           ></v-btn>
@@ -163,7 +163,7 @@
         type="article"
       ></v-skeleton-loader>
       <div class="d-flex mt-6">
-        <v-btn v-if="!loading && !descriptionDialog" @click="descriptionDialog = true; descriptionAction = 'evolutions'" class="ma-auto mb-6">Adicionar Evolução</v-btn>
+        <v-btn v-if="!loading && !descriptionDialog" @click="descriptionDialog = true; description = ''; descriptionAction = 'evolutions'" class="ma-auto mb-6">Adicionar Evolução</v-btn>
       </div>
       <div v-if="client.evolutions && client.evolutions.length < 1" class="d-flex ma-auto" style="width: max-content">
         Não há evoluções cadastradas!
@@ -427,7 +427,7 @@
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Receitas</h4>
             <div class="d-flex ga-2 ml-auto">
-              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true;  descriptionAction = 'prescriptions'" color="primary" variant="tonal"/>
+              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true;  title = ''; description = ''; descriptionAction = 'prescriptions'" color="primary" variant="tonal"/>
             </div>
           </div>
         </v-card-title>
@@ -445,7 +445,7 @@
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Planos de Tratamento</h4>
             <div class="d-flex ga-2 ml-auto">
-              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true;  descriptionAction = 'plans'; getProcedures()" color="primary" variant="tonal"/>
+              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true; title = ''; newPlan = { name: '', actions: []};  descriptionAction = 'plans'; getProcedures()" color="primary" variant="tonal"/>
             </div>
           </div>
         </v-card-title>
@@ -457,7 +457,7 @@
           <v-btn @click="planDialog = true" variant="tonal" color="primary" class="text-none" >Ver todos os planos</v-btn>
         </v-card-text>
         <v-card-text v-else class="d-flex flex-column ga-3">
-          Não existem planos cadastradas!
+          Não existem planos cadastrados!
         </v-card-text>
         <v-card-title>
           <div class="d-flex ga-2 align-center">
