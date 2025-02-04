@@ -1,7 +1,7 @@
 import axios from 'axios'
 import authHeader from './auth-header'
 
-const API_URL = 'https://lizard-clean-singularly.ngrok-free.app/api/'
+const API_URL = 'http://localhost:8000/api/'
 
 const G_CALENDAR_TOKEN = 'AIzaSyCSyrsKhMs7_iqHArtlN8ZKfF4FAm-7glA'
 
@@ -61,6 +61,12 @@ class UserService {
   }
   deleteClient(id) {
     return axios.delete(API_URL + 'clients/' + id, { headers: authHeader() })
+  }
+  deletePlan(id) {
+    return axios.delete(API_URL + 'plans/' + id, { headers: authHeader() })
+  }
+  deletePrescription(id) {
+    return axios.delete(API_URL + 'prescriptions/' + id, { headers: authHeader() })
   }
   saveClient(data) {
     return axios.post(API_URL + 'clients', data, { headers: authHeader() })

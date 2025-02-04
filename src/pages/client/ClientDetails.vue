@@ -213,6 +213,60 @@
         </v-card>
       </v-dialog>
       <v-dialog
+        v-model="prescriptionDeleteDialog"
+        width="auto"
+      >
+        <v-card
+          max-width="400"
+          prepend-icon="mdi-alert"
+          text="Esses dados não podem ser restaurados"
+          title="Deseja excluir essa receita?"
+        >
+          <template v-slot:actions>
+            <v-btn
+              class="ms-auto"
+              text="Cancelar"
+              :disabled="loading"
+              @click="prescriptionDeleteDialog = false"
+            ></v-btn>
+            <v-btn
+              text="Excluir"
+              color="error"
+              :disabled="loading"
+              :loading="loading"
+              @click="removePrescripiton"
+            ></v-btn>
+          </template>
+        </v-card>
+      </v-dialog>
+      <v-dialog
+        v-model="planDeleteDialog"
+        width="auto"
+      >
+        <v-card
+          max-width="400"
+          prepend-icon="mdi-alert"
+          text="Esses dados não podem ser restaurados"
+          title="Deseja excluir esse plano?"
+        >
+          <template v-slot:actions>
+            <v-btn
+              class="ms-auto"
+              text="Cancelar"
+              :disabled="loading"
+              @click="planDeleteDialog = false"
+            ></v-btn>
+            <v-btn
+              text="Excluir"
+              color="error"
+              :disabled="loading"
+              :loading="loading"
+              @click="removePlan"
+            ></v-btn>
+          </template>
+        </v-card>
+      </v-dialog>
+      <v-dialog
         max-width="600"
         v-model="prescriptionDialog"
       >
@@ -432,9 +486,10 @@
           </div>
         </v-card-title>
         <v-card-text v-if="client.prescriptions && client.prescriptions.length > 0" class="d-flex flex-column ga-3">
-          <div v-for="prescription in client.prescriptions" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none bg-surface" :key="prescription.id">
+          <div v-for="prescription in client.prescriptions" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between align-center text-none bg-surface" :key="prescription.id">
             <div class="text-error">{{ getDateTime(prescription.created_at) }}</div>
             <div>{{prescription.title}}</div>
+            <v-btn size="small" density="comfortable" icon="mdi-delete" @click="prescriptionDeleteDialog = true; selectedPrescription = prescription.id" color="error" variant="text"/>
           </div>
           <v-btn @click="prescriptionDialog = true" variant="tonal" color="primary" class="text-none" >Ver todas as receitas</v-btn>
         </v-card-text>
@@ -450,9 +505,12 @@
           </div>
         </v-card-title>
         <v-card-text v-if="client.plans && client.plans.length > 0" class="d-flex flex-column ga-3">
-          <div @click="planView = true; currentPlan = plan" v-for="plan in client.plans" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none bg-surface cursor-pointer" :key="plan.id">
-            <div class="text-error">{{ getDateTime(plan.created_at) }}</div>
-            <div>{{plan.name}}</div>
+          <div v-for="plan in client.plans" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-surface cursor-pointer" :key="plan.id">
+            <div @click="planView = true; currentPlan = plan" class="d-flex justify-space-between w-100">
+              <div class="text-error">{{ getDateTime(plan.created_at) }}</div>
+              <div>{{plan.name}}</div>
+            </div>
+            <v-btn size="small" density="comfortable" icon="mdi-delete" @click="planDeleteDialog = true; selectedPlan = plan.id" color="error" variant="text"/>
           </div>
           <v-btn @click="planDialog = true" variant="tonal" color="primary" class="text-none" >Ver todos os planos</v-btn>
         </v-card-text>
@@ -571,6 +629,10 @@
         actionSuggestions: [],
         planForm: false,
         planView: false,
+        planDeleteDialog: false,
+        selectedPlan: null,
+        selectedPrescription: null,
+        prescriptionDeleteDialog: false,
         currentPlan: null,
         newPlan: {
           actions: [],
@@ -661,6 +723,40 @@
         userService.deleteClient(this.id).then(() => {
           this.dialog = false
           this.$router.push('/clientes')
+        },
+          (error) => {
+            this.loading = false
+            this.snackbar = true
+            this.message =
+              (error.response &&
+                error.response.data &&
+                error.response.data.message) ||
+              error.message ||
+              error.toString()
+          })
+      },
+      removePlan() {
+        this.loading = true
+        userService.deletePlan(this.selectedPlan).then(() => {
+          this.planDeleteDialog = false
+          this.getClient()
+        },
+          (error) => {
+            this.loading = false
+            this.snackbar = true
+            this.message =
+              (error.response &&
+                error.response.data &&
+                error.response.data.message) ||
+              error.message ||
+              error.toString()
+          })
+      },
+      removePrescripiton() {
+        this.loading = true
+        userService.deletePrescription(this.selectedPrescription).then(() => {
+          this.prescriptionDeleteDialog = false
+          this.getClient()
         },
           (error) => {
             this.loading = false

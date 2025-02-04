@@ -4,8 +4,8 @@ import Login from "./pages/Login.vue"
 import Register from "./pages/Register.vue"
 // lazy-loaded
 const Profile = () => import("./pages/Profile.vue")
-const Users = () => import("./pages/user/Users.vue")
-const UserRegister = () => import("./pages/user/UserRegister.vue")
+const Company = () => import("./pages/Company.vue")
+const User = () => import("./pages/User.vue")
 const Procedures = () => import("./pages/Procedures.vue")
 const Clients = () => import("./pages/client/Clients.vue")
 const ClientDetails = () => import("./pages/client/ClientDetails.vue")
@@ -71,13 +71,13 @@ const routes = [
     path: "/ajustes",
     name: "user",
     // lazy-loaded
-    component: Users,
+    component: Company,
   },
   {
     path: "/ajustes/registro/:id?",
     name: "user-register",
     // lazy-loaded
-    component: UserRegister,
+    component: User,
   },
   {
     path: "/procedimentos",

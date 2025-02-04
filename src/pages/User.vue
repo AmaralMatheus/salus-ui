@@ -85,7 +85,7 @@
 </template>
 
 <script>
-  import userService from '../../services/user.service'
+  import userService from '../services/user.service'
   import { vMaska } from "maska/vue"
 
   export default {

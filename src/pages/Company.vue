@@ -117,8 +117,8 @@
   </template>
 
   <script>
-    import userService from '../../services/user.service'
-    import Procedures from '../Procedures.vue'
+    import userService from '../services/user.service'
+    import Procedures from './Procedures.vue'
     import { format, parseISO } from 'date-fns'
 
     export default {
