@@ -68,6 +68,12 @@ class UserService {
   deletePrescription(id) {
     return axios.delete(API_URL + 'prescriptions/' + id, { headers: authHeader() })
   }
+  deleteProceduer(id) {
+    return axios.delete(API_URL + 'procedures/' + id, { headers: authHeader() })
+  }
+  deleteUsers(id) {
+    return axios.delete(API_URL + 'users/' + id, { headers: authHeader() })
+  }
   saveClient(data) {
     return axios.post(API_URL + 'clients', data, { headers: authHeader() })
   }
