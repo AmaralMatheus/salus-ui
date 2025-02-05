@@ -202,7 +202,7 @@
         },
         remove () {
           this.loading = true
-          userService.deleteUser(this.selectedItem.id).then(() => {
+          userService.deleteUsers(this.selectedItem.id).then(() => {
             this.dialog = false
             this.loadItems({
               page:1,
