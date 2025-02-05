@@ -1,7 +1,7 @@
 import axios from 'axios'
 import authHeader from './auth-header'
 
-const API_URL = 'https://salus-682523916a3b.herokuapp.com/api/'
+const API_URL = 'http://localhost:8000/api/'
 
 const G_CALENDAR_TOKEN = 'AIzaSyCSyrsKhMs7_iqHArtlN8ZKfF4FAm-7glA'
 
@@ -96,7 +96,7 @@ class UserService {
     return axios.post(API_URL + 'users/calendar', data, { headers: authHeader() })
   }
   schedule(data) {
-    return axios.post(API_URL + 'appointments/', data, { headers: authHeader() })
+    return axios.post(API_URL + 'appointments', data, { headers: authHeader() })
   }
   updateSchedule(id, data) {
     return axios.put(API_URL + 'appointments/' + id, data, { headers: authHeader() })
