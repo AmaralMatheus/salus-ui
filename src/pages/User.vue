@@ -22,6 +22,7 @@
                   v-model="user.email"
                   :loading="loadingInfo"
                   :disabled="loadingInfo"
+                  :rules="rules"
                   variant="outlined"
                   density="compact"
                   hide-details="auto"
@@ -64,21 +65,6 @@
             </div>
           </v-form>
         </v-card-text>
-        <v-snackbar
-          v-model="snackbar"
-        >
-          {{ message }}
-          <template v-slot:actions>
-            <v-btn
-              color="red"
-              variant="text"
-              class="text-none"
-              @click="snackbar = false"
-            >
-              Fechar
-            </v-btn>
-          </template>
-        </v-snackbar>
       </v-card>
     </v-col>
   </v-row>
@@ -86,7 +72,8 @@
 
 <script>
   import userService from '../services/user.service'
-  import { vMaska } from "maska/vue"
+  import { vMaska } from 'maska/vue'
+  import { toast } from 'vue3-toastify'
 
   export default {
     name: 'UserForm',
@@ -98,8 +85,6 @@
     },
     data: () => ({
       valid: true,
-      snackbar: false,
-      message: false,
       user: {
         name: '',
         email: '',
@@ -149,13 +134,11 @@
           },
           (error) => {
             this.loadingRequest = false
-            this.snackbar = true
-            this.message =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString()
+            toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
           })
         } else {
           userService.saveUser(this.user).then(() => {
@@ -164,13 +147,11 @@
           },
           (error) => {
             this.loadingRequest = false
-            this.snackbar = true
-            this.message =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString()
+            toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
           })
         }
       },

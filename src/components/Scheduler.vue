@@ -121,21 +121,6 @@
       </template>
     </v-card>
   </v-form>
-  <v-snackbar
-    v-model="snackbar"
-  >
-    {{ message }}
-    <template v-slot:actions>
-      <v-btn
-        color="red"
-        variant="text"
-        class="text-none"
-        @click="snackbar = false"
-      >
-        Fechar
-      </v-btn>
-    </template>
-  </v-snackbar>
 </template>
 
 <script>
@@ -143,6 +128,7 @@
   import { vMaska } from "maska/vue"
   import { format, parseISO, setHours, setMinutes } from 'date-fns'
   import { VTimePicker } from 'vuetify/labs/VTimePicker'
+  import { toast } from 'vue3-toastify'
 
   export default {
     name: 'ClientScheduler',
@@ -165,8 +151,6 @@
       description: '',
       type: 1,
       duration: 60,
-      snackbar: false,
-      message: false,
       rules: [
         value => {
           if (value) return true
@@ -218,13 +202,11 @@
             },
               (error) => {
                 this.loading = false
-                this.snackbar = true
-                this.message =
-                  (error.response &&
+                toast.error((error.response &&
                     error.response.data &&
                     error.response.data.message) ||
                   error.message ||
-                  error.toString()
+                  error.toString())
               })
           } else {
             userService.schedule(data).then(() => {
@@ -233,13 +215,11 @@
             },
               (error) => {
                 this.loading = false
-                this.snackbar = true
-                this.message =
-                  (error.response &&
+                toast.error((error.response &&
                     error.response.data &&
                     error.response.data.message) ||
                   error.message ||
-                  error.toString()
+                  error.toString())
               })
           }
         }

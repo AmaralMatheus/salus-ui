@@ -32,8 +32,12 @@
         </div>
       </v-bottom-navigation>
       <v-main class="d-flex ga-5">
-        <v-list class="bg-transparent custom-navbar" density="compact" nav v-if="currentUser">
-          <v-breadcrumbs v-if="currentUser" divider=">" style="color: transparent" :items="['s']"></v-breadcrumbs>
+        <v-list class="bg-transparent custom-navbar d-flex flex-column" density="compact" nav v-if="currentUser">
+          <v-breadcrumbs v-if="currentUser" style="color: transparent" :items="['s']">
+            <template v-slot:divider>
+              <v-icon icon="mdi-chevron-right"></v-icon>
+            </template>
+          </v-breadcrumbs>
           <v-list-item active-class="text-white bg-primary" value="home" :active="path === undefined" @click="$router.push('/home')">
             <div class="d-flex ga-3 align-center">
               <img class="cursor-pointer" :class="path === undefined ? 'active' : ''" :src="require('./assets/home-6-line.svg')"/>
@@ -58,9 +62,6 @@
               <div>Financeiro</div>
             </div>
           </v-list-item>
-          <div class="my-2">
-            <v-divider></v-divider>
-          </div>
           <v-list-item class="mt-auto" v-if="currentUser && currentUser.type === 1" active-class="text-white bg-primary" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
             <div class="d-flex ga-3 align-center">
               <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
@@ -69,13 +70,17 @@
           </v-list-item>
         </v-list>
         <div class="w-100">
-          <v-breadcrumbs v-if="currentUser" divider=">" :items="route.fullPath.split('/').map((link) => {
+          <v-breadcrumbs v-if="currentUser" :items="route.fullPath.split('/').map((link) => {
             if (link !== '') {
               return { href: '/'+link, title: link.length < 5 ? name : link, disabled: link.length < 5 || link === 'registro' }
             } else {
               return { href: '/home', title: 'Home', disabled: false }  
             }
-          })"></v-breadcrumbs>   
+          })">
+            <template v-slot:divider>
+              <v-icon icon="mdi-chevron-right"></v-icon>
+            </template>  
+          </v-breadcrumbs>   
           <router-view />
         </div>
       </v-main>
@@ -134,9 +139,9 @@ export default {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 .v-card {
-  -webkit-box-shadow: -1px 2px 19px -4px rgba(0,0,0,0.19) !important;
-  -moz-box-shadow: -1px 2px 19px -4px rgba(0,0,0,0.19) !important;
-  box-shadow: 0px 10px 19px 5px rgba(0,0,0,0.05) !important;
+  -webkit-box-shadow: 0px 0px 0px -0px rgba(0,0,0,0) !important;
+  -moz-box-shadow: 0px 0px 0px -0px rgba(0,0,0,0) !important;
+  box-shadow:0px 0px 0px 0px rgba(0,0,0,0) !important;
 }
 .v-btn {
   height: 40px !important;
@@ -191,9 +196,10 @@ td {
 }
 
 .custom-navbar {
-  width: 40px;
-  height: -webkit-fill-;
-  overflow: hidden;
+  width: 58px;
+  height: calc(100vh - 80px);
+  top: 0;
+  position: sticky;
   transition: ease-in-out .2s;
 }
 
@@ -204,7 +210,7 @@ td {
 }
 
 .custom-navbar:hover {
-  width: 200px;
+  width: 220px;
 }
 
 .v-list-item__spacer {
@@ -221,5 +227,15 @@ td {
 
 .v-app-bar-nav-icon {
   width: 15px !important;
+}
+
+.v-list-item--nav {
+  padding-inline: 16px;
+  padding-block: 8px;
+  border-radius: 8px;
+}
+
+.v-main {
+  --v-layout-bottom: 0px !important;
 }
 </style>

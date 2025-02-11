@@ -14,6 +14,7 @@ import { format, parseISO, add } from "date-fns"
 import { ref, defineProps, defineComponent } from 'vue'
 import { auth } from '../store/auth.module'
 import { createEventModalPlugin } from '@schedule-x/event-modal'
+import { toast } from 'vue3-toastify'
 
 defineComponent({
   name: 'CalendarComponent'
@@ -23,8 +24,6 @@ const eventModal = createEventModalPlugin()
 
 const props = defineProps({ showHeader: Boolean, gridHeight: Number, limits: Object })
 const dialog = ref(false)
-const snackbar = ref(false)
-const message = ref('')
 const loading = ref(false)
 const selectedEvent = ref({})
 
@@ -68,7 +67,7 @@ const calendarApp = createCalendar(
       /**
       * The total height in px of the week grid (week- and day views)
       * */
-      gridHeight: props.gridHeight,
+      gridHeight: props.gridHeight ?? 613,
 
       /**
       * The number of days to display in week view
@@ -79,7 +78,7 @@ const calendarApp = createCalendar(
       * The width in percentage of the event element in the week grid
       * Defaults to 100, but can be used to leave a small margin to the right of the event
       */
-      eventWidth: 100,
+      eventWidth: 50,
       
       isResponsive: true,
 
@@ -125,13 +124,11 @@ function remove () {
     },
       (error) => {
         loading.value = false
-        snackbar.value = true
-        message.value =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString()
+        toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
       })
   } else {
     userService.deleteAppointment(selectedEvent.value.id).then(() => {
@@ -142,13 +139,11 @@ function remove () {
     },
       (error) => {
         loading.value = false
-        snackbar.value = true
-        message.value =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString()
+        toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
       })
   }
 }

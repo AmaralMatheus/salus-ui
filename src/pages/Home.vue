@@ -32,29 +32,35 @@
             </div>
           </v-col>
           <v-col cols="12" md="6" class="dashboard-card">
-            <v-card :loading="loading" title="Ultimos 30 dias">
-              <v-card-text v-if="!loading" class="d-flex flex-column ga-1">
+            <v-card :loading="loading" :title="transactions.length > 0 ? 'Ultimos 30 dias' : ''">
+              <v-card-text v-if="!loading && transactions.length > 0" class="d-flex flex-column ga-1">
                 <div v-for="transaction in transactions.slice(0,3)" :key="transaction.id">
                   <div :class="transaction.type === 1 ? 'text-success' : 'text-error'">
                     <v-icon>mdi-calendar-outline</v-icon> {{ transaction.type === 1 ? 'Entrada' : 'Saida' }} de R$ {{ transaction.amount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}
                   </div>
                 </div>
               </v-card-text>
-              <v-card-text v-if="!loading" class="d-flex pa-0 flex-column">
+              <v-card-text v-if="!loading && transactions.length > 0" class="d-flex pa-0 flex-column">
                 <Line style="height: 225px;" :data="info" :options="options" :key="info.datasets[0].data.length" />
+              </v-card-text>
+              <v-card-text v-else-if="!loading && transactions.length === 0" style="height: 345px" class="w-100 d-flex">
+                <div class="ma-auto d-flex flex-column">
+                  <div class="mx-auto"><img src="../assets/no-finance.png" /></div>
+                  <div>Sem transações cadastradas</div>
+                </div>
               </v-card-text>
               <v-card-text v-else>
                 <v-skeleton-loader
                   class="mx-auto border"
                   type="article"
                 ></v-skeleton-loader>
-                </v-card-text>
+              </v-card-text>
             </v-card>
           </v-col>
         </v-row>
       </div>
-      <v-card v-if="appointment && appointment.client" :loading="loading" title="Próximo cliente na agenda" class="next-appointment">
-        <v-card-text class="d-flex flex-column ga-6" v-if="!loading">
+      <v-card :loading="loading" :title="appointment ? 'Próximo cliente na agenda' : ''" :class="appointment ? 'next-appointment' : ''">
+        <v-card-text v-if="!loading && appointment?.client" class="d-flex flex-column ga-6">
           <div class="d-flex ga-6 next-appointment-height">
             <v-avatar color="surface-variant" size="57">
               <v-img :src="appointment.client.avatar ?? 'https://ui-avatars.com/api/?name='+appointment.client.name.replaceAll(' ', '+') + '&background=random'" cover></v-img>
@@ -75,6 +81,12 @@
             </div>
           </div>
         </v-card-text>
+        <v-card-text v-else-if="!loading && !appointment" style="height: 345px" class="w-100 d-flex">
+          <div class="ma-auto d-flex flex-column">
+            <div class="mx-auto"><img src="../assets/no-clients.png" /></div>
+            <div>Sem clientes marcados</div>
+          </div>
+        </v-card-text>
         <v-card-text v-else>
           <v-skeleton-loader
             class="mx-auto border"
@@ -83,7 +95,7 @@
         </v-card-text>
         <v-spacer></v-spacer>
         <v-card-actions>
-            <v-btn color="primary" class="ml-auto text-white" variant="tonal" @click="view()">Ver Odontograma</v-btn>
+            <v-btn v-if="!loading && appointment?.client" color="primary" class="ml-auto text-white" variant="tonal" @click="view()">Ver Odontograma</v-btn>
           </v-card-actions>
       </v-card>
     </v-col>
@@ -96,7 +108,7 @@
           <calendar :show-header="true" :limits="{
             start: '07:00',
             end: '19:00',
-          }" :grid-height="612"/>
+          }"/>
         </v-card-text>
       </v-card>
     </v-col>
@@ -161,20 +173,30 @@
           datasets: [
             {
               label: 'Saldo',
-              backgroundColor: '#f87979',
+              backgroundColor: (ctx) => {
+                const canvas = ctx.chart.ctx;
+                const gradient = canvas.createLinearGradient(0,0,0,540);
+
+                gradient.addColorStop(0, '#ECDDFF')
+                gradient.addColorStop(.5, '#FFFFFF')
+                gradient.addColorStop(1, '#EADAFF')
+
+                return gradient;
+              },
               data: [],
               fill: 'start',
               cubicInterpolationMode: 'monotone',
               tension: 0.4,
-              borderColor: '#f87979',
+              borderWidth: 1.5,
+              borderColor: '#C62977'
             }
           ]
         },
         options: {    
-          radius: 10,
+          radius: 1,
           plugins: {
             legend: {
-              display: true
+              display: false
             },
             filler: {
               propagate: true

@@ -115,21 +115,6 @@
       </v-card>
     </v-form>
   </v-dialog>
-  <v-snackbar
-    v-model="snackbar"
-  >
-    {{ message }}
-    <template v-slot:actions>
-      <v-btn
-        color="red"
-        variant="text"
-        class="text-none"
-        @click="snackbar = false"
-      >
-        Fechar
-      </v-btn>
-    </template>
-  </v-snackbar>
 </template>
 
 <script>
@@ -138,7 +123,7 @@
   import { vMaska } from "maska/vue"
   import { format, parseISO } from 'date-fns'
   import CurrencyInput from './CurrencyInput.vue'
-
+  import { toast } from 'vue3-toastify'
 
   export default {
     name: "FinancePage",
@@ -160,8 +145,6 @@
       type: null,
       method: 1,
       amount: 0.00,
-      snackbar: false,
-      message: false,
       rules: [
         value => {
           if (value) return true
@@ -202,13 +185,11 @@
           },
             (error) => {
               this.loading = false
-              this.snackbar = true
-              this.message =
-                (error.response &&
-                  error.response.data &&
-                  error.response.data.message) ||
-                error.message ||
-                error.toString()
+              toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
             })
         }
       },

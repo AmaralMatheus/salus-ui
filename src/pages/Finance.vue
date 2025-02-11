@@ -85,6 +85,17 @@
                 R$ {{ item.amount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}
               </div>
             </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <v-menu>
+                <template v-slot:activator="{ props }">
+                  <v-icon :disabled="loading" v-bind="props">mdi-dots-vertical</v-icon>
+                </template>
+          
+                <v-list>
+                  <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
+                </v-list>
+              </v-menu>
+            </template>
           </v-data-table-server>
         </v-card>
         <v-dialog
@@ -125,8 +136,8 @@
   import { VDateInput } from 'vuetify/labs/VDateInput'
   import { vMaska } from "maska/vue"
   import { format, parseISO } from 'date-fns'
-  import Transaction from '@/components/Transaction.vue';
-
+  import Transaction from '@/components/Transaction.vue'
+  import { toast } from 'vue3-toastify'
 
   export default {
     name: "FinancePage",
@@ -158,6 +169,7 @@
         { title: 'Data', key: 'date', align: 'start' },
         { title: 'Forma de Pagamento', key: 'method', align: 'start' },
         { title: 'Descrição', key: 'description', align: 'start' },
+        { title: '', key: 'actions', align: 'start' },
       ],
       rules: [
         value => {
@@ -212,13 +224,11 @@
         },
           (error) => {
             this.loading = false
-            this.snackbar = true
-            this.message =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString()
+            toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
           })
       },
       getDateTime(date) {

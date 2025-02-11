@@ -3,6 +3,7 @@ import Calendar from '../components/Calendar.vue'
 import Scheduler from '../components/Scheduler.vue'
 import userService from '../services/user.service'
 import { format, parseISO } from 'date-fns'
+import { toast } from 'vue3-toastify'
 
 export default {
   name: "DefaultAgenda",
@@ -34,7 +35,6 @@ export default {
     serverItems: [],
     loading: true,
     totalItems: 0,
-    snackbar: false,
     message: '',
   }),
   computed: {
@@ -73,13 +73,11 @@ export default {
       },
         (error) => {
           this.loading = false
-          this.snackbar = true
-          this.message =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString()
+          toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
         })
     },
     getDateTime(date) {
@@ -190,19 +188,4 @@ export default {
       itemsPerPage: 10,
       sortBy: []})"/>
   </v-dialog>
-  <v-snackbar
-    v-model="snackbar"
-  >
-    {{ message }}
-    <template v-slot:actions>
-      <v-btn
-        color="red"
-        variant="text"
-        class="text-none"
-        @click="snackbar = false"
-      >
-        Fechar
-      </v-btn>
-    </template>
-  </v-snackbar>
 </template>

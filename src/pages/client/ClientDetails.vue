@@ -407,21 +407,6 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-snackbar
-        v-model="snackbar"
-      >
-        {{ message }}
-        <template v-slot:actions>
-          <v-btn
-            color="red"
-            variant="text"
-            class="text-none"
-            @click="snackbar = false"
-          >
-            Fechar
-          </v-btn>
-        </template>
-      </v-snackbar>
     </v-col>
 		<v-col cols="12" sm="6" md="5" lg="4">
       <v-card v-if="!loading" :loading="loading">
@@ -491,7 +476,10 @@
             <div>{{prescription.title}}</div>
             <v-btn size="small" density="comfortable" icon="mdi-delete" @click="prescriptionDeleteDialog = true; selectedPrescription = prescription.id" color="error" variant="text"/>
           </div>
-          <v-btn @click="prescriptionDialog = true" variant="tonal" color="primary" class="text-none" >Ver todas as receitas</v-btn>
+          <div @click="prescriptionDialog = true" class="text-none text-primary cursor-pointer d-flex align-center" >
+            Ver todas as receitas
+            <v-icon icon="mdi-chevron-right"></v-icon>
+          </div>
         </v-card-text>
         <v-card-text v-else class="d-flex flex-column ga-3">
           Não existem receitas cadastradas!
@@ -512,7 +500,10 @@
             </div>
             <v-btn size="small" density="comfortable" icon="mdi-delete" @click="planDeleteDialog = true; selectedPlan = plan.id" color="error" variant="text"/>
           </div>
-          <v-btn @click="planDialog = true" variant="tonal" color="primary" class="text-none" >Ver todos os planos</v-btn>
+          <div @click="planDialog = true" class="text-none text-primary cursor-pointer d-flex align-center" >
+            Ver todos os planos
+            <v-icon icon="mdi-chevron-right"></v-icon>
+          </div>
         </v-card-text>
         <v-card-text v-else class="d-flex flex-column ga-3">
           Não existem planos cadastrados!
@@ -549,7 +540,10 @@
             </v-carousel-item>
           </v-carousel>
           <div v-else>Não existem imagens cadastradas</div>
-          <v-btn v-if="client.images.length > 0" @click="imageDialog = true" variant="tonal" color="primary" class="text-none">Ver todas as imagens</v-btn>
+          <div v-if="client.images.length > 0" @click="imageDialog = true" class="text-none text-primary cursor-pointer d-flex align-center">
+            Ver todas as imagens
+            <v-icon icon="mdi-chevron-right"></v-icon>
+          </div>
         </v-card-text>
       </v-card>
       <v-skeleton-loader
@@ -606,7 +600,8 @@
   import { QuillEditor } from '@vueup/vue-quill'
   import '@vueup/vue-quill/dist/vue-quill.snow.css'
   import CurrencyInput from '../../components/CurrencyInput.vue'
-  import draggable from "vuedraggable"
+  import draggable from 'vuedraggable'
+  import { toast } from 'vue3-toastify'
 
   export default {
     computed: {
@@ -670,8 +665,6 @@
         dialog: false,
         descriptionDialog: false,
         description: '',
-        snackbar: false,
-        message: false,
         loading: false,
         client: {},
         rules: [
@@ -726,13 +719,11 @@
         },
           (error) => {
             this.loading = false
-            this.snackbar = true
-            this.message =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString()
+            toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
           })
       },
       removePlan() {
@@ -743,13 +734,11 @@
         },
           (error) => {
             this.loading = false
-            this.snackbar = true
-            this.message =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString()
+            toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
           })
       },
       removePrescripiton() {
@@ -760,13 +749,11 @@
         },
           (error) => {
             this.loading = false
-            this.snackbar = true
-            this.message =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString()
+            toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
           })
       },
       update () {
@@ -795,13 +782,11 @@
         },
         (error) => {
           this.loading = false
-          this.snackbar = true
-          this.message =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString()
+          toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
         })
       },
       getToothStatus(status) {
@@ -825,13 +810,11 @@
         },
         (error) => {
           this.loading = false
-          this.snackbar = true
-          this.message =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString()
+          toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
         })
       },
       getDateTime(date) {
@@ -853,13 +836,11 @@
         },
         (error) => {
           this.loading = false
-          this.snackbar = true
-          this.message =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString()
+          toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
         })
       },
       convertToBase64(file) {

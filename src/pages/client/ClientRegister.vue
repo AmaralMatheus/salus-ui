@@ -134,21 +134,6 @@
           </div>
         </v-form>
       </v-card-text>
-      <v-snackbar
-        v-model="snackbar"
-      >
-        {{ message }}
-        <template v-slot:actions>
-          <v-btn
-            color="red"
-            variant="text"
-            class="text-none"
-            @click="snackbar = false"
-          >
-            Fechar
-          </v-btn>
-        </template>
-      </v-snackbar>
     </v-card>
   </div>
 </template>
@@ -157,6 +142,7 @@
   import userService from '../../services/user.service'
   import { VDateInput } from 'vuetify/labs/VDateInput'
   import { vMaska } from "maska/vue"
+  import { toast } from 'vue3-toastify'
 
   export default {
     components: {
@@ -170,8 +156,6 @@
     },
     data: () => ({
       valid: true,
-      snackbar: false,
-      message: false,
       client: {
         name: '',
         email: '',
@@ -235,13 +219,11 @@
           },
           (error) => {
             this.loadingRequest = false
-            this.snackbar = true
-            this.message =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString()
+            toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
           })
         } else {
           userService.saveClient(this.client).then(() => {
@@ -250,13 +232,11 @@
           },
           (error) => {
             this.loadingRequest = false
-            this.snackbar = true
-            this.message =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString()
+            toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
           })
         }
       },

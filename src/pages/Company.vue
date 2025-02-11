@@ -97,21 +97,6 @@
             </template>
           </v-card>
         </v-dialog>
-        <v-snackbar
-          v-model="snackbar"
-        >
-          {{ message }}
-          <template v-slot:actions>
-            <v-btn
-              color="red"
-              variant="text"
-              class="text-none"
-              @click="snackbar = false"
-            >
-              Fechar
-            </v-btn>
-          </template>
-        </v-snackbar>
       </v-col>
     </v-row>
   </template>
@@ -120,6 +105,7 @@
     import userService from '../services/user.service'
     import Procedures from './Procedures.vue'
     import { format, parseISO } from 'date-fns'
+    import { toast } from 'vue3-toastify'
 
     export default {
       name: 'UserList',
@@ -132,7 +118,6 @@
         company: {
           name: ''
         },
-        snackbar: false,
         message: false,
         itemsPerPage: 5,
         dialog: false,
@@ -212,13 +197,11 @@
           },
             (error) => {
               this.loading = false
-              this.snackbar = true
-              this.message =
-                (error.response &&
+              toast.error((error.response &&
                   error.response.data &&
                   error.response.data.message) ||
                 error.message ||
-                error.toString()
+                error.toString())  
             })
         },
         getDateTime(date) {

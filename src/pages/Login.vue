@@ -33,37 +33,20 @@
             :disabled:="loading" color="primary"
           class="mt-2 text-none">{{ login ? 'Esqueci minha senha' : 'Voltar' }}</v-btn>
         </div>
-
-        <v-snackbar
-          v-model="snackbar"
-        >
-          {{ message }}
-          <template v-slot:actions>
-            <v-btn
-              color="red"
-              variant="text"
-              class="text-none"
-              @click="snackbar = false"
-            >
-              Fechar
-            </v-btn>
-          </template>
-        </v-snackbar>
       </v-form >
     </v-card>
   </div>
 </template>
 
 <script>
+import { toast } from 'vue3-toastify'
 
 export default {
   name: "LoginPage",
   data() {
     return {
       login: true,
-      snackbar: false,
       loading: false,
-      message: '',
       username: '',
       password: '',
       show: false,
@@ -98,13 +81,11 @@ export default {
           },
           (error) => {
             this.loading = false
-            this.snackbar = true
-            this.message =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString()
+            toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
           }
         )
       }

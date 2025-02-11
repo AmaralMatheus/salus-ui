@@ -58,25 +58,11 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <v-snackbar
-    v-model="snackbar"
-  >
-    {{ message }}
-    <template v-slot:actions>
-      <v-btn
-        color="red"
-        variant="text"
-        class="text-none"
-        @click="snackbar = false"
-      >
-        Fechar
-      </v-btn>
-    </template>
-  </v-snackbar>
 </template>
 
 <script>
 import userService from '../services/user.service'
+import { toast } from 'vue3-toastify'
 
 export default {
   name: 'ProfileData',
@@ -86,7 +72,6 @@ export default {
       calendar: '',
       loading: false,
       addImageDialog: false,
-      snackbar: false
     }
   },
   computed: {
@@ -121,13 +106,11 @@ export default {
       },
       (error) => {
         this.loading = false
-        this.snackbar = true
-        this.message =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString()
+        toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
       })
     },
     saveCalendar() {
@@ -141,13 +124,11 @@ export default {
       },
       (error) => {
         this.loading = false
-        this.snackbar = true
-        this.message =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString()
+        toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
       })
     }
   }
