@@ -55,7 +55,7 @@
                     <v-btn block append-icon="mdi-plus" @click="transactionDialog = true" class="py-1" color="primary">Adicionar Transação</v-btn>
                   </v-col>
                   <v-col cols="12" sm="3" md="3" lg="2">
-                    <v-btn block append-icon="mdi-table" @click="dialog = true" class="py-1" color="primary">Exportar</v-btn>
+                    <v-btn block append-icon="mdi-table" @click="download" class="py-1" color="primary">Exportar</v-btn>
                   </v-col>
                 </v-row>
               </v-col>
@@ -234,6 +234,20 @@
       getDateTime(date) {
         return format(parseISO(date), 'dd/MM/yyyy')
       },
+      download() {
+        this.loading = true
+
+        const dates = this.dateFilter.map((date) => date.toISOString())
+        userService.exportTransactions((this.dateFilter.length > 0 ? `startDate=${dates[0]}&finishDate=${dates[dates.length-1]}` : '')).then((response) => {
+          const blob = new Blob([response.data], { type: 'text/csv' })
+          const link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = 'Relatório'
+          link.click()
+          URL.revokeObjectURL(link.href)
+          this.loading = false
+        })
+      }
     },
   }
 </script>

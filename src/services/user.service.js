@@ -1,7 +1,7 @@
 import axios from 'axios'
 import authHeader from './auth-header'
 
-const API_URL = 'https://salus-682523916a3b.herokuapp.com/api/'
+const API_URL = 'http://localhost:8000/api/'
 
 const G_CALENDAR_TOKEN = 'AIzaSyCSyrsKhMs7_iqHArtlN8ZKfF4FAm-7glA'
 
@@ -13,6 +13,9 @@ class UserService {
   }
   getTransactions(params) {
     return axios.get(API_URL + 'transactions?' + params, { headers: authHeader() })
+  }
+  exportTransactions(params) {
+    return axios.get(API_URL + 'transactions/download?' + params, { headers: authHeader() })
   }
   addTransaction(data) {
     return axios.post(API_URL + 'transactions', data, { headers: authHeader() })
