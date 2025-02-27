@@ -139,7 +139,7 @@
 </template>
 
 <script>
-  import userService from '../../services/user.service'
+  import clientService from '../../services/client.service'
   import { VDateInput } from 'vuetify/labs/VDateInput'
   import { vMaska } from "maska/vue"
   import { toast } from 'vue3-toastify'
@@ -201,7 +201,7 @@
     methods: {
       getClient() {
         this.loadingInfo = true
-        userService.getClient(this.id).then((response) => {
+        clientService.getClient(this.id).then((response) => {
           if (response.data.birthday) {
             response.data.birthday = new Date(response.data.birthday);
           }
@@ -213,7 +213,7 @@
         this.loadingRequest = true
         if (!this.valid) return
         if (this.id) {
-          userService.updateClient(this.id, this.client).then(() => {
+          clientService.updateClient(this.id, this.client).then(() => {
             this.loadingRequest = false
             this.$router.go(-1)
           },
@@ -226,7 +226,7 @@
                   error.toString())
           })
         } else {
-          userService.saveClient(this.client).then(() => {
+          clientService.saveClient(this.client).then(() => {
             this.loadingRequest = false
             this.$router.push('/clientes')
           },

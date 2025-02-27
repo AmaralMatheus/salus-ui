@@ -1,7 +1,7 @@
 <script>
 import Calendar from '../components/Calendar.vue'
 import Scheduler from '../components/Scheduler.vue'
-import userService from '../services/user.service'
+import appointmentService from '../services/appointment.service'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'vue3-toastify'
 
@@ -55,7 +55,7 @@ export default {
           key: 'id'
         })
       }
-      userService.getAppointments(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
+      appointmentService.getAppointments(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
         this.serverItems = response.data.data
         this.totalItems = response.data.total
         this.loading = false
@@ -63,7 +63,7 @@ export default {
     },
     remove () {
       this.loading = true
-      userService.deleteAppointment(this.selectedItem.id).then(() => {
+      appointmentService.deleteAppointment(this.selectedItem.id).then(() => {
         this.dialog = false
         this.loadItems({
           page:1,

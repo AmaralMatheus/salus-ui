@@ -3,7 +3,7 @@
     <v-col cols="12" md="8" class="d-flex flex-column ga-6">
       <div>
         <v-row>
-          <v-col cols="12" md="6" class="dashboard-card d-flex flex-column ga-6">
+          <v-col cols="12" md="6" class="d-flex flex-column ga-6">
             <v-card @click="$router.push({name: 'client-register'})" class="action-card cursor-pointer" title="Ações Rápidas">
               <v-card-text class="d-flex h-100">
                 <span class="mx-auto mt-4 d-flex flex-column">
@@ -31,8 +31,8 @@
               </v-card>
             </div>
           </v-col>
-          <v-col cols="12" md="6" class="dashboard-card">
-            <v-card :loading="loading" :title="transactions.length > 0 ? 'Ultimos 30 dias' : ''">
+          <v-col cols="12" md="6">
+            <v-card class="h-100" :loading="loading" :title="transactions.length > 0 ? 'Ultimos 30 dias' : ''">
               <v-card-text v-if="!loading && transactions.length > 0" class="d-flex flex-column ga-1">
                 <div v-for="transaction in transactions.slice(0,3)" :key="transaction.id">
                   <div :class="transaction.type === 1 ? 'text-success' : 'text-error'">
@@ -124,7 +124,8 @@
 </template>
 
 <script>
-  import userService from '../services/user.service'
+  import transactionService from '../services/transaction.service'
+  import appointmentService from '../services/appointment.service'
   import { format, parseISO } from 'date-fns'
   import Calendar from '../components/Calendar.vue'
   import Scheduler from '../components/Scheduler.vue'
@@ -244,7 +245,7 @@
       getFinancialResume() {
         let balance = 0
         let values = []
-        userService.getTransactions('page=1&itemsPerPage=10&sort=date&order=asc').then((response) => {
+        transactionService.getTransactions('page=1&itemsPerPage=10&sort=date&order=asc').then((response) => {
           this.transactions = response.data.list.data
           this.info.labels = response.data.list.data.map((transaction) => this.getDate(transaction.date))
           this.transactions.forEach((transaction) => {
@@ -259,7 +260,7 @@
         })
       },
       getNextAppointment() {
-        userService.getNextAppointment().then((response) => {
+        appointmentService.getNextAppointment().then((response) => {
           this.appointment = response.data
           this.loading = false
         })
@@ -309,6 +310,6 @@
 }
 
 .dashboard-card {
-  height: fit-content;
+  height: 100% !important;
 }
 </style>

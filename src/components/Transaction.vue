@@ -118,7 +118,8 @@
 </template>
 
 <script>
-  import userService from '../services/user.service'
+  import clientService from '../services/client.service'
+  import transactionService from '../services/transaction.service'
   import { VDateInput } from 'vuetify/labs/VDateInput'
   import { vMaska } from "maska/vue"
   import { format, parseISO } from 'date-fns'
@@ -159,7 +160,7 @@
       }
     },
     created() {
-      userService.getAllClients().then((response) => {
+      clientService.getAllClients().then((response) => {
         this.clients = response.data
         this.loading = false
       })
@@ -180,7 +181,7 @@
             method: this.method,
             client_id: this.client ? this.client.id : null
           }
-          userService.addTransaction(data).then(() => {
+          transactionService.addTransaction(data).then(() => {
             this.$emit('reload')
           },
             (error) => {

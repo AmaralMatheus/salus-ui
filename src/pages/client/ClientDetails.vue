@@ -594,7 +594,8 @@
 </template>
 
 <script>
-  import userService from '../../services/user.service'
+  import clientService from '../../services/client.service'
+  import companyService from '../../services/company.service'
   import { format, parseISO, differenceInYears } from 'date-fns'
   import Scheduler from '../../components/Scheduler.vue'
   import { QuillEditor } from '@vueup/vue-quill'
@@ -702,7 +703,7 @@
       },
       getClient() {
         this.loading = true
-        userService.getClient(this.id).then((response) => {
+        clientService.getClient(this.id).then((response) => {
           if (response.data.birthday) {
             response.data.birthday = new Date(response.data.birthday)
           }
@@ -713,7 +714,7 @@
       },
       remove () {
         this.loading = true
-        userService.deleteClient(this.id).then(() => {
+        clientService.deleteClient(this.id).then(() => {
           this.dialog = false
           this.$router.push('/clientes')
         },
@@ -728,7 +729,7 @@
       },
       removePlan() {
         this.loading = true
-        userService.deletePlan(this.selectedPlan).then(() => {
+        clientService.deletePlan(this.selectedPlan).then(() => {
           this.planDeleteDialog = false
           this.getClient()
         },
@@ -743,7 +744,7 @@
       },
       removePrescripiton() {
         this.loading = true
-        userService.deletePrescription(this.selectedPrescription).then(() => {
+        clientService.deletePrescription(this.selectedPrescription).then(() => {
           this.prescriptionDeleteDialog = false
           this.getClient()
         },
@@ -772,7 +773,7 @@
           actions: this.newPlan.actions,
           teeth: this.teeth
         }
-        userService.saveDescription(data, this.descriptionAction).then(() => {
+        clientService.saveDescription(data, this.descriptionAction).then(() => {
           this.loading = false
           this.descriptionDialog = false
           this.description = ''
@@ -806,7 +807,7 @@
           this.client.teeth[tooth].status = 0
         }
 
-        userService.updateToothStatus(this.client.teeth[tooth]).then(() => {
+        clientService.updateToothStatus(this.client.teeth[tooth]).then(() => {
         },
         (error) => {
           this.loading = false
@@ -829,7 +830,7 @@
           image: this.image,
           client: this.id
         }
-        userService.saveImage(data).then(() => {
+        clientService.saveImage(data).then(() => {
           this.addImageDialog = false
           this.image = null
           this.getClient()
@@ -858,7 +859,7 @@
         return differenceInYears(new Date(), this.client.birthday)
       },
       getProcedures() {
-        userService.getAllProcedures().then((response) => {
+        companyService.getAllProcedures().then((response) => {
           this.procedures = response.data
         })
       },

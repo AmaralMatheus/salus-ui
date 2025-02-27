@@ -132,7 +132,7 @@
 </template>
 
 <script>
-  import userService from '../services/user.service'
+  import transactionService from '../services/transaction.service'
   import { VDateInput } from 'vuetify/labs/VDateInput'
   import { vMaska } from "maska/vue"
   import { format, parseISO } from 'date-fns'
@@ -202,7 +202,7 @@
         }
 
         const dates = this.dateFilter.map((date) => date.toISOString())
-        userService.getTransactions(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}` + (this.dateFilter.length > 0 ? `&search=${this.search}&startDate=${dates[0]}&finishDate=${dates[dates.length-1]}` : '')).then((response) => {
+        transactionService.getTransactions(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}` + (this.dateFilter.length > 0 ? `&search=${this.search}&startDate=${dates[0]}&finishDate=${dates[dates.length-1]}` : '')).then((response) => {
           this.serverItems = response.data.list.data
           this.totalItems = response.data.list.total
           this.incoming = response.data.incoming
@@ -213,7 +213,7 @@
       },
       remove () {
         this.loading = true
-        userService.deleteTransaction(this.selectedItem.id).then(() => {
+        transactionService.deleteTransaction(this.selectedItem.id).then(() => {
           this.dialog = false
           this.formattedValue = null
           this.loadItems({
@@ -238,7 +238,7 @@
         this.loading = true
 
         const dates = this.dateFilter.map((date) => date.toISOString())
-        userService.exportTransactions((this.dateFilter.length > 0 ? `startDate=${dates[0]}&finishDate=${dates[dates.length-1]}` : '')).then((response) => {
+        transactionService.exportTransactions((this.dateFilter.length > 0 ? `startDate=${dates[0]}&finishDate=${dates[dates.length-1]}` : '')).then((response) => {
           const blob = new Blob([response.data], { type: 'text/csv' })
           const link = document.createElement('a')
           link.href = URL.createObjectURL(blob)

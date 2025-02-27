@@ -103,6 +103,7 @@
 
   <script>
     import userService from '../services/user.service'
+    import companyService from '../services/company.service'
     import Procedures from './Procedures.vue'
     import { format, parseISO } from 'date-fns'
     import { toast } from 'vue3-toastify'
@@ -156,7 +157,7 @@
             this.serverItems = response.data.data
             this.totalItems = response.data.total
           })
-          userService.getCompany().then((response) => {
+          companyService.getCompany().then((response) => {
             this.company = response.data
             this.loading = false
           })
@@ -212,7 +213,7 @@
           const data = {
             name: this.company.name
           }
-          userService.saveCompany(data).then(() => {
+          companyService.saveCompany(data).then(() => {
             this.loading = false
           })
         }

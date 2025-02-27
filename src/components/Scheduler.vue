@@ -124,6 +124,8 @@
 </template>
 
 <script>
+  import clientService from '../services/client.service'
+  import appointmentService from '../services/appointment.service'
   import userService from '../services/user.service'
   import { vMaska } from "maska/vue"
   import { format, parseISO, setHours, setMinutes } from 'date-fns'
@@ -177,7 +179,7 @@
       userService.getAllUsers().then((response) => {
         this.users = response.data
       })
-      userService.getAllClients().then((response) => {
+      clientService.getAllClients().then((response) => {
         this.clients = response.data
       })
     },
@@ -196,7 +198,7 @@
             duration: this.duration,
           }
           if (this.event) {
-            userService.updateSchedule(this.event.id, data).then(() => {
+            appointmentService.updateSchedule(this.event.id, data).then(() => {
               this.$emit('reload')
               this.$emit('cancel')
             },

@@ -108,7 +108,7 @@
 
 <script>
   import Scheduler from '../../components/Scheduler.vue'
-  import userService from '../../services/user.service'
+  import clientService from '../../services/client.service'
   import { format, parseISO } from 'date-fns'
   import { toast } from 'vue3-toastify'
 
@@ -161,7 +161,7 @@
             key: 'id'
           })
         }
-        userService.getClients(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
+        clientService.getClients(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
           this.serverItems = response.data.data
           this.totalItems = response.data.total
           this.loading = false
@@ -192,7 +192,7 @@
       },
       remove () {
         this.loading = true
-        userService.deleteClient(this.selectedItem.id).then(() => {
+        clientService.deleteClient(this.selectedItem.id).then(() => {
           this.dialog = false
           this.loadItems({
             page:1,

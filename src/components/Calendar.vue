@@ -8,7 +8,7 @@ import {
   createViewWeek,
 } from '@schedule-x/calendar'
 import '@schedule-x/theme-default/dist/index.css'
-import userService from '../services/user.service'
+import appointmentService from '../services/appointment.service'
 import { createEventsServicePlugin } from '@schedule-x/events-service'
 import { format, parseISO, add } from "date-fns"
 import { ref, defineProps, defineComponent } from 'vue'
@@ -116,7 +116,7 @@ function getName(type) {
 function remove () {
   loading.value = true
   if (selectedEvent.value.title === 'Agendamento Google') {
-    userService.deleteGoogleAppointment(auth.state.user.calendar, selectedEvent.value.id).then(() => {
+    appointmentService.deleteGoogleAppointment(auth.state.user.calendar, selectedEvent.value.id).then(() => {
       dialog.value = false
       selectedEvent.value = {}
       loading.value = false
@@ -131,7 +131,7 @@ function remove () {
                   error.toString())
       })
   } else {
-    userService.deleteAppointment(selectedEvent.value.id).then(() => {
+    appointmentService.deleteAppointment(selectedEvent.value.id).then(() => {
       dialog.value = false
       selectedEvent.value = {}
       loading.value = false
@@ -149,7 +149,7 @@ function remove () {
 }
 
 function load() {
-  userService.getAllAppointments().then((response) => {
+  appointmentService.getAllAppointments().then((response) => {
     response.data.forEach((event) => {
       calendarApp.eventsService.add({
         title: getName(event.type),
@@ -165,7 +165,7 @@ function load() {
   })
 
   if (auth.state.user.calendar) {
-    userService.getGoogleCalendarEvents(auth.state.user.calendar).then((response) => {
+    appointmentService.getGoogleCalendarEvents(auth.state.user.calendar).then((response) => {
       response.data.items.forEach((event) => {
         if (event.start && event.end) {
           calendarApp.eventsService.add({
