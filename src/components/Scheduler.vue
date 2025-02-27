@@ -211,7 +211,7 @@
                   error.toString())
               })
           } else {
-            userService.schedule(data).then(() => {
+            appointmentService.schedule(data).then(() => {
               this.$emit('reload')
               this.$emit('cancel')
             },

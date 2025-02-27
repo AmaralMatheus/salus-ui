@@ -107,11 +107,11 @@ export default {
             </v-col>
           </v-row>
         </v-card-title>
-        <v-card-text v-if="!list" style="height: calc(100vh - 300px) !important" class="overflow-y-scroll">
+        <v-card-text v-if="!list" class="overflow-y-scroll">
           <Calendar :show-header="false" :limits="{
             start: '07:00',
             end: '23:59',
-          }" :grid-height="1500"/>
+          }"/>
         </v-card-text>
         <v-card-text v-else>
           <v-data-table-server

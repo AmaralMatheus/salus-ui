@@ -14,7 +14,7 @@
                     :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
                   >{{ getToothStatus(client.teeth[tooth].status) }}
                     <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
-                      <div>{{ evolution.description }}</div>
+                      <div v-html="evolution.description"></div>
                       <div>{{ getDateTime(evolution.created_at) }}</div>
                     </div>
                   </v-tooltip>
@@ -30,7 +30,7 @@
                     :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
                   >{{ getToothStatus(client.teeth[tooth].status) }}
                     <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
-                      <div>{{ evolution.description }}</div>
+                      <div v-html="evolution.description"></div>
                       <div>{{ getDateTime(evolution.created_at) }}</div>
                     </div>
                   </v-tooltip>
@@ -596,6 +596,7 @@
 <script>
   import clientService from '../../services/client.service'
   import companyService from '../../services/company.service'
+  import planService from '../../services/plan.service'
   import { format, parseISO, differenceInYears } from 'date-fns'
   import Scheduler from '../../components/Scheduler.vue'
   import { QuillEditor } from '@vueup/vue-quill'
@@ -729,7 +730,7 @@
       },
       removePlan() {
         this.loading = true
-        clientService.deletePlan(this.selectedPlan).then(() => {
+        planService.deletePlan(this.selectedPlan).then(() => {
           this.planDeleteDialog = false
           this.getClient()
         },

@@ -45,7 +45,7 @@
               </template>
         
               <v-list>
-                <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="update(item)" title="Editar"></v-list-item>
+                <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="viewRow(null, {item})" title="Editar"></v-list-item>
                 <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
               </v-list>
             </v-menu>
@@ -216,6 +216,7 @@
           procedureService.updateProcedure(this.procedure.id, this.procedure).then(() => {
             this.loading = false
             this.procedureDialog = false
+            this.procedure = { name: '', price: 0 }
             this.loadItems({
               page:1,
               itemsPerPage: 10,
@@ -226,6 +227,7 @@
           procedureService.saveProcedure(this.procedure).then(() => {
             this.loading = false
             this.procedureDialog = false
+            this.procedure = { name: '', price: 0 }
             this.loadItems({
               page:1,
               itemsPerPage: 10,

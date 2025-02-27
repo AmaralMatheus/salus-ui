@@ -163,11 +163,11 @@ html {
 
 html {
   font-family: 'montserrat' !important;
-  color: #969696;
+  color: #474747;
 }
 
 .v-card {
-  color: #969696;
+  color: #474747;
 }
 
 .v-card-title {
@@ -179,11 +179,11 @@ html {
 }
 
 td {
-  color: #969696 !important;
+  color: #474747 !important;
 }
 
 .v-data-table-footer {
-  color: #969696 !important;
+  color: #474747 !important;
 }
 
 .v-list {

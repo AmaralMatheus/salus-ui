@@ -67,7 +67,7 @@ const calendarApp = createCalendar(
       /**
       * The total height in px of the week grid (week- and day views)
       * */
-      gridHeight: props.gridHeight ?? 613,
+      gridHeight: props.gridHeight ?? 623,
 
       /**
       * The number of days to display in week view

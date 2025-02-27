@@ -179,7 +179,7 @@
             type: this.type,
             amount: this.amount,
             method: this.method,
-            client_id: this.client ? this.client.id : null
+            client_id: this.client
           }
           transactionService.addTransaction(data).then(() => {
             this.$emit('reload')
