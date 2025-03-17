@@ -67,7 +67,7 @@ const calendarApp = createCalendar(
       /**
       * The total height in px of the week grid (week- and day views)
       * */
-      gridHeight: props.gridHeight ?? 623,
+      gridHeight: props.gridHeight ?? 1200,
 
       /**
       * The number of days to display in week view
@@ -78,7 +78,7 @@ const calendarApp = createCalendar(
       * The width in percentage of the event element in the week grid
       * Defaults to 100, but can be used to leave a small margin to the right of the event
       */
-      eventWidth: 50,
+      eventWidth: 100,
       
       isResponsive: true,
 
@@ -154,6 +154,12 @@ function load() {
       calendarApp.eventsService.add({
         title: getName(event.type),
         people: [event.client.name],
+        client: event.client,
+        date: event.date,
+        user: event.user_id,
+        type: event.type,
+        duration: event.duration,
+        description: event.description,
         start: format(parseISO(event.date), 'yyyy-MM-dd kk:mm'),
         end: format(add(parseISO(event.date), {
           minutes: event.duration,
@@ -182,6 +188,11 @@ function load() {
   }
 }
 
+
+function getDateTime(date) {
+  return format(parseISO(date), 'dd/MM/yyyy kk:mm')
+}
+
 load()
 
 eventModal.close(); // close the modal
@@ -190,6 +201,54 @@ eventModal.close(); // close the modal
 <template>
   <ScheduleXCalendar :calendar-app="calendarApp">
     <template v-if="showHeader" #headerContent="{ }">
+    </template>
+    <template #timeGridEvent="{ calendarEvent }">
+      <div class="event px-3 py-2">
+        <div class="d-flex ga-4">
+          <div><v-icon>mdi-calendar</v-icon></div>
+          <div>{{ calendarEvent.title }}</div>
+        </div>
+
+        <div class="d-flex ga-4">
+          <div><v-icon>mdi-account</v-icon></div>
+          <div>{{ calendarEvent.people.toString() }}</div>
+        </div>
+
+        <div class="d-flex ga-4">
+          <div><v-icon>mdi-clock</v-icon></div>
+          <div>{{ getDateTime(calendarEvent.start) }}</div>
+        </div>
+      </div>
+    </template>
+    <template #eventModal="{ calendarEvent }">
+      <div class="event bg-grey rounded">
+        <div class="pa-3 d-flex flex-column ga-4">
+          <div class="d-flex ga-4">
+            <div><v-icon>mdi-calendar</v-icon></div>
+            <div>{{ calendarEvent.title }}</div>
+            <div class="ml-auto d-flex ga-3">
+              <v-btn density="compact" size="small" icon="mdi-pencil" @click="$emit('update', calendarEvent)" color="warning"></v-btn>
+              <v-btn density="compact" size="small" icon="mdi-delete" @click="$emit('update', calendarEvent)" color="primary"></v-btn>
+            </div>
+          </div>
+  
+          <div class="d-flex ga-4">
+            <div><v-icon>mdi-account</v-icon></div>
+            <div>{{ calendarEvent.people.toString() }}</div>
+          </div>
+  
+          <div class="d-flex ga-4">
+            <div><v-icon>mdi-clock</v-icon></div>
+            <div>{{ getDateTime(calendarEvent.start) }}</div>
+          </div>
+
+          <div class="d-flex ga-4" v-if="calendarEvent.description.length > 0">
+            <div><v-icon>mdi-text</v-icon></div>
+            <div>{{ calendarEvent.description }}</div>
+          </div>
+          <v-btn @click="$emit('update', calendarEvent)" color="primary">Alterar Data/Horário</v-btn>
+        </div>
+      </div>
     </template>
   </ScheduleXCalendar>
   <v-dialog
@@ -272,11 +331,17 @@ eventModal.close(); // close the modal
   transition: ease-in-out .3s;
 }
 
-.sx__event:has(.event:hover) {
+/*.sx__event:has(.event:hover) {
   height: fit-content !important;
-}
+}*/
 
 .sx__event-modal.is-open {
   overflow: hidden;
+}
+
+.event {
+  -webkit-box-shadow: 6px 6px 26px -11px rgba(0,0,0,0.75) !important;
+  -moz-box-shadow: 6px 6px 26px -11px rgba(0,0,0,0.75) !important;
+  box-shadow: 6px 6px 26px -11px rgba(0,0,0,0.75) !important;
 }
 </style>

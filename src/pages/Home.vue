@@ -8,7 +8,7 @@
               <v-card-text class="d-flex h-100">
                 <span class="mx-auto mt-4 d-flex flex-column">
                   <img width="48" class="cursor-pointer mx-auto" :src="require('../assets/user-add-fill.svg')"/>
-                  Adicionar Cliente
+                  Adicionar Paciente
                 </span>
               </v-card-text>
             </v-card>
@@ -59,7 +59,7 @@
           </v-col>
         </v-row>
       </div>
-      <v-card :loading="loading" :title="appointment ? 'Próximo cliente na agenda' : ''" :class="appointment ? 'next-appointment' : ''">
+      <v-card :loading="loading" :title="appointment ? 'Próximo paciente na agenda' : ''" :class="appointment ? 'next-appointment' : ''">
         <v-card-text v-if="!loading && appointment?.client" class="d-flex flex-column ga-6">
           <div class="d-flex ga-6 next-appointment-height">
             <v-avatar color="surface-variant" size="57">
@@ -84,7 +84,7 @@
         <v-card-text v-else-if="!loading && !appointment" style="height: 345px" class="w-100 d-flex">
           <div class="ma-auto d-flex flex-column">
             <div class="mx-auto"><img src="../assets/no-clients.png" /></div>
-            <div>Sem clientes marcados</div>
+            <div>Sem pacientes marcados</div>
           </div>
         </v-card-text>
         <v-card-text v-else>

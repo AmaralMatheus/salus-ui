@@ -24,7 +24,7 @@
       <v-bottom-navigation color="primary" v-if="currentUser" class="d-md-none align-center">
         <div class="d-flex justify-space-between ga-3">
           <v-icon :class="path === undefined ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/home')"><img class="cursor-pointer" :src="require('./assets/home-6-line.svg')"/></v-icon>
-          <v-icon :class="path && path.toString().includes('client') ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/clientes')"><img class="cursor-pointer" :src="require('./assets/clientes.svg')"/></v-icon>
+          <v-icon :class="path && path.toString().includes('client') ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/pacientes')"><img class="cursor-pointer" :src="require('./assets/clientes.svg')"/></v-icon>
           <v-icon :class="path === 'agenda' ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/agenda')"><img class="cursor-pointer" :src="require('./assets/calendar-event-fill.svg')"/></v-icon>
           <v-icon :class="path === 'financeiro' ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/financeiro')"><img class="cursor-pointer" :src="require('./assets/coins-line.svg')"/></v-icon>
           <v-icon :class="path && path.toString().includes('user') ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/ajustes')" v-if="currentUser.type === 1"><img class="cursor-pointer" :src="require('./assets/settings-3-line.svg')"/></v-icon>
@@ -44,10 +44,10 @@
               <div>Home</div>
             </div>
           </v-list-item>
-          <v-list-item active-class="text-white bg-primary" value="clientes" :active="path && path.toString().includes('client')" @click="$router.push('/clientes')">
+          <v-list-item active-class="text-white bg-primary" value="pacientes" :active="path && path.toString().includes('client')" @click="$router.push('/pacientes')">
             <div class="d-flex ga-3 align-center">
               <img class="cursor-pointer" :class="path && path.toString().includes('client') ? 'active' : ''" :src="require('./assets/clientes.svg')"/>
-              <div>Clientes</div>
+              <div>Pacientes</div>
             </div>
           </v-list-item>
           <v-list-item active-class="text-white bg-primary" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')">

@@ -1,6 +1,6 @@
 <template>
   <div >
-    <v-card :loading="loadingInfo" :title="!id ? 'Cadastrar cliente' : 'Editar Cliente'" :subtitle="client.name">
+    <v-card :loading="loadingInfo" :title="!id ? 'Cadastrar paciente' : 'Editar Paciente'" :subtitle="client.name">
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
           <v-row>
@@ -29,7 +29,7 @@
                 label="CPF">
               </v-text-field>
             </v-col>
-            <v-col cols="12" sm="6" md="1">
+            <v-col cols="12" sm="6" md="2">
               <v-select
               :items="[
                   {label: 'Masculino', id: 1},
@@ -48,9 +48,19 @@
               </v-select>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-              <v-file-input prepend-icon="" hide-details="auto" prepend-inner-icon="mdi-attachment" label="Foto de perfil" density="compact" @update:modelValue="convertToBase64" variant="outlined"></v-file-input>
+              <v-text-field
+                v-model="client.phone"
+                :loading="loadingInfo"
+                :disabled="loadingInfo"
+                v-maska="'(##) #####-####'"
+                :rules="phoneRule"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                label="Telefone">
+              </v-text-field>
             </v-col>
-            <v-col cols="12" sm="6" md="3">
+            <v-col cols="12" sm="6" md="2">
               <v-date-input
                 v-model="client.birthday"
                 :rules="dateRule"
@@ -122,19 +132,6 @@
             </v-col>
             <v-col cols="12" sm="6" md="3">
               <v-text-field
-                v-model="client.phone"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                v-maska="'(##) #####-####'"
-                :rules="phoneRule"
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                label="Telefone">
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" md="3">
-              <v-text-field
                 v-model="client.email"
                 :loading="loadingInfo"
                 :disabled="loadingInfo"
@@ -157,6 +154,9 @@
                 hide-details="auto"
                 label="Status">
               </v-select>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <v-file-input prepend-icon="" hide-details="auto" prepend-inner-icon="mdi-attachment" label="Foto de perfil" density="compact" @update:modelValue="convertToBase64" variant="outlined"></v-file-input>
             </v-col>
             <v-col cols="12">
               <v-textarea

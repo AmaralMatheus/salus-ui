@@ -4,7 +4,7 @@
       <v-card>
         <v-card-title>
           <v-row class="mt-0">
-            <v-col cols="12" sm="3" class="text-h6">Clientes</v-col>
+            <v-col cols="12" sm="3" class="text-h6">Pacientes</v-col>
             <v-col cols="12" sm="9">
               <v-row>
                 <v-col cols="12" sm="5" md="7" lg="8">
@@ -14,11 +14,11 @@
                     density="compact"
                     hide-details="auto"
                     append-inner-icon="mdi-magnify"
-                    placeholder="Buscar Cliente">
+                    placeholder="Buscar Paciente">
                   </v-text-field>
                 </v-col>
                 <v-col cols="12" sm="7" md="5" lg="4">
-                  <v-btn block append-icon="mdi-plus" @click="create()" color="primary">Adicionar Cliente</v-btn>
+                  <v-btn block append-icon="mdi-plus" @click="create()" color="primary">Adicionar Paciente</v-btn>
                 </v-col>
               </v-row>
             </v-col>
@@ -75,7 +75,7 @@
           max-width="400"
           prepend-icon="mdi-alert-outline"
           text="Esses dados não podem ser restaurados"
-          title="Deseja excluir esse cliente?"
+          title="Deseja excluir esse paciente?"
         >
           <template v-slot:actions>
             <v-btn

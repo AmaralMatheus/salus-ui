@@ -110,7 +110,7 @@
                       density="compact"
                       hide-details="auto"
                       @update:modelValue="setProcedure($event, element)"
-                      label="Peocedimento">
+                      label="Procedimento">
                     </v-combobox>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
@@ -194,7 +194,7 @@
           max-width="400"
           prepend-icon="mdi-alert"
           text="Esses dados não podem ser restaurados"
-          title="Deseja excluir esse cliente?"
+          title="Deseja excluir esse paciente?"
         >
           <template v-slot:actions>
             <v-btn
@@ -726,7 +726,7 @@
         this.loading = true
         clientService.deleteClient(this.id).then(() => {
           this.dialog = false
-          this.$router.push('/clientes')
+          this.$router.push('/pacientes')
         },
           (error) => {
             this.loading = false

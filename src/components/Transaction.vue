@@ -81,7 +81,7 @@
                 :disabled="loading"
                 variant="outlined"
                 density="compact"
-                label="Cliente"
+                label="Paciente"
               ></v-select>
             </v-col>
             <v-col cols="12">

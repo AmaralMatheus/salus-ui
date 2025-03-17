@@ -38,19 +38,19 @@ const routes = [
     component: Profile,
   },
   {
-    path: "/clientes",
+    path: "/pacientes",
     name: "client",
     // lazy-loaded
     component: Clients,
   },
   {
-    path: "/clientes/:id",
+    path: "/pacientes/:id",
     name: "client-details",
     // lazy-loaded
     component: ClientDetails,
   },
   {
-    path: "/clientes/registro/:id?",
+    path: "/pacientes/registro/:id?",
     name: "client-register",
     // lazy-loaded
     component: ClientRegister,

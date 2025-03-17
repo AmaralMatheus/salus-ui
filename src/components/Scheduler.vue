@@ -53,7 +53,7 @@
               :rules="rules"
               variant="outlined"
               density="compact"
-              label="Cliente"
+              label="Paciente"
             ></v-select>
           </v-col>
           <v-col cols="12" :md="currentUser.type === 1 && client ? '6' : currentUser.type === 1 && !client ? '4' : '3'">

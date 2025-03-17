@@ -111,7 +111,7 @@ export default {
           <Calendar :show-header="false" :limits="{
             start: '07:00',
             end: '23:59',
-          }"/>
+          }" @update="update"/>
         </v-card-text>
         <v-card-text v-else>
           <v-data-table-server
