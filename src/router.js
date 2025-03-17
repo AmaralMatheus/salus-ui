@@ -9,7 +9,7 @@ const User = () => import("./pages/User.vue")
 const Procedures = () => import("./pages/Procedures.vue")
 const Clients = () => import("./pages/client/Clients.vue")
 const ClientDetails = () => import("./pages/client/ClientDetails.vue")
-const ClientRegister = () => import("./pages/client/ClientRegister.vue")
+const ClientRegister = () => import("./components/ClientRegister.vue")
 const Finance = () => import("./pages/Finance.vue")
 const Agenda = () => import("./pages/Agenda.vue")
 

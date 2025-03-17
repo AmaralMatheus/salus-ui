@@ -1,30 +1,10 @@
 <template>
     <v-row>
       <v-col cols="12" class="d-flex flex-column ga-6">
-        <v-card title="Empresa">
-          <v-card-text>
-            <v-row>
-              <v-col cols="8" sm="9" md="10">
-                <v-text-field
-                  v-model="company.name"
-                  variant="outlined"
-                  density="compact"
-                  hide-details="auto"
-                  :loading="loading"
-                  :disabled="loading"
-                  placeholder="Nome da Empresa">
-                </v-text-field>
-              </v-col>
-              <v-col cols="4" sm="3" md="2">
-                <v-btn block @click="saveCompany()" :loading="loading" :disabled="loading" color="primary">Salvar</v-btn>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
         <v-card>
           <v-card-title>
             <v-row class="mt-0">
-              <v-col cols="12" sm="3" class="text-h6">Usuários</v-col>
+              <v-col cols="12" sm="3" class="text-h6">Status</v-col>
               <v-col cols="12" sm="9">
                 <v-row>
                   <v-col cols="12" sm="5" md="7" lg="8">
@@ -38,7 +18,7 @@
                     </v-text-field>
                   </v-col>
                   <v-col cols="12" sm="7" md="5" lg="4">
-                    <v-btn block append-icon="mdi-plus" @click="create()" color="primary">Adicionar Usuário</v-btn>
+                    <v-btn block append-icon="mdi-plus" @click="statusDialog = true" color="primary">Adicionar Status</v-btn>
                   </v-col>
                 </v-row>
               </v-col>
@@ -62,15 +42,53 @@
                 </template>
           
                 <v-list>
-                  <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="update(item)" title="Editar"></v-list-item>
+                  <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="viewRow(null, {item})" title="Editar"></v-list-item>
                   <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
                 </v-list>
               </v-menu>
             </template>
           </v-data-table-server>
         </v-card>
-        <Procedures/>
-        <Statuses/>
+        <v-dialog
+          v-model="statusDialog"
+          width="auto"
+        >
+          <v-card
+            width="700"
+            title="Cadastrar Status"
+          >
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" sm="8">
+                  <v-text-field
+                    label="Nome"
+                    :rules="rules"
+                    hide-details="auto"
+                    :disabled="loading"
+                    variant="outlined"
+                    density="compact"
+                    v-model="status.name"
+                  ></v-text-field>  
+                </v-col>
+              </v-row>
+            </v-card-text>
+            <template v-slot:actions>
+              <v-btn
+                class="ms-auto"
+                text="Cancelar"
+                :disabled="loading"
+                @click="statusDialog = false; status = { name: '' }"
+              ></v-btn>
+              <v-btn
+                text="Salvar"
+                color="error"
+                :disabled="loading"
+                :loading="loading"
+                @click="save"
+              ></v-btn>
+            </template>
+          </v-card>
+        </v-dialog>
         <v-dialog
           v-model="dialog"
           width="auto"
@@ -101,40 +119,35 @@
       </v-col>
     </v-row>
   </template>
-
+  
   <script>
-    import userService from '../services/user.service'
-    import companyService from '../services/company.service'
-    import Procedures from './Procedures.vue'
-    import Statuses from './Status.vue'
+    import statusService from '../services/company.service'
     import { format, parseISO } from 'date-fns'
     import { toast } from 'vue3-toastify'
-
+  
     export default {
-      name: 'UserList',
-      components: {
-        Procedures,
-        Statuses
-      },
+      name: 'StatusList',
       data: () => ({
         format,
         parseISO,
         company: {
           name: ''
         },
-        message: false,
+        status: {
+          name: ''
+        },
         itemsPerPage: 5,
         dialog: false,
+        statusDialog: false,
         selectedItem: null,
         search: '',
         headers: [
           {
-            title: 'Nome Completo',
+            title: 'Nome',
             align: 'start',
             sortable: true,
             key: 'name',
           },
-          { title: 'E-mail', key: 'email', align: 'start', sortable: true },
           { title: '', key: 'actions', align: 'end', sortable: true },
         ],
         rules: [
@@ -148,6 +161,10 @@
         totalItems: 0,
       }),
       methods: {
+        viewRow (event, row) {
+          this.statusDialog = true
+          this.status = row.item
+        },
         loadItems ({ page, itemsPerPage, sortBy }) {
           this.loading = true
           if (sortBy.length <= 1) {
@@ -156,42 +173,15 @@
               key: 'id'
             })
           }
-          userService.getUsers(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
+          statusService.getStatus(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
             this.serverItems = response.data.data
             this.totalItems = response.data.total
-          })
-          companyService.getCompany().then((response) => {
-            this.company = response.data
             this.loading = false
-          })
-        },
-        view (row) {
-          this.$router.push({
-            name: 'user-register',
-            params: { id: row.id }
-          })
-        },
-        viewRow (event, row) {
-          console.log(row)
-          this.$router.push({
-            name: 'user-register',
-            params: { id: row.item.id }
-          })
-        },
-        create () {
-          this.$router.push({
-            name: 'user-register'
-          })
-        },
-        update (row) {
-          this.$router.push({
-            name: 'user-register',
-            params: { id: row.id }
           })
         },
         remove () {
           this.loading = true
-          userService.deleteUsers(this.selectedItem.id).then(() => {
+          statusService.deleteStatus(this.selectedItem.id).then(() => {
             this.dialog = false
             this.loadItems({
               page:1,
@@ -202,30 +192,38 @@
             (error) => {
               this.loading = false
               toast.error((error.response &&
-                  error.response.data &&
-                  error.response.data.message) ||
-                error.message ||
-                error.toString())  
+                      error.response.data &&
+                      error.response.data.message) ||
+                    error.message ||
+                    error.toString())
             })
         },
-        getDateTime(date) {
-          return format(parseISO(date), 'dd/MM/yyyy kk:mm')
-        },
-        saveCompany() {
+        save() {
           this.loading = true
-          const data = {
-            name: this.company.name
+          if (this.status.id) {
+            statusService.updateStatus(this.status.id, this.status).then(() => {
+              this.loading = false
+              this.statusDialog = false
+              this.status = { name: '' }
+              this.loadItems({
+                page:1,
+                itemsPerPage: 10,
+                sortBy: []
+              })
+            })
+          } else {
+            statusService.saveStatus(this.status).then(() => {
+              this.loading = false
+              this.statusDialog = false
+              this.status = { name: '' }
+              this.loadItems({
+                page:1,
+                itemsPerPage: 10,
+                sortBy: []
+              })
+            })
           }
-          companyService.saveCompany(data).then(() => {
-            this.loading = false
-          })
         }
       },
     }
-  </script>
-
-  <style>
-  .v-time-picker {
-    padding-top:16px !important;
-  }
-  </style>
+  </script>  

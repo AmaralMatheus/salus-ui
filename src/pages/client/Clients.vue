@@ -102,12 +102,21 @@
           itemsPerPage: 10,
           sortBy: []})"/>
       </v-dialog>
+      <v-dialog
+        v-model="newClientDialog"
+        max-width="800"
+      >
+        <client-register :selectedClient="this.selectedItem" @cancel="newClientDialog = false" @reload="newClientDialog = false; loadItems({page:1,
+          itemsPerPage: 10,
+          sortBy: []})"/>
+      </v-dialog>
     </v-col>
   </v-row>
 </template>
 
 <script>
   import Scheduler from '../../components/Scheduler.vue'
+  import ClientRegister from '../../components/ClientRegister.vue'
   import clientService from '../../services/client.service'
   import { format, parseISO } from 'date-fns'
   import { toast } from 'vue3-toastify'
@@ -115,12 +124,14 @@
   export default {
     name: 'ClientList',
     components: {
-      Scheduler
+      Scheduler,
+      ClientRegister
     },
     data: () => ({
       format,
       parseISO,
       schedulerDialog: false,
+      newClientDialog: false,
       itemsPerPage: 5,
       dialog: false,
       selectedItem: null,
@@ -180,15 +191,12 @@
         })
       },
       create () {
-        this.$router.push({
-          name: 'client-register'
-        })
+        this.selectedItem = null
+        this.newClientDialog = true
       },
       update (row) {
-        this.$router.push({
-          name: 'client-register',
-          params: { id: row.id }
-        })
+        this.selectedItem = row.id
+        this.newClientDialog = true
       },
       remove () {
         this.loading = true

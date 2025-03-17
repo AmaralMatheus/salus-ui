@@ -4,7 +4,7 @@
       <div>
         <v-row>
           <v-col cols="12" md="6" class="d-flex flex-column ga-6">
-            <v-card @click="$router.push({name: 'client-register'})" class="action-card cursor-pointer" title="Ações Rápidas">
+            <v-card @click="newClientDialog = true" class="action-card cursor-pointer" title="Ações Rápidas">
               <v-card-text class="d-flex h-100">
                 <span class="mx-auto mt-4 d-flex flex-column">
                   <img width="48" class="cursor-pointer mx-auto" :src="require('../assets/user-add-fill.svg')"/>
@@ -120,7 +120,14 @@
   >
     <scheduler @cancel="schedulerDialog = false" @reload="init"/>
   </v-dialog>
-  <Transaction :transactionDialog="transactionDialog" @reload="loadItems({ page:1, itemsPerPage: 10, sortBy: []})" @close="transactionDialog = false"></Transaction>
+
+  <v-dialog
+    v-model="newClientDialog"
+    max-width="800"
+  >
+    <client-register :selectedClient="this.selectedItem" @cancel="newClientDialog = false" @reload="newClientDialog = false"/>
+  </v-dialog>
+  <Transaction :transactionDialog="transactionDialog" @reload="init" @close="transactionDialog = false"></Transaction>
 </template>
 
 <script>
@@ -130,6 +137,7 @@
   import Calendar from '../components/Calendar.vue'
   import Scheduler from '../components/Scheduler.vue'
   import Transaction from '../components/Transaction.vue'
+  import ClientRegister from '../components/ClientRegister.vue'
   import {
     Chart as ChartJS,
     CategoryScale,
@@ -160,13 +168,15 @@
       Line,
       Calendar,
       Scheduler,
-      Transaction
+      Transaction,
+      ClientRegister
     },
     data() {
       return {
         loading: true,
         schedulerDialog: false,
         transactionDialog: false,
+        newClientDialog: false,
         appointment: {},
         transactions: [],
         info: {

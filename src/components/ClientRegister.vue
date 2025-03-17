@@ -4,7 +4,7 @@
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
           <v-row>
-            <v-col cols="12" sm="6" md="4">
+            <v-col cols="12" sm="6" md="3">
               <v-text-field
                 v-model="client.name"
                 :loading="loadingInfo"
@@ -17,6 +17,19 @@
               </v-text-field>
             </v-col>
             <v-col cols="12" sm="6" md="2">
+              <v-text-field
+                v-model="client.cpf"
+                :loading="loadingInfo"
+                :disabled="loadingInfo"
+                :rules="cpfRules"
+                variant="outlined"
+                density="compact"
+                v-maska="'###.###.###-##'"
+                hide-details="auto"
+                label="CPF">
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6" md="1">
               <v-select
               :items="[
                   {label: 'Masculino', id: 1},
@@ -52,7 +65,21 @@
                 label="Data de nascimento">
               </v-date-input>
             </v-col>
-            <v-col cols="12" sm="6" md="4">
+            <v-col cols="12" sm="6" md="2">
+              <v-text-field
+                v-model="client.cep"
+                :loading="loadingInfo"
+                :disabled="loadingInfo"
+                :rules="cepRules"
+                @change="getAddress"
+                v-maska="'#####-###'"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                label="CEP">
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6" md="5">
               <v-text-field
                 v-model="client.address"
                 :loading="loadingInfo"
@@ -62,6 +89,36 @@
                 hide-details="auto"
                 label="Endereço">
               </v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6" md="2">
+              <v-autocomplete
+              :items="states"
+                item-title="sigla"
+                item-value="id"
+                v-model="client.state"
+                :loading="loadingInfo"
+                :disabled="loadingInfo || blockState"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                @update:modelValue="getCities"
+                label="Estado">
+              </v-autocomplete>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <v-autocomplete
+              :items="cities"
+                item-title="nome"
+                item-value="id"
+                v-model="client.city"
+                :loading="loadingInfo"
+                :disabled="loadingInfo || blockCity"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                no-data-text="Selecione um estado"
+                label="Cidade">
+              </v-autocomplete>
             </v-col>
             <v-col cols="12" sm="6" md="3">
               <v-text-field
@@ -89,13 +146,8 @@
             </v-col>
             <v-col cols="12" sm="6" md="2">
               <v-select
-              :items="[
-                  {label: 'Em Tratamento', id: 1},
-                  {label: 'Orçando', id: 2},
-                  {label: 'Inativo', id: 3},
-                  {label: 'Plano de Tratamento enviado', id: 4},
-                ]"
-                item-title="label"
+              :items="statuses"
+                item-title="name"
                 item-value="id"
                 v-model="client.status"
                 :loading="loadingInfo"
@@ -129,8 +181,9 @@
               </v-textarea>
             </v-col>
           </v-row>
-          <div>
-            <v-btn type="submit" class="text-none" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">Salvar</v-btn>
+          <div class="d-flex">
+            <v-btn class="ml-auto" @click="$emit('cancel')" variant="plain">Cancelar</v-btn>
+            <v-btn type="submit" variant="plain" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">SALVAR</v-btn>
           </div>
         </v-form>
       </v-card-text>
@@ -139,7 +192,9 @@
 </template>
 
 <script>
-  import clientService from '../../services/client.service'
+  import clientService from '../services/client.service'
+  import statusService from '../services/company.service'
+  import locationService from '../services/location.service'
   import { VDateInput } from 'vuetify/labs/VDateInput'
   import { vMaska } from "maska/vue"
   import { toast } from 'vue3-toastify'
@@ -151,9 +206,10 @@
     directives: { maska: vMaska },
     computed: {
       id() {
-        return this.$route.params.id
+        return this.selectedClient
       },
     },
+    props: ['selectedClient'],
     data: () => ({
       valid: true,
       client: {
@@ -163,6 +219,11 @@
         address: '',
         birthday: null,
       },
+      statuses: [],
+      cities: [],
+      states: [],
+      blockCity: false,
+      blockState: false,
       loadingRequest: false,
       loadingInfo: false,
       rules: [
@@ -182,6 +243,28 @@
           }
         },
       ],
+      cpfRules: [
+        value => {
+          if (value) {
+            if (value.length < 14) return 'Informe o CPF completo.'
+            if (value.length === 0) return true
+            return true
+          } else {
+            return true
+          }
+        },
+      ],
+      cepRules: [
+        value => {
+          if (value) {
+            if (value.length < 9) return 'Informe o CEP completo.'
+            if (value.length === 0) return true
+            return true
+          } else {
+            return true
+          }
+        },
+      ],
       dateRule: [
         value => {
           if (!value) return true
@@ -194,11 +277,52 @@
       ],
     }),
     created() {
+      console.log(this.id)
       if (this.id) {
         this.getClient()
       }
+      this.loading = true
+      this.getStates()
+      statusService.getAllStatus().then((response) => {
+        this.statuses = response.data
+        this.loading = false
+      })
     },
     methods: {
+      getAddress() {
+        this.blockCity = false
+        this.blockState = false
+        if(this.client.cep.length === 9) {
+          locationService.getAddress(this.client.cep.replace('-', '')).then((response) => {
+            if (response.data.uf) {
+              this.client.state = this.states.filter((state) => state.sigla === response.data.uf)[0].id
+              this.blockState = true
+              const returnedCity = response.data.localidade 
+              locationService.getCities(this.client.state).then((response) => {
+                this.cities = response.data
+                if (returnedCity) {
+                  this.client.city = this.cities.filter((city) => {
+                    return city.nome === returnedCity
+                  })[0]
+                  this.blockCity = true
+                }
+              })
+            }
+
+            this.client.address = response.data.logradouro + (response.data.complemento ? ', ' + response.data.complemento : '')
+          })
+        }
+      },
+      getCities(){
+        locationService.getCities(this.client.state).then((response) => {
+          this.cities = response.data
+        })
+      },
+      getStates(){
+        locationService.getStates().then((response) => {
+          this.states = response.data
+        })
+      },
       getClient() {
         this.loadingInfo = true
         clientService.getClient(this.id).then((response) => {
@@ -215,7 +339,7 @@
         if (this.id) {
           clientService.updateClient(this.id, this.client).then(() => {
             this.loadingRequest = false
-            this.$router.go(-1)
+            this.$emit('reload')
           },
           (error) => {
             this.loadingRequest = false
@@ -228,7 +352,7 @@
         } else {
           clientService.saveClient(this.client).then(() => {
             this.loadingRequest = false
-            this.$router.push('/clientes')
+            this.$emit('reload')
           },
           (error) => {
             this.loadingRequest = false

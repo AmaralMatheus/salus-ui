@@ -76,7 +76,7 @@
           </v-row>
         </v-card-text>
         <v-card-text v-else :class="newPlan.actions.length === 0 ? 'pb-0' : ''">
-          <v-form v-model="planForm">
+          <v-form v-model="planForm" class="d-flex flex-column ga-4">
             <v-text-field
               label="Título"
               :rules="rules"
@@ -131,15 +131,16 @@
                 </v-row>
               </template>
             </draggable>
+            <v-btn
+              text="Adicionar Procedimento"
+              v-if="descriptionAction === 'plans'"
+              variant="outlined"
+              class="mx-auto"
+              @click="newPlan.actions.push({price: 0, description: '', quantity: null, order: newPlan.actions.length})"
+            ></v-btn>
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <v-btn
-            text="Adicionar Procedimento"
-            v-if="descriptionAction === 'plans'"
-            variant="plain"
-            @click="newPlan.actions.push({price: 0, description: '', quantity: null, order: newPlan.actions.length})"
-          ></v-btn>
           <v-spacer></v-spacer>
           <v-btn
             text="Cancelar"
@@ -569,16 +570,14 @@
       :title="'Plano de tratamento ' + currentPlan.name"
     >
       <v-card-text>
-        <v-row>
-          <v-col class="pa-1" cols="6"><div class="px-2 ma-0">Atividade</div></v-col>
-          <v-col class="pa-1" cols="3"><div class="px-2 ma-0">Quantidade</div></v-col>
-          <v-col class="pa-1" cols="3"><div class="px-2 ma-0">Preço</div></v-col>
-        </v-row>
-        <v-row v-for="action in currentPlan.actions" :key="action">
-          <v-col class="pa-1" cols="6"><div class="bg-grey-lighten-3 pa-2 ma-0">{{ action.description }}</div></v-col>
-          <v-col class="pa-1" cols="3"><div class="bg-grey-lighten-3 pa-2 ma-0">{{ action.quantity }}</div></v-col>
-          <v-col class="pa-1" cols="3"><div class="bg-grey-lighten-3 pa-2 ma-0">{{ action.price.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }} R$</div></v-col>
-        </v-row>
+        <v-data-table-virtual
+          :headers="planActionHeaders"
+          :items="currentPlan.actions"
+        >
+          <template v-slot:[`item.price`]="{ item }">
+            {{ item.price.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }} R$
+          </template>
+        </v-data-table-virtual>
       </v-card-text>
       <v-card-actions>
         <div class="ml-2">Total: R$ {{ getTotal().toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}</div>
@@ -659,6 +658,16 @@
             key: 'name',
           },
           { title: 'Data', key: 'created_at', align: 'end' },
+        ],
+        planActionHeaders: [
+          {
+            title: 'Procedimento',
+            align: 'start',
+            sortable: true,
+            key: 'description',
+          },
+          { title: 'Quantidade', key: 'quantity', align: 'end' },
+          { title: 'Preço', key: 'price', align: 'end' },
         ],
         planDialog: false,
         prescriptionDialog: false,
