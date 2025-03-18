@@ -143,9 +143,6 @@ export default {
   -moz-box-shadow: 0px 0px 0px -0px rgba(0,0,0,0) !important;
   box-shadow:0px 0px 0px 0px rgba(0,0,0,0) !important;
 }
-.v-btn {
-  height: 40px !important;
-}
 .bg-app {
   background: linear-gradient(106.57deg, #FEF7F7 0.04%, #E4EEEE 51.26%, #F4E3E3 100.46%);
 }

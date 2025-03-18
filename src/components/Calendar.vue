@@ -100,19 +100,6 @@ const calendarApp = createCalendar(
   [eventsServicePlugin, eventModal]
 )
 
-function getName(type) {
-  switch (type) {
-    case 1:
-      return 'Consulta'
-    case 2:
-      return 'Extração'
-    case 3:
-      return 'Manutenção'
-    default:
-      return 'Consulta'
-  }
-}
-
 function remove () {
   loading.value = true
   if (selectedEvent.value.title === 'Agendamento Google') {
@@ -152,12 +139,12 @@ function load() {
   appointmentService.getAllAppointments().then((response) => {
     response.data.forEach((event) => {
       calendarApp.eventsService.add({
-        title: getName(event.type),
+        title: event.procedures,
         people: [event.client.name],
         client: event.client,
         date: event.date,
         user: event.user_id,
-        type: event.type,
+        procedures: event.procedures,
         duration: event.duration,
         description: event.description,
         start: format(parseISO(event.date), 'yyyy-MM-dd kk:mm'),
@@ -203,12 +190,7 @@ eventModal.close(); // close the modal
     <template v-if="showHeader" #headerContent="{ }">
     </template>
     <template #timeGridEvent="{ calendarEvent }">
-      <div class="event px-3 py-2">
-        <div class="d-flex ga-4">
-          <div><v-icon>mdi-calendar</v-icon></div>
-          <div>{{ calendarEvent.title }}</div>
-        </div>
-
+      <div class="event px-3 py-1">
         <div class="d-flex ga-4">
           <div><v-icon>mdi-account</v-icon></div>
           <div>{{ calendarEvent.people.toString() }}</div>
@@ -218,20 +200,15 @@ eventModal.close(); // close the modal
           <div><v-icon>mdi-clock</v-icon></div>
           <div>{{ getDateTime(calendarEvent.start) }}</div>
         </div>
+
+        <div class="mt-1 d-flex ga-2">
+          <v-chip v-for="procedure in calendarEvent.title" :key="procedure" density="compact" color="primary" size="small">{{ procedure.name }}</v-chip>
+        </div>
       </div>
     </template>
     <template #eventModal="{ calendarEvent }">
-      <div class="event bg-grey rounded">
-        <div class="pa-3 d-flex flex-column ga-4">
-          <div class="d-flex ga-4">
-            <div><v-icon>mdi-calendar</v-icon></div>
-            <div>{{ calendarEvent.title }}</div>
-            <div class="ml-auto d-flex ga-3">
-              <v-btn density="compact" size="small" icon="mdi-pencil" @click="$emit('update', calendarEvent)" color="warning"></v-btn>
-              <v-btn density="compact" size="small" icon="mdi-delete" @click="$emit('update', calendarEvent)" color="primary"></v-btn>
-            </div>
-          </div>
-  
+      <div class="event bg-grey rounded d-flex pa-3">
+        <div class="d-flex flex-column ga-4">
           <div class="d-flex ga-4">
             <div><v-icon>mdi-account</v-icon></div>
             <div>{{ calendarEvent.people.toString() }}</div>
@@ -242,11 +219,18 @@ eventModal.close(); // close the modal
             <div>{{ getDateTime(calendarEvent.start) }}</div>
           </div>
 
-          <div class="d-flex ga-4" v-if="calendarEvent.description.length > 0">
+          <div class="d-flex ga-4" v-if="calendarEvent.description?.length > 0">
             <div><v-icon>mdi-text</v-icon></div>
             <div>{{ calendarEvent.description }}</div>
           </div>
-          <v-btn @click="$emit('update', calendarEvent)" color="primary">Alterar Data/Horário</v-btn>
+          
+          <div class="mt-1 d-flex ga-2">
+            <v-chip v-for="procedure in calendarEvent.title" :key="procedure" density="compact" color="primary" size="small">{{ procedure.name }}</v-chip>
+          </div>
+        </div>
+        <div class="ml-auto d-flex ga-3">
+          <v-btn density="comfortable" size="small" icon="mdi-pencil" @click="$emit('update', calendarEvent)" color="warning"></v-btn>
+          <v-btn density="comfortable" size="small" icon="mdi-delete" @click="$emit('delete', calendarEvent)" color="primary"></v-btn>
         </div>
       </div>
     </template>
@@ -340,6 +324,8 @@ eventModal.close(); // close the modal
 }
 
 .event {
+  height: -webkit-fill-available;
+  z-index: 3;
   -webkit-box-shadow: 6px 6px 26px -11px rgba(0,0,0,0.75) !important;
   -moz-box-shadow: 6px 6px 26px -11px rgba(0,0,0,0.75) !important;
   box-shadow: 6px 6px 26px -11px rgba(0,0,0,0.75) !important;

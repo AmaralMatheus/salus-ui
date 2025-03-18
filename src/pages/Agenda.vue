@@ -47,6 +47,11 @@ export default {
       this.selectedItem = item
       this.schedulerDialog = true
     },
+    deleteEvent(item) {
+      this.loading = false
+      this.selectedItem = item
+      this.dialog = true
+    },
     loadItems ({ page, itemsPerPage, sortBy }) {
       this.loading = true
       if (sortBy.length <= 1) {
@@ -58,8 +63,8 @@ export default {
       appointmentService.getAppointments(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
         this.serverItems = response.data.data
         this.totalItems = response.data.total
-        this.loading = false
       })
+      this.loading = false
     },
     remove () {
       this.loading = true
@@ -111,7 +116,7 @@ export default {
           <Calendar :show-header="false" :limits="{
             start: '07:00',
             end: '23:59',
-          }" @update="update"/>
+          }" @update="update" @delete="deleteEvent"/>
         </v-card-text>
         <v-card-text v-else>
           <v-data-table-server
@@ -161,7 +166,7 @@ export default {
       max-width="400"
       prepend-icon="mdi-alert-outline"
       text="Esses dados não podem ser restaurados"
-      title="Deseja excluir esse appointmente?"
+      title="Deseja excluir esse evento?"
     >
       <template v-slot:actions>
         <v-btn

@@ -63,7 +63,7 @@
             </v-menu>
           </template>
           <template v-slot:[`item.status`]="{ item }">
-            {{ getStatusType(item.status) }}
+            {{ item.status?.name }}
           </template>
         </v-data-table-server>
       </v-card>
@@ -220,18 +220,6 @@
       getDateTime(date) {
         return format(parseISO(date), 'dd/MM/yyyy kk:mm')
       },
-      getStatusType(status) {
-        switch(status) {
-          case 1:
-            return 'Em Tratamento'
-          case 2:
-            return 'Orçando'
-          case 3:
-            return 'Inativo'
-          case 4:
-            return 'Plano de Tratamento enviado'
-        }
-      }
     },
   }
 </script>

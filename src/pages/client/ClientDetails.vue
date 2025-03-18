@@ -1,162 +1,98 @@
 <template>
   <v-row>
     <v-col cols="12" sm="6" md="7" lg="8">
-      <v-card v-if="!descriptionDialog && !loading" title="Odontograma">
+      <v-card v-if="!loading" title="Odontograma">
         <v-card-text>
-          <div class="d-flex flex-column ga-3">
-            <div class="d-flex justify-space-between align-baseline">
-              <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
-                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                  <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
-                  <v-tooltip
-                    activator="parent"
-                    location="bottom"
-                    :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
-                  >{{ getToothStatus(client.teeth[tooth].status) }}
-                    <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
-                      <div v-html="evolution.description"></div>
-                      <div>{{ getDateTime(evolution.created_at) }}</div>
-                    </div>
-                  </v-tooltip>
+          <v-tabs-window v-model="tab">
+            <v-tabs-window-item
+              :key="1"
+              :value="1"
+            >
+              <div class="d-flex flex-column ga-3">
+                <div class="d-flex justify-space-between align-baseline">
+                  <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
+                      <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                      <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+                      <v-tooltip
+                        activator="parent"
+                        location="bottom"
+                        :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
+                      >{{ getToothStatus(client.teeth[tooth].status) }}
+                        <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
+                          <div v-html="evolution.description"></div>
+                          <div>{{ getDateTime(evolution.created_at) }}</div>
+                        </div>
+                      </v-tooltip>
+                  </div>
+                </div>
+                <div class="d-flex justify-space-between">
+                  <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
+                      <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+                      <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                      <v-tooltip
+                        activator="parent"
+                        location="bottom"
+                        :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
+                      >{{ getToothStatus(client.teeth[tooth].status) }}
+                        <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
+                          <div v-html="evolution.description"></div>
+                          <div>{{ getDateTime(evolution.created_at) }}</div>
+                        </div>
+                      </v-tooltip>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="d-flex justify-space-between">
-              <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
-                  <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
-                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                  <v-tooltip
-                    activator="parent"
-                    location="bottom"
-                    :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
-                  >{{ getToothStatus(client.teeth[tooth].status) }}
-                    <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
-                      <div v-html="evolution.description"></div>
-                      <div>{{ getDateTime(evolution.created_at) }}</div>
-                    </div>
-                  </v-tooltip>
+            </v-tabs-window-item>
+            <v-tabs-window-item
+              :key="2"
+              :value="2"
+            >  
+              <div class="d-flex flex-column ga-3">
+                <div class="d-flex justify-space-between align-baseline">
+                  <div v-for="tooth in [32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]" class="d-flex flex-column" :key="tooth">
+                      <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                      <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+(tooth-32)+'.svg')"/>
+                      <v-tooltip
+                        activator="parent"
+                        location="bottom"
+                        :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
+                      >{{ getToothStatus(client.teeth[tooth].status) }}
+                        <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
+                          <div v-html="evolution.description"></div>
+                          <div>{{ getDateTime(evolution.created_at) }}</div>
+                        </div>
+                      </v-tooltip>
+                  </div>
+                </div>
+                <div class="d-flex justify-space-between">
+                  <div v-for="tooth in [48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63]" class="d-flex flex-column" :key="tooth">
+                      <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+(tooth-32)+'.svg')"/>
+                      <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                      <v-tooltip
+                        activator="parent"
+                        location="bottom"
+                        :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
+                      >{{ getToothStatus(client.teeth[tooth].status) }}
+                        <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
+                          <div v-html="evolution.description"></div>
+                          <div>{{ getDateTime(evolution.created_at) }}</div>
+                        </div>
+                      </v-tooltip>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </v-card-text>
-      </v-card>
-      <v-card
-        v-else-if="descriptionDialog && !loading"
-        :title="'Adicionar ' +  (descriptionAction === 'evolutions' ? 'Evolução' : descriptionAction === 'plans' ? 'Plano' : 'Receita')"
-      >
-        <v-card-text  v-if="descriptionAction === 'evolutions' || descriptionAction === 'prescriptions'">
-          <div class="d-flex flex-column ga-3 mb-3" v-if="descriptionAction === 'evolutions'">
-            <div class="d-flex justify-space-between align-baseline">
-              <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
-                <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
-              </div>
-            </div>
-            <div class="d-flex justify-space-between">
-              <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
-                <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
-                <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-              </div>
-            </div>
-          </div>
-          <v-row dense >
-            <v-col cols="12">
-              <v-text-field
-                v-if="descriptionAction !== 'evolutions'"
-                label="Título"
-                required
-                :disabled="loading"
-                variant="outlined"
-                density="compact"
-                v-model="title"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <quill-editor style="height:200px" placeholder="Descrição" contentType="html" v-model:content="description" theme="snow"></quill-editor>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-card-text v-else :class="newPlan.actions.length === 0 ? 'pb-0' : ''">
-          <v-form v-model="planForm" class="d-flex flex-column ga-4">
-            <v-text-field
-              label="Título"
-              :rules="rules"
-              :disabled="loading"
-              variant="outlined"
-              density="compact"
-              v-model="title"
-            ></v-text-field>
-            <div class="text-center" v-if="newPlan.actions.length === 0">Cadastre os procedimentos para este plano de tratamento!</div>
-            <draggable 
-              v-model="newPlan.actions"
-              v-if="!loading"
-              @start="drag=true" 
-              @end="drag=false" 
-              item-key="order">
-              <!-- the row will go here -->
-               
-              <template #item="{element}">
-                <v-row dense>
-                  <v-col class="d-flex ga-2" cols="12" sm="6" md="6">
-                    <v-btn size="small" icon="mdi-delete" @click="newPlan.actions = newPlan.actions.filter((action) => action !== element)" color="error" variant="plain"/>
-                    <v-combobox
-                      :items="procedures"
-                      item-title="name"
-                      item-value="name"
-                      :rules="rules"
-                      v-model="element.description"
-                      :loading="loading"
-                      :disabled="loading"
-                      variant="outlined"
-                      density="compact"
-                      hide-details="auto"
-                      @update:modelValue="setProcedure($event, element)"
-                      label="Procedimento">
-                    </v-combobox>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                    <CurrencyInput v-model="element.price"></CurrencyInput>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="2">
-                    <v-text-field
-                      label="Quantidade"
-                      :rules="rules"
-                      hide-details="auto"
-                      :disabled="loading"
-                      variant="outlined"
-                      density="compact"
-                      type="number"
-                      v-model="element.quantity"
-                    ></v-text-field>  
-                  </v-col>
-                </v-row>
-              </template>
-            </draggable>
-            <v-btn
-              text="Adicionar Procedimento"
-              v-if="descriptionAction === 'plans'"
-              variant="outlined"
-              class="mx-auto"
-              @click="newPlan.actions.push({price: 0, description: '', quantity: null, order: newPlan.actions.length})"
-            ></v-btn>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            text="Cancelar"
-            variant="plain"
-            @click="descriptionDialog = false; description = '', teeth = []"
-          ></v-btn>
-
-          <v-btn
+            </v-tabs-window-item>
+          </v-tabs-window>
+          <v-tabs
+            v-model="tab"
             color="primary"
-            text="Salvar"
-            variant="tonal"
-            :disabled="loading || (descriptionAction === 'evolutions' && !description) || (descriptionAction === 'plans' && !planForm) || (descriptionAction === 'prescriptions' && (!description || title === '' || (!description && title === '')))"
-            :loading="loading"
-            @click="saveDescription"
-          ></v-btn>
-        </v-card-actions>
+            align-tabs="center"
+            class="mt-2"
+          >
+            <v-tab :value="1">Permanentes</v-tab>
+            <v-tab :value="2">Desiduos</v-tab>
+          </v-tabs>
+        </v-card-text>
       </v-card>
       <v-skeleton-loader
         v-if="loading"
@@ -164,7 +100,7 @@
         type="article"
       ></v-skeleton-loader>
       <div class="d-flex mt-6">
-        <v-btn v-if="!loading && !descriptionDialog" @click="descriptionDialog = true; description = ''; descriptionAction = 'evolutions'" class="ma-auto mb-6">Adicionar Evolução</v-btn>
+        <v-btn v-if="!loading" @click="descriptionDialog = true; description = ''; descriptionAction = 'evolutions'" class="ma-auto mb-6">Adicionar Evolução</v-btn>
       </div>
       <div v-if="client.evolutions && client.evolutions.length < 1" class="d-flex ma-auto" style="width: max-content">
         Não há evoluções cadastradas!
@@ -391,7 +327,7 @@
                 >
                   <div class="d-flex fill-height justify-center align-center">
                     <div class="text-h2">
-                      <img :src="image.path" />
+                      <img :src="image.path" width="100%" />
                     </div>
                   </div>
                 </v-sheet>
@@ -421,8 +357,8 @@
             </div>
           </div>
         </v-card-title>
-        <v-card-subtitle class="text-medium-emphasis">
-          {{ getStatusType(client.status) }}
+        <v-card-subtitle v-if="client.status" class="text-medium-emphasis">
+          {{ client.status.name }}
         </v-card-subtitle>
         <v-card-text>
           <div v-if="!loading" class="d-flex flex-column ga-6">
@@ -450,10 +386,6 @@
                 <v-icon>mdi-email-outline</v-icon>
                 <div>{{ client.email ?? 'Nenhum e-mail cadastrado' }}</div>
               </div>
-              <div class="d-flex ga-2 align-center" v-if="expanded">
-                <v-icon>mdi-alert-outline</v-icon>
-                <div>{{ client.comorbities ?? 'Nenhum alerta de segurança de saúde' }}</div>
-              </div>
               <div class="d-flex ga-2 align-center">
                 <v-icon>mdi-clock-outline</v-icon>
                 <div>{{ client.next_appointment.length > 0 ? 'Próxima consulta dia ' + getDateTime(client.next_appointment[0].date) : 'Sem consultas agendadas' }}</div>
@@ -462,7 +394,7 @@
             </div>
           </div>
         </v-card-text>
-
+        <v-alert v-if="client.comorbities" type="error" variant="tonal" class="mx-4">{{ client.comorbities }}</v-alert>
         <v-card-title>
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Receitas</h4>
@@ -590,6 +522,18 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+  <v-dialog
+    v-model="descriptionDialog"
+    width="auto"
+  >
+    <ClientInfoDialog :description-action="descriptionAction" :client="client" @cancel="descriptionDialog = false" @save="descriptionDialog = false;getClient()"/>
+  </v-dialog>
+  <v-dialog
+    v-model="registeringDialog"
+    max-width="800"
+  >
+    <client-register :selectedClient="this.client.id" @cancel="registeringDialog = false" @reload="registeringDialog = false; getClient()"/>
+  </v-dialog>
 </template>
 
 <script>
@@ -598,10 +542,8 @@
   import planService from '../../services/plan.service'
   import { format, parseISO, differenceInYears } from 'date-fns'
   import Scheduler from '../../components/Scheduler.vue'
-  import { QuillEditor } from '@vueup/vue-quill'
-  import '@vueup/vue-quill/dist/vue-quill.snow.css'
-  import CurrencyInput from '../../components/CurrencyInput.vue'
-  import draggable from 'vuedraggable'
+  import ClientInfoDialog from '../../components/ClientInfoDialog.vue'
+  import ClientRegister from '../../components/ClientRegister.vue'
   import { toast } from 'vue3-toastify'
 
   export default {
@@ -612,14 +554,15 @@
     },
     components: {
       Scheduler,
-      QuillEditor,
-      CurrencyInput,
-      draggable
+      ClientInfoDialog,
+      ClientRegister
     },
     data () {
       return {
         format,
         parseISO,
+        tab: 1,
+        registeringDialog: false,
         procedures: [],
         expanded: false,
         actionSuggestions: [],
@@ -768,37 +711,7 @@
           })
       },
       update () {
-        this.$router.push({
-          name: 'client-register',
-          params: { id: this.id }
-        })
-      },
-      saveDescription() {
-        this.loading = true
-        const data = {
-          client_id: this.id,
-          description: this.description,
-          title: this.title,
-          name: this.title,
-          actions: this.newPlan.actions,
-          teeth: this.teeth
-        }
-        clientService.saveDescription(data, this.descriptionAction).then(() => {
-          this.loading = false
-          this.descriptionDialog = false
-          this.description = ''
-          this.title = ''
-          this.getClient()
-          this.newPlan.actions = []
-        },
-        (error) => {
-          this.loading = false
-          toast.error((error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                  error.message ||
-                  error.toString())
-        })
+        this.registeringDialog = true
       },
       getToothStatus(status) {
         switch (status) {
@@ -834,33 +747,6 @@
       getBirthday(date) {
         return format(date, 'dd/MM/yyyy')
       },
-      saveImage() {
-        this.loading = true
-        const data = {
-          image: this.image,
-          client: this.id
-        }
-        clientService.saveImage(data).then(() => {
-          this.addImageDialog = false
-          this.image = null
-          this.getClient()
-        },
-        (error) => {
-          this.loading = false
-          toast.error((error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                  error.message ||
-                  error.toString())
-        })
-      },
-      convertToBase64(file) {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = () => {
-          this.image = reader.result
-        }
-      },
       viewRow (event, row) {
         this.planView = true
         this.currentPlan = row.item
@@ -880,18 +766,6 @@
           element.description = event.name
         }
       },
-      getStatusType(status) {
-        switch(status) {
-          case 1:
-            return 'Em Tratamento'
-          case 2:
-            return 'Orçando'
-          case 3:
-            return 'Inativo'
-          case 4:
-            return 'Plano de Tratamento enviado'
-        }
-      }
     }
   }
 </script>

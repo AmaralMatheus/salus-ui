@@ -371,18 +371,6 @@
           this.client.avatar = reader.result
         };
       },
-      getStatusType(status) {
-        switch(status) {
-          case 1:
-            return 'Em Tratamento'
-          case 2:
-            return 'Orçando'
-          case 3:
-            return 'Inativo'
-          case 4:
-            return 'Plano de Tratamento enviado'
-        }
-      }
     },
   }
 </script>

@@ -2,22 +2,19 @@
   <v-form @submit.prevent="schedule" v-model="valid" >
     <v-card
       prepend-icon="mdi-calendar-edit-outline"
-      :subtitle="client ? getName(type) + ' para ' + client.name : customClient ? getName(type) + ' para ' + clients.filter((client) => customClient === client.id)[0].name : ''"
+      :subtitle="client ?  ' para ' + client.name : customClient ? ' para ' + clients.filter((client) => customClient === client.id)[0].name : ''"
       :title="event ? 'Alterar agendamento' : 'Novo agendamento'"
     >
     <v-card-text>
         <v-row>
           <v-col cols="12" :md="currentUser.type === 1 && client ? '6' : currentUser.type === 1 && !client ? '4' : '3'">
             <v-select
-              :items="[
-                {label: 'Consulta', id: 1},
-                {label: 'Extração', id: 2},
-                {label: 'Manutenção', id: 3}
-              ]"
-              item-title="label"
+              :items="allProcedures"
+              item-title="name"
               item-value="id"
               hide-details="auto"
-              v-model="type"
+              multiple
+              v-model="procedures"
               :loading="loading"
               :disabled="loading"
               :rules="rules"
@@ -109,7 +106,7 @@
         class="ms-auto"
         text="Cancelar"
         :disabled="loading"
-        @click="this.$emit('cancel'); scheduleDate = null; description = ''; type = 1; duration = 60;"
+        @click="this.$emit('cancel'); scheduleDate = null; description = ''; procedures = []; duration = 60;"
         ></v-btn>
         <v-btn
         text="Agendar"
@@ -126,6 +123,7 @@
 <script>
   import clientService from '../services/client.service'
   import appointmentService from '../services/appointment.service'
+  import procedureService from '../services/company.service'
   import userService from '../services/user.service'
   import { vMaska } from "maska/vue"
   import { format, parseISO, setHours, setMinutes } from 'date-fns'
@@ -147,11 +145,12 @@
       users: [],
       user: null,
       clients: [],
+      allProcedures: [],
       customClient: null,
       scheduleDate: null,
       scheduleTime: null,
       description: '',
-      type: 1,
+      procedures: [],
       duration: 60,
       rules: [
         value => {
@@ -172,7 +171,7 @@
         this.scheduleDate = parseISO(this.event.date)
         this.scheduleTime = parseISO(this.event.date)
         this.user = this.event.user_id
-        this.type = this.event.type
+        this.procedures = this.event.procedures
         this.duration = this.event.duration
         this.description = this.event.description
       }
@@ -182,19 +181,25 @@
       clientService.getAllClients().then((response) => {
         this.clients = response.data
       })
+      procedureService.getAllProcedures().then((response) => {
+        this.allProcedures = response.data
+      })
     },
     methods: {
       schedule () {
         if (this.valid) {
           this.loading = true
-          this.scheduleDate = setHours(this.scheduleDate,this.scheduleTime.split(':')[0])
-          this.scheduleDate = setMinutes(this.scheduleDate,this.scheduleTime.split(':')[1])
+          console.log(typeof this.scheduleTime === 'string' || this.scheduleTime instanceof String)
+          if (typeof this.scheduleTime === 'string' || this.scheduleTime instanceof String) {
+            this.scheduleDate = setHours(this.scheduleDate,this.scheduleTime.split(':')[0])
+            this.scheduleDate = setMinutes(this.scheduleDate,this.scheduleTime.split(':')[1])
+          } 
           const data = {
             client_id: this.customClient ?? this.client.id,
             user_id: this.user,
             date: this.scheduleDate.toISOString(),
             description: this.description,
-            type: this.type,
+            procedures: this.procedures,
             duration: this.duration,
           }
           if (this.event) {
@@ -224,18 +229,6 @@
                   error.toString())
               })
           }
-        }
-      },
-      getName(type) {
-        switch (type) {
-          case 1:
-            return 'Consulta'
-          case 2:
-            return 'Extração'
-          case 3:
-            return 'Manutenção'
-          default:
-            return 'Consulta'
         }
       },
     },
