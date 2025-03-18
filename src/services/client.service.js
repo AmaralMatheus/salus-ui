@@ -1,7 +1,7 @@
 import axios from 'axios'
 import authHeader from './auth-header'
 
-const API_URL = 'https://lizard-clean-singularly.ngrok-free.app/api/'
+const API_URL = 'https://salus-682523916a3b.herokuapp.com/api/'
 
 class ClientService {
   getAllClients() {
