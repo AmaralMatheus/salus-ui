@@ -330,6 +330,9 @@
           if (response.data.birthday) {
             response.data.birthday = new Date(response.data.birthday);
           }
+          if (response.data.status) {
+            response.data.status = response.data.status.id;
+          }
           this.client = response.data
           this.loadingInfo = false
         })
