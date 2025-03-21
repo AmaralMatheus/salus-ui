@@ -55,7 +55,7 @@
             
           <template #item="{element}">
             <v-row dense>
-              <v-col class="d-flex ga-2" cols="12" sm="6" md="6">
+              <v-col class="d-flex ga-2" cols="12" sm="6" md="4">
                 <v-btn size="small" icon="mdi-delete" @click="newPlan.actions = newPlan.actions.filter((action) => action !== element)" color="error" variant="plain"/>
                 <v-combobox
                   :items="procedures"
@@ -72,20 +72,48 @@
                   label="Procedimento">
                 </v-combobox>
               </v-col>
-              <v-col cols="12" sm="6" md="4">
+              <v-col cols="12" sm="6" md="2">
                 <CurrencyInput v-model="element.price"></CurrencyInput>
               </v-col>
-              <v-col cols="12" sm="6" md="2">
-                <v-text-field
-                  label="Quantidade"
-                  :rules="rules"
-                  hide-details="auto"
-                  :disabled="loading"
-                  variant="outlined"
-                  density="compact"
-                  type="number"
-                  v-model="element.quantity"
-                ></v-text-field>  
+              <v-col cols="12" sm="6" md="6">
+                <v-menu :close-on-content-click="false">
+                  <template v-slot:activator="{ props }">
+                    <v-combobox
+                      readonly
+                      clearable
+                      v-bind="props"
+                      :items="[16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]"
+                      item-title="name"
+                      item-value="name"
+                      multiple
+                      :rules="rules"
+                      v-model="element.quantity"
+                      :loading="loading"
+                      :disabled="loading"
+                      variant="outlined"
+                      density="compact"
+                      hide-details="auto"
+                      label="Quantidade">
+                    </v-combobox>
+                  </template>
+
+                  <v-list>
+                    <v-list-item>
+                      <div class="d-flex justify-space-between align-baseline">
+                        <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
+                          <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                          <img class="cursor-pointer" @click="element.quantity.push(tooth)" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-space-between">
+                        <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
+                          <img class="cursor-pointer" @click="element.quantity.push(tooth)" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
+                          <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                        </div>
+                      </div>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
               </v-col>
             </v-row>
           </template>
@@ -95,7 +123,7 @@
           v-if="descriptionAction === 'plans'"
           variant="outlined"
           class="mx-auto"
-          @click="newPlan.actions.push({price: 0, description: '', quantity: null, order: newPlan.actions.length})"
+          @click="newPlan.actions.push({price: 0, description: '', quantity: [], order: newPlan.actions.length})"
         ></v-btn>
       </v-form>
     </v-card-text>

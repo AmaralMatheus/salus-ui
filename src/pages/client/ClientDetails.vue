@@ -509,6 +509,9 @@
           <template v-slot:[`item.price`]="{ item }">
             {{ item.price.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }} R$
           </template>
+          <template v-slot:[`item.quantity`]="{ item }">
+            {{ item.teeth.length }}
+          </template>
         </v-data-table-virtual>
       </v-card-text>
       <v-card-actions>
@@ -524,7 +527,7 @@
   </v-dialog>
   <v-dialog
     v-model="descriptionDialog"
-    width="auto"
+    width="800"
   >
     <ClientInfoDialog :description-action="descriptionAction" :client="client" @cancel="descriptionDialog = false" @save="descriptionDialog = false;getClient()"/>
   </v-dialog>
@@ -650,7 +653,7 @@
       getTotal() {
         let total = 0
         this.currentPlan.actions.forEach((action) => {
-          total += action.price * action.quantity
+          total += action.price * action.teeth.length
         })
         return total
       },
