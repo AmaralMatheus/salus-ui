@@ -146,6 +146,7 @@
               :items="statuses"
                 item-title="name"
                 item-value="id"
+                :return-object="false"
                 v-model="client.status"
                 :loading="loadingInfo"
                 :disabled="loadingInfo"
