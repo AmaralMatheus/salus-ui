@@ -212,20 +212,18 @@
           title="Receitas"
         >
           <v-card-text>
-            <v-data-table-server
+            <v-data-table-virtual
               v-model:items-per-page="itemsPerPage"
               :headers="headers"
               :items="client.prescriptions"
               :items-length="client.prescriptions.length"
               item-value="id"
+              @click:row="viewPrescription"
             >
-              <template v-slot:[`item.description`]="{ item }">
-                <div v-html="item.description"></div>
-              </template>
               <template v-slot:[`item.created_at`]="{ item }">
                 {{ getDateTime(item.created_at) }}
               </template>
-            </v-data-table-server>
+            </v-data-table-virtual>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -246,8 +244,7 @@
           title="Planos"
         >
           <v-card-text>
-            <v-data-table-server
-              v-model:items-per-page="itemsPerPage"
+            <v-data-table-virtual
               :headers="planHeaders"
               :items="client.plans"
               :items-length="client.plans.length"
@@ -260,7 +257,7 @@
               <template v-slot:[`item.created_at`]="{ item }">
                 {{ getDateTime(item.created_at) }}
               </template>
-            </v-data-table-server>
+            </v-data-table-virtual>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -405,8 +402,9 @@
         </v-card-title>
         <v-card-text v-if="client.prescriptions && client.prescriptions.length > 0" class="d-flex flex-column ga-3">
           <div v-for="prescription in client.prescriptions" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between align-center text-none bg-surface" :key="prescription.id">
-            <div class="text-error">{{ getDateTime(prescription.created_at) }}</div>
-            <div>{{prescription.title}}</div>
+            <div @click="prescriptionView = true; currentPrescription = prescription" class="d-flex justify-space-between w-100">
+              <div class="text-error">{{ getDateTime(prescription.created_at) }}</div>
+            </div>
             <v-btn size="small" density="comfortable" icon="mdi-delete" @click="prescriptionDeleteDialog = true; selectedPrescription = prescription.id" color="error" variant="text"/>
           </div>
           <div @click="prescriptionDialog = true" class="text-none text-primary cursor-pointer d-flex align-center" >
@@ -526,6 +524,27 @@
     </v-card>
   </v-dialog>
   <v-dialog
+    v-model="prescriptionView"
+    width="auto"
+  >
+    <v-card
+      width="600"
+      :title="'Receita de ' + getDateTime(currentPrescription.created_at)"
+    >
+      <v-card-text>
+        <div v-html="currentPrescription.description" />
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          text="Fechar"
+          variant="plain"
+          @click="prescriptionView = false"
+        ></v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <v-dialog
     v-model="descriptionDialog"
     width="800"
   >
@@ -576,6 +595,8 @@
         selectedPrescription: null,
         prescriptionDeleteDialog: false,
         currentPlan: null,
+        currentPrescription: null,
+        prescriptionView: false,
         newPlan: {
           actions: [],
           name: ''
@@ -588,13 +609,7 @@
         itemsPerPage: 5,
         teeth: [],
         headers: [
-          {
-            title: 'Receita',
-            align: 'start',
-            sortable: true,
-            key: 'description',
-          },
-          { title: 'Data', key: 'created_at', align: 'end' },
+          { title: 'Data', key: 'created_at', align: 'start' },
         ],
         planHeaders: [
           {
@@ -754,6 +769,10 @@
         this.planView = true
         this.currentPlan = row.item
       },
+      viewPrescription (event, row) {
+        this.prescriptionView = true
+        this.currentPrescription = row.item
+      },
       getAge() {
         return differenceInYears(new Date(), this.client.birthday)
       },
@@ -768,6 +787,33 @@
           element.price = event.price
           element.description = event.name
         }
+      },
+      convertToBase64(file) {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => {
+          this.image = reader.result
+        }
+      },
+      saveImage() {
+        this.loading = true
+        const data = {
+          image: this.image,
+          client: this.id
+        }
+        clientService.saveImage(data).then(() => {
+          this.addImageDialog = false
+          this.image = null
+          this.$emit('save')
+        },
+        (error) => {
+          this.loading = false
+          toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
+        })
       },
     }
   }

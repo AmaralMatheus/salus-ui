@@ -20,7 +20,7 @@
       <v-row dense >
         <v-col cols="12">
           <v-text-field
-            v-if="descriptionAction !== 'evolutions'"
+            v-if="descriptionAction !== 'evolutions' && descriptionAction !== 'prescriptions'"
             label="Título"
             required
             :disabled="loading"
@@ -34,7 +34,7 @@
         </v-col>
       </v-row>
     </v-card-text>
-    <v-card-text v-else :class="newPlan.actions?.length === 0 ? 'pb-0' : ''">
+    <v-card-text v-else class="pb-0">
       <v-form v-model="planForm" class="d-flex flex-column ga-4">
         <v-text-field
           label="Título"
@@ -42,12 +42,13 @@
           :disabled="loading"
           variant="outlined"
           density="compact"
+          hide-details
           v-model="title"
         ></v-text-field>
         <div class="text-center" v-if="newPlan.actions?.length === 0">Cadastre os procedimentos para este plano de tratamento!</div>
         <draggable 
           v-model="newPlan.actions"
-          v-if="!loading"
+          v-if="!loading && newPlan.actions?.length > 0"
           @start="drag=true" 
           @end="drag=false" 
           item-key="order">
@@ -55,8 +56,11 @@
             
           <template #item="{element}">
             <v-row dense>
-              <v-col class="d-flex ga-2" cols="12" sm="6" md="4">
-                <v-btn size="small" icon="mdi-delete" @click="newPlan.actions = newPlan.actions.filter((action) => action !== element)" color="error" variant="plain"/>
+              <v-col class="d-flex mx-auto align-center ga-2 mt-1" cols="1">
+                <v-btn size="comfortable" icon="mdi-reorder-horizontal" disabled variant="plain"/>
+                <v-btn size="comfortable" icon="mdi-delete" @click="newPlan.actions = newPlan.actions.filter((action) => action !== element)" color="error" variant="plain"/>
+              </v-col>
+              <v-col cols="11" sm="5" md="3">
                 <v-combobox
                   :items="procedures"
                   item-title="name"
@@ -65,17 +69,14 @@
                   v-model="element.description"
                   :loading="loading"
                   :disabled="loading"
-                  variant="outlined"
+                  variant="underlined"
                   density="compact"
                   hide-details="auto"
                   @update:modelValue="setProcedure($event, element)"
                   label="Procedimento">
                 </v-combobox>
               </v-col>
-              <v-col cols="12" sm="6" md="2">
-                <CurrencyInput v-model="element.price"></CurrencyInput>
-              </v-col>
-              <v-col cols="12" sm="6" md="6">
+              <v-col cols="11" sm="5" md="6">
                 <v-menu :close-on-content-click="false">
                   <template v-slot:activator="{ props }">
                     <v-combobox
@@ -90,10 +91,10 @@
                       v-model="element.quantity"
                       :loading="loading"
                       :disabled="loading"
-                      variant="outlined"
+                      variant="underlined"
                       density="compact"
                       hide-details="auto"
-                      label="Quantidade">
+                      label="Dentes">
                     </v-combobox>
                   </template>
 
@@ -102,18 +103,21 @@
                       <div class="d-flex justify-space-between align-baseline">
                         <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
                           <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                          <img class="cursor-pointer" @click="element.quantity.push(tooth)" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
+                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : null" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
                         </div>
                       </div>
                       <div class="d-flex justify-space-between">
                         <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
-                          <img class="cursor-pointer" @click="element.quantity.push(tooth)" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
+                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : null" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
                           <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
                         </div>
                       </div>
                     </v-list-item>
                   </v-list>
                 </v-menu>
+              </v-col>
+              <v-col cols="11" sm="5" md="2">
+                <CurrencyInput variant="underlined" v-model="element.price"></CurrencyInput>
               </v-col>
             </v-row>
           </template>
@@ -123,7 +127,8 @@
           v-if="descriptionAction === 'plans'"
           variant="outlined"
           class="mx-auto"
-          @click="newPlan.actions.push({price: 0, description: '', quantity: [], order: newPlan.actions.length})"
+          color="primary"
+          @click="newPlan.actions.push({price: 0, description: null, quantity: [], order: newPlan.actions.length})"
         ></v-btn>
       </v-form>
     </v-card-text>
@@ -139,7 +144,7 @@
         color="primary"
         text="Salvar"
         variant="tonal"
-        :disabled="loading || (descriptionAction === 'evolutions' && !description) || (descriptionAction === 'plans' && !planForm) || (descriptionAction === 'prescriptions' && (!description || title === '' || (!description && title === '')))"
+        :disabled="loading || (descriptionAction === 'evolutions' && !description) || (descriptionAction === 'plans' && !planForm) || (descriptionAction === 'prescriptions' && !description)"
         :loading="loading"
         @click="saveDescription"
       ></v-btn>
@@ -242,33 +247,6 @@
       getDateTime(date) {
         return format(parseISO(date), 'dd/MM/yyyy kk:mm')
       },
-      saveImage() {
-        this.loading = true
-        const data = {
-          image: this.image,
-          client: this.id
-        }
-        clientService.saveImage(data).then(() => {
-          this.addImageDialog = false
-          this.image = null
-          this.$emit('save')
-        },
-        (error) => {
-          this.loading = false
-          toast.error((error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                  error.message ||
-                  error.toString())
-        })
-      },
-      convertToBase64(file) {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = () => {
-          this.image = reader.result
-        }
-      },
       getProcedures() {
         companyService.getAllProcedures().then((response) => {
           this.procedures = response.data
@@ -276,7 +254,7 @@
       },
       setProcedure(event, element) {
         console.log(event)
-        if(typeof event === 'object') {
+        if(typeof event === 'object' && event?.price) {
           element.price = event.price
           element.description = event.name
         }

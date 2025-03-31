@@ -11,7 +11,7 @@
     :loading="loading"
     :disabled="loading"
     hide-details="auto"
-    variant="outlined"
+    :variant="variant ?? 'outlined'"
     density="compact"
     label="Valor">
   </v-text-field>
@@ -21,7 +21,7 @@
   import { useCurrencyInput } from 'vue-currency-input'
   import { watchEffect, defineProps, watch } from 'vue'
 
-  const props = defineProps({ modelValue: Number, loading: Boolean })
+  const props = defineProps({ modelValue: Number, loading: Boolean, variant: String })
 
   const { inputRef, formattedValue, setValue } = useCurrencyInput({
     currency: 'BRL',
