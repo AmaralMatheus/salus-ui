@@ -22,7 +22,6 @@ class ClientService {
   updateClient(id, data) {
     return axios.put(API_URL + 'clients/' + id, data, { headers: authHeader() })
   }
-
   saveDescription(data, action) {
     return axios.post(API_URL + action, data, { headers: authHeader() })
   }
