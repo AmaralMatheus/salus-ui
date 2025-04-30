@@ -2,7 +2,7 @@ import AWS from 'aws-sdk'
 
 AWS.config.update({
   accessKeyId: process.env.VUE_APP_S3_ACCESS_KEY,
-  secretAccessKey: process.env.VUE_APP_S3_SECRET,
+  secretAccessKey: process.env.VUE_APP_S3_SCRT,
   region: process.env.VUE_APP_S3_REGION,
 });
 
