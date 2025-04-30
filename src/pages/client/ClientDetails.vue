@@ -567,6 +567,7 @@
   import ClientInfoDialog from '../../components/ClientInfoDialog.vue'
   import ClientRegister from '../../components/ClientRegister.vue'
   import { toast } from 'vue3-toastify'
+  import AWS from '../../services/aws.service'
 
   export default {
     computed: {
@@ -788,14 +789,28 @@
           element.description = event.name
         }
       },
-      convertToBase64(file) {
+      async convertToBase64(file) {
+        this.loading = true
         const reader = new FileReader()
         reader.readAsDataURL(file)
         reader.onload = () => {
-          this.image = reader.result
+          this.image = file
         }
+        console.log(file)
+        this.file = file;
+        const params = {
+          Bucket: 'dental-salus',
+          Key: this.file.name,
+          Body: this.file,
+          ContentType: this.file.type
+        }
+  
+        const data = await AWS.upload(params).promise()
+        this.client.images.push({path: data.Location})
+        this.image = data.Location
+        this.loading = false
       },
-      saveImage() {
+      async saveImage() {
         this.loading = true
         const data = {
           image: this.image,

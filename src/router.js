@@ -44,6 +44,12 @@ const routes = [
     component: Clients,
   },
   {
+    path: "/cadastro",
+    name: "external-register",
+    // lazy-loaded
+    component: ClientRegister,
+  },
+  {
     path: "/pacientes/:id",
     name: "client-details",
     // lazy-loaded
@@ -93,7 +99,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-const publicPages = ['/login', '/register', '/home'];
+const publicPages = ['/login', '/cadastro', '/home'];
 const authRequired = !publicPages.includes(to.path);
 const loggedIn = localStorage.getItem('user');
 
