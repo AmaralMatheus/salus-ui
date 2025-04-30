@@ -5,9 +5,17 @@
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
           <v-row>
             <v-col cols="12" sm="2">
-              <v-avatar 
-              @click="handleInputFile" class="cursor-pointer" color="surface-variant" size="104">
-                <v-img @click="this.client.avatar = null" v-if="this.client.avatar" :src="this.client.avatar" cover></v-img>
+              <v-avatar @click="handleInputFile" class="cursor-pointer" color="surface-variant" size="104">
+                <div v-if="this.client.avatar">
+                  <v-img id="box" @click="this.client.avatar = null" width="104" height="104" :src="this.client.avatar" cover></v-img>
+                  <v-btn
+                    density="compact"
+                    id="overlay"
+                    class="ma-auto"
+                    icon="mdi-delete"
+                    variant="plain"
+                  ></v-btn>
+                </div>
                 <div v-else class="d-flex flex-column ga-0">
                   <v-btn
                     density="compact"
@@ -217,6 +225,7 @@
             </v-col>
           </v-row>
           <div class="d-flex">
+            <v-btn @click="$emit('cancel')" variant="plain">Mande para o CLiente Responder</v-btn>
             <v-btn class="ml-auto" @click="$emit('cancel')" variant="plain">Cancelar</v-btn>
             <v-btn type="submit" variant="plain" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">SALVAR</v-btn>
           </div>
@@ -312,7 +321,6 @@
       ],
     }),
     created() {
-      console.log(this.id)
       if (this.id) {
         this.getClient()
       }
@@ -416,3 +424,17 @@
     },
   }
 </script>
+
+<style>
+#box{
+    border:1px solid black;
+    position:relative;
+}
+#overlay{
+    position:absolute;
+    top:0px;
+    left:0px;
+    bottom:0px;
+    right:0px;
+}
+</style>

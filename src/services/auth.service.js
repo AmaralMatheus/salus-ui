@@ -1,11 +1,9 @@
 import axios from 'axios'
 
-const API_URL = 'https://salus-682523916a3b.herokuapp.com/api/'
-
 class AuthService {
   login(user) {
     return axios
-      .post(API_URL + 'login', {
+      .post(process.env.VUE_APP_API_URL + 'login', {
         username: user.username,
         password: user.password
       })
@@ -23,7 +21,7 @@ class AuthService {
   }
 
   register(user) {
-    return axios.post(API_URL + 'register', {
+    return axios.post(process.env.VUE_APP_API_URL + 'register', {
       username: user.username,
       email: user.email,
       password: user.password,
