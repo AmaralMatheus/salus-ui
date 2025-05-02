@@ -27,7 +27,7 @@ class ClientService {
     return axios.put(process.env.VUE_APP_API_URL + 'teeth/' + data.id, data, { headers: authHeader() })
   }
   saveImage(data) {
-    return axios.post(process.env.VUE_APP_API_URL + 'images/', data, { headers: authHeader() })
+    return axios.post(process.env.VUE_APP_API_URL + 'images/save', data, { headers: authHeader() })
   }
   saveProfileImage(data) {
     return axios.post(process.env.VUE_APP_API_URL + 'users/image', data, { headers: authHeader() })

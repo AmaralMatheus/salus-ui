@@ -818,6 +818,8 @@
         }
         clientService.saveImage(data).then(() => {
           this.addImageDialog = false
+
+          this.loading = false
           this.image = null
           this.$emit('save')
         },
