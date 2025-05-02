@@ -35,8 +35,12 @@ class CompanyService {
   updateStatus(id, data) {
     return axios.put(process.env.VUE_APP_API_URL + 'status/' + id, data, { headers: authHeader() })
   }
-  getAllStatus() {
-    return axios.get(process.env.VUE_APP_API_URL + 'status/all', { headers: authHeader() })
+  getAllStatus(companyId) {
+    if (companyId) {
+      return axios.get(process.env.VUE_APP_API_URL + 'status/all?company_id='+companyId,  { headers: authHeader() })
+    } else {
+      return axios.get(process.env.VUE_APP_API_URL + 'status/all',  { headers: authHeader() })
+    }
   }
   deleteStatus(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'status/' + id, { headers: authHeader() })

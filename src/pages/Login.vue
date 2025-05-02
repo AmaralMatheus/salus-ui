@@ -1,6 +1,10 @@
 <template>
   <div class="d-flex h-screen">
-    <v-card class="pa-5 ma-auto" width="350">
+    <v-card class="pa-5 ma-auto d-flex flex-column" width="350">
+      <div class="d-flex ga-3 align-center ma-auto mb-5">
+        <v-app-bar-nav-icon><img width="20" src="/favicon.svg" /></v-app-bar-nav-icon>
+        <v-toolbar-title class="d-md-block">Dental Salus</v-toolbar-title>
+      </div>
       <v-form @submit.prevent="handleLogin" v-model="valid" class="d-flex flex-column ga-3">
         <v-text-field
           variant="outlined"

@@ -1,6 +1,6 @@
 <template>
   <div >
-    <v-card :loading="loadingInfo" :title="!id ? 'Cadastrar paciente' : 'Editar Paciente'" :subtitle="client.name">
+    <v-card :class="!this.currentUser ? 'mt-5' : ''" :loading="loadingInfo" :title="!id ? 'Cadastrar paciente' : 'Editar Paciente'" :subtitle="client.name">
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
           <v-row>
@@ -225,7 +225,7 @@
             </v-col>
           </v-row>
           <div class="d-flex">
-            <v-btn @click="$emit('cancel')" variant="plain">Mande para o CLiente Responder</v-btn>
+            <v-btn @click="$emit('cancel')" v-if="this.currentUser" variant="plain">Mande para o CLiente Responder</v-btn>
             <v-btn class="ml-auto" @click="$emit('cancel')" variant="plain">Cancelar</v-btn>
             <v-btn type="submit" variant="plain" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">SALVAR</v-btn>
           </div>
@@ -242,6 +242,7 @@
   import { VDateInput } from 'vuetify/labs/VDateInput'
   import { vMaska } from "maska/vue"
   import { toast } from 'vue3-toastify'
+  import { useRoute } from 'vue-router'
 
   export default {
     components: {
@@ -252,8 +253,11 @@
       id() {
         return this.selectedClient
       },
+      currentUser() {
+        return this.$store.state.auth.user
+      },
     },
-    props: ['selectedClient'],
+    props: ['selectedClient', 'external'],
     data: () => ({
       valid: true,
       client: {
@@ -326,10 +330,18 @@
       }
       this.loading = true
       this.getStates()
-      statusService.getAllStatus().then((response) => {
-        this.statuses = response.data
-        this.loading = false
-      })
+      if (this.currentUser) {
+        statusService.getAllStatus().then((response) => {
+          this.statuses = response.data
+          this.loading = false
+        })
+      } else {
+        const route = useRoute() 
+        statusService.getAllStatus(route.query.company_id).then((response) => {
+          this.statuses = response.data
+          this.loading = false
+        })
+      }
     },
     methods: {
       handleInputFile() {

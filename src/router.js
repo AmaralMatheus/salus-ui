@@ -10,6 +10,7 @@ const Procedures = () => import("./pages/Procedures.vue")
 const Clients = () => import("./pages/client/Clients.vue")
 const ClientDetails = () => import("./pages/client/ClientDetails.vue")
 const ClientRegister = () => import("./components/ClientRegister.vue")
+const AnonymousRegister = () => import("./pages/AnonymousRegister.vue")
 const Finance = () => import("./pages/Finance.vue")
 const Agenda = () => import("./pages/Agenda.vue")
 
@@ -47,7 +48,7 @@ const routes = [
     path: "/cadastro",
     name: "external-register",
     // lazy-loaded
-    component: ClientRegister,
+    component: AnonymousRegister,
   },
   {
     path: "/pacientes/:id",

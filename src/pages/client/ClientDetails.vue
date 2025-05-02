@@ -285,14 +285,14 @@
             <v-btn
               text="Fechar"
               variant="plain"
-              :disabled="loading"
+              :disabled="imageLoading"
               @click="addImageDialog = false;"
             ></v-btn>
             <v-btn
               text="Salvar"
               variant="plain"
               color="primary"
-              :disabled="loading || !image"
+              :disabled="imageLoading || !image"
               :loading="loading"
               @click="saveImage"
             ></v-btn>
@@ -585,6 +585,7 @@
         format,
         parseISO,
         tab: 1,
+        imageLoading: false,
         registeringDialog: false,
         procedures: [],
         expanded: false,
@@ -790,7 +791,7 @@
         }
       },
       async convertToBase64(file) {
-        this.loading = true
+        this.imageLoading = true
         const reader = new FileReader()
         reader.readAsDataURL(file)
         reader.onload = () => {
@@ -808,17 +809,17 @@
         const data = await AWS.upload(params).promise()
         this.client.images.push({path: data.Location})
         this.image = data.Location
-        this.loading = false
+        this.imageLoading = false
       },
       async saveImage() {
-        this.loading = true
+        this.imageLoading = true
         const data = {
           image: this.image,
           client: this.id
         }
         clientService.saveImage(data).then(() => {
           this.addImageDialog = false
-          this.image = null
+          this.imageLoading = null
           this.$emit('save')
         },
         (error) => {
