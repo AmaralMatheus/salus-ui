@@ -140,7 +140,7 @@ function load() {
     response.data.forEach((event) => {
       calendarApp.eventsService.add({
         title: event.procedures,
-        people: [event.client.name],
+        people: [event.client],
         client: event.client,
         date: event.date,
         user: event.user_id,
@@ -193,7 +193,9 @@ eventModal.close(); // close the modal
       <div class="event px-3 py-1">
         <div class="d-flex ga-4">
           <div><v-icon>mdi-account</v-icon></div>
-          <div>{{ calendarEvent.people.toString() }}</div>
+          <div v-for="people in calendarEvent.people" :key="people">
+            <span class="cursor-pointer">{{ people.name + (calendarEvent.people.indexOf(people) === calendarEvent.people.length -1 ? '' : ', ') }}</span>
+          </div>
         </div>
 
         <div class="d-flex ga-4">
@@ -211,7 +213,9 @@ eventModal.close(); // close the modal
         <div class="d-flex flex-column ga-4">
           <div class="d-flex ga-4">
             <div><v-icon>mdi-account</v-icon></div>
-            <div>{{ calendarEvent.people.toString() }}</div>
+            <div v-for="people in calendarEvent.people" :key="people">
+              <span @click="$router.push('pacientes/'+people.id)" class="cursor-pointer link">{{ people.name + (calendarEvent.people.indexOf(people) === calendarEvent.people.length -1 ? '' : ', ') }}</span>
+            </div>
           </div>
   
           <div class="d-flex ga-4">

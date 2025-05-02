@@ -96,7 +96,7 @@
               hide-details="auto"
               variant="outlined"
               density="compact"
-              label="Descrição">
+              label="Observação">
             </v-textarea>
           </v-col>
         </v-row>

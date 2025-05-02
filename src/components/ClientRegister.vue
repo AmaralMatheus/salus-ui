@@ -4,78 +4,123 @@
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
           <v-row>
+            <v-col cols="12" sm="2">
+              <v-avatar @click="handleInputFile" class="cursor-pointer" color="surface-variant" size="104">
+                <div v-if="this.client.avatar">
+                  <v-img id="box" @click="this.client.avatar = null" width="104" height="104" :src="this.client.avatar" cover></v-img>
+                  <v-btn
+                    density="compact"
+                    id="overlay"
+                    class="ma-auto"
+                    icon="mdi-delete"
+                    variant="plain"
+                  ></v-btn>
+                </div>
+                <div v-else class="d-flex flex-column ga-0">
+                  <v-btn
+                    density="compact"
+                    class="mx-auto"
+                    icon="mdi-upload"
+                    variant="plain"
+                    @click="handleInputFile"
+                  >
+                  </v-btn>
+                  <div class="text-caption">
+                    Adicionar Foto
+                  </div>
+                </div>
+                <v-file-input ref="inputFile" style="display: none" @update:modelValue="convertToBase64"/>
+              </v-avatar>
+            </v-col>
+            <v-col cols="12" md="10">
+              <v-row>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="client.name"
+                    :loading="loadingInfo"
+                    :disabled="loadingInfo"
+                    :rules="rules"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="Nome">
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="client.cpf"
+                    :loading="loadingInfo"
+                    :disabled="loadingInfo"
+                    :rules="cpfRules"
+                    variant="outlined"
+                    density="compact"
+                    v-maska="'###.###.###-##'"
+                    hide-details="auto"
+                    label="CPF">
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="client.rg"
+                    :loading="loadingInfo"
+                    :disabled="loadingInfo"
+                    :rules="cpfRules"
+                    variant="outlined"
+                    density="compact"
+                    v-maska="'##.###.###-#'"
+                    hide-details="auto"
+                    label="RG">
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-select
+                  :items="[
+                      {label: 'Masculino', id: 1},
+                      {label: 'Feminino', id: 2},
+                      {label: 'Outros', id: 3},
+                    ]"
+                    item-title="label"
+                    item-value="id"
+                    v-model="client.gender"
+                    :loading="loadingInfo"
+                    :disabled="loadingInfo"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="Gênero">
+                  </v-select>
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="client.phone"
+                    :loading="loadingInfo"
+                    :disabled="loadingInfo"
+                    v-maska="'(##) #####-####'"
+                    :rules="phoneRule"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="Telefone">
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-date-input
+                    v-model="client.birthday"
+                    :rules="dateRule"
+                    :loading="loadingInfo"
+                    :disabled="loadingInfo"
+                    prepend-icon=""
+                    v-maska="'##/##/####'"
+                    append-inner-icon="$calendar"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="Data de nascimento">
+                  </v-date-input>
+                </v-col>
+              </v-row>
+            </v-col>
             <v-col cols="12" sm="6" md="3">
-              <v-text-field
-                v-model="client.name"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                :rules="rules"
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                label="Nome">
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" md="2">
-              <v-text-field
-                v-model="client.cpf"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                :rules="cpfRules"
-                variant="outlined"
-                density="compact"
-                v-maska="'###.###.###-##'"
-                hide-details="auto"
-                label="CPF">
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" md="2">
-              <v-select
-              :items="[
-                  {label: 'Masculino', id: 1},
-                  {label: 'Feminino', id: 2},
-                  {label: 'Outros', id: 3},
-                ]"
-                item-title="label"
-                item-value="id"
-                v-model="client.gender"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                label="Gênero">
-              </v-select>
-            </v-col>
-            <v-col cols="12" sm="6" md="3">
-              <v-text-field
-                v-model="client.phone"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                v-maska="'(##) #####-####'"
-                :rules="phoneRule"
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                label="Telefone">
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" md="2">
-              <v-date-input
-                v-model="client.birthday"
-                :rules="dateRule"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                prepend-icon=""
-                v-maska="'##/##/####'"
-                append-inner-icon="$calendar"
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                label="Data de nascimento">
-              </v-date-input>
-            </v-col>
-            <v-col cols="12" sm="6" md="2">
               <v-text-field
                 v-model="client.cep"
                 :loading="loadingInfo"
@@ -89,7 +134,7 @@
                 label="CEP">
               </v-text-field>
             </v-col>
-            <v-col cols="12" sm="6" md="5">
+            <v-col cols="12" sm="6" md="9">
               <v-text-field
                 v-model="client.address"
                 :loading="loadingInfo"
@@ -100,7 +145,7 @@
                 label="Endereço">
               </v-text-field>
             </v-col>
-            <v-col cols="12" sm="6" md="2">
+            <v-col cols="12" sm="6" md="4">
               <v-autocomplete
               :items="states"
                 item-title="sigla"
@@ -115,7 +160,7 @@
                 label="Estado">
               </v-autocomplete>
             </v-col>
-            <v-col cols="12" sm="6" md="3">
+            <v-col cols="12" sm="6" md="4">
               <v-autocomplete
               :items="cities"
                 item-title="nome"
@@ -130,7 +175,7 @@
                 label="Cidade">
               </v-autocomplete>
             </v-col>
-            <v-col cols="12" sm="6" md="3">
+            <v-col cols="12" sm="6" md="4">
               <v-text-field
                 v-model="client.email"
                 :loading="loadingInfo"
@@ -141,7 +186,7 @@
                 label="E-mail">
               </v-text-field>
             </v-col>
-            <v-col cols="12" sm="6" md="2">
+            <!-- <v-col cols="12" sm="6" md="2">
               <v-select
               :items="statuses"
                 item-title="name"
@@ -155,10 +200,7 @@
                 hide-details="auto"
                 label="Status">
               </v-select>
-            </v-col>
-            <v-col cols="12" sm="6" md="3">
-              <v-file-input prepend-icon="" hide-details="auto" prepend-inner-icon="mdi-attachment" label="Foto de perfil" density="compact" @update:modelValue="convertToBase64" variant="outlined"></v-file-input>
-            </v-col>
+            </v-col> -->
             <v-col cols="12">
               <v-textarea
                 v-model="client.comorbities"
@@ -183,6 +225,7 @@
             </v-col>
           </v-row>
           <div class="d-flex">
+            <v-btn @click="$emit('cancel')" variant="plain">Mande para o CLiente Responder</v-btn>
             <v-btn class="ml-auto" @click="$emit('cancel')" variant="plain">Cancelar</v-btn>
             <v-btn type="submit" variant="plain" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">SALVAR</v-btn>
           </div>
@@ -278,7 +321,6 @@
       ],
     }),
     created() {
-      console.log(this.id)
       if (this.id) {
         this.getClient()
       }
@@ -290,6 +332,9 @@
       })
     },
     methods: {
+      handleInputFile() {
+        if (this.$refs.inputFile) this.$refs.inputFile.click()
+      },
       getAddress() {
         this.blockCity = false
         this.blockState = false
@@ -369,6 +414,7 @@
         }
       },
       convertToBase64(file) {
+        console.log(file)
         const reader = new FileReader()
         reader.readAsDataURL(file)
         reader.onload = () => {
@@ -378,3 +424,17 @@
     },
   }
 </script>
+
+<style>
+#box{
+    border:1px solid black;
+    position:relative;
+}
+#overlay{
+    position:absolute;
+    top:0px;
+    left:0px;
+    bottom:0px;
+    right:0px;
+}
+</style>

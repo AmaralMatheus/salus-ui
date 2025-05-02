@@ -105,7 +105,7 @@
           <div class="text-h6">Agenda do dia</div>
         </v-card-title>
         <v-card-text>
-          <calendar :show-header="true" :limits="{
+          <calendar :show-header="true" :gridHeight="624" :limits="{
             start: '07:00',
             end: '19:00',
           }"/>

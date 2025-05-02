@@ -23,11 +23,11 @@
     <v-layout>
       <v-bottom-navigation color="primary" v-if="currentUser" class="d-md-none align-center">
         <div class="d-flex justify-space-between ga-3">
-          <v-icon :class="path === undefined ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/home')"><img class="cursor-pointer" :src="require('./assets/home-6-line.svg')"/></v-icon>
-          <v-icon :class="path && path.toString().includes('client') ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/pacientes')"><img class="cursor-pointer" :src="require('./assets/clientes.svg')"/></v-icon>
-          <v-icon :class="path === 'agenda' ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/agenda')"><img class="cursor-pointer" :src="require('./assets/calendar-event-fill.svg')"/></v-icon>
-          <v-icon :class="path === 'financeiro' ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/financeiro')"><img class="cursor-pointer" :src="require('./assets/coins-line.svg')"/></v-icon>
-          <v-icon :class="path && path.toString().includes('user') ? 'bg-primary text-white' : ''" class="pa-5 rounded" @click="$router.push('/ajustes')" v-if="currentUser.type === 1"><img class="cursor-pointer" :src="require('./assets/settings-3-line.svg')"/></v-icon>
+          <v-icon :class="path === undefined ? 'bg-theme text-white' : ''" class="pa-5 rounded" @click="$router.push('/home')"><img class="cursor-pointer" :src="require('./assets/home-6-line.svg')"/></v-icon>
+          <v-icon :class="path && path.toString().includes('client') ? 'bg-theme text-white' : ''" class="pa-5 rounded" @click="$router.push('/pacientes')"><img class="cursor-pointer" :src="require('./assets/clientes.svg')"/></v-icon>
+          <v-icon :class="path === 'agenda' ? 'bg-theme text-white' : ''" class="pa-5 rounded" @click="$router.push('/agenda')"><img class="cursor-pointer" :src="require('./assets/calendar-event-fill.svg')"/></v-icon>
+          <v-icon :class="path === 'financeiro' ? 'bg-theme text-white' : ''" class="pa-5 rounded" @click="$router.push('/financeiro')"><img class="cursor-pointer" :src="require('./assets/coins-line.svg')"/></v-icon>
+          <v-icon :class="path && path.toString().includes('user') ? 'bg-theme text-white' : ''" class="pa-5 rounded" @click="$router.push('/ajustes')" v-if="currentUser.type === 1"><img class="cursor-pointer" :src="require('./assets/settings-3-line.svg')"/></v-icon>
           <v-icon class="pa-5" @click="logOut">mdi-exit-to-app</v-icon>
         </div>
       </v-bottom-navigation>
@@ -38,31 +38,31 @@
               <v-icon icon="mdi-chevron-right"></v-icon>
             </template>
           </v-breadcrumbs>
-          <v-list-item active-class="text-white bg-primary" value="home" :active="path === undefined" @click="$router.push('/home')">
+          <v-list-item active-class="text-white bg-theme" value="home" :active="path === undefined" @click="$router.push('/home')">
             <div class="d-flex ga-3 align-center">
               <img class="cursor-pointer" :class="path === undefined ? 'active' : ''" :src="require('./assets/home-6-line.svg')"/>
               <div>Home</div>
             </div>
           </v-list-item>
-          <v-list-item active-class="text-white bg-primary" value="pacientes" :active="path && path.toString().includes('client')" @click="$router.push('/pacientes')">
+          <v-list-item active-class="text-white bg-theme" value="pacientes" :active="path && path.toString().includes('client')" @click="$router.push('/pacientes')">
             <div class="d-flex ga-3 align-center">
               <img class="cursor-pointer" :class="path && path.toString().includes('client') ? 'active' : ''" :src="require('./assets/clientes.svg')"/>
               <div>Pacientes</div>
             </div>
           </v-list-item>
-          <v-list-item active-class="text-white bg-primary" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')">
+          <v-list-item active-class="text-white bg-theme" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')">
             <div class="d-flex ga-3 align-center">
               <img class="cursor-pointer" :class="path ==='agenda' ? 'active' : ''" :src="require('./assets/calendar-event-fill.svg')"/>
               <div>Agenda</div>
             </div>
           </v-list-item>
-          <v-list-item active-class="text-white bg-primary" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')">
+          <v-list-item active-class="text-white bg-theme" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')">
             <div class="d-flex ga-3 align-center">
               <img class="cursor-pointer" :class="path ==='financeiro' ? 'active' : ''" :src="require('./assets/coins-line.svg')"/>
               <div>Financeiro</div>
             </div>
           </v-list-item>
-          <v-list-item class="mt-auto" v-if="currentUser && currentUser.type === 1" active-class="text-white bg-primary" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
+          <v-list-item class="mt-auto" v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
             <div class="d-flex ga-3 align-center">
               <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
               <div>Configurações</div>
@@ -143,6 +143,11 @@ export default {
   -moz-box-shadow: 0px 0px 0px -0px rgba(0,0,0,0) !important;
   box-shadow:0px 0px 0px 0px rgba(0,0,0,0) !important;
 }
+
+.bg-theme {
+  background-color: #C62424;
+}
+
 .bg-app {
   background: linear-gradient(106.57deg, #FEF7F7 0.04%, #E4EEEE 51.26%, #F4E3E3 100.46%);
 }
