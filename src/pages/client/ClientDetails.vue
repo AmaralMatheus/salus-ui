@@ -348,9 +348,9 @@
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">{{ client.name }}</h4>
             <div class="d-flex ga-2 ml-auto">
-              <v-btn size="small" icon="mdi-calendar-outline" @click="schedulerDialog = true" color="info" variant="tonal"/>
-              <v-btn size="small" icon="mdi-pencil" @click="update" color="warning" variant="tonal"/>
-              <v-btn size="small" icon="mdi-delete" @click="dialog = true" color="error" variant="tonal"/>
+              <v-btn size="small" icon="mdi-calendar-outline" @click="schedulerDialog = true" color="info" variant="tonal" density="comfortable"/>
+              <v-btn size="small" icon="mdi-pencil" @click="update" color="warning" variant="tonal" density="comfortable"/>
+              <v-btn size="small" icon="mdi-delete" @click="dialog = true" color="error" variant="tonal" density="comfortable"/>
             </div>
           </div>
         </v-card-title>
@@ -391,12 +391,12 @@
             </div>
           </div>
         </v-card-text>
-        <v-alert v-if="client.comorbities" type="error" variant="tonal" class="mx-4">{{ client.comorbities }}</v-alert>
+        <v-alert v-if="client.comorbities" type="error" variant="tonal" density="comfortable" class="mx-4">{{ client.comorbities }}</v-alert>
         <v-card-title>
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Receitas</h4>
             <div class="d-flex ga-2 ml-auto">
-              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true;  title = ''; description = ''; descriptionAction = 'prescriptions'" color="primary" variant="tonal"/>
+              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true;  title = ''; description = ''; descriptionAction = 'prescriptions'" color="primary" variant="tonal" density="comfortable"/>
             </div>
           </div>
         </v-card-title>
@@ -419,12 +419,12 @@
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Planos de Tratamento</h4>
             <div class="d-flex ga-2 ml-auto">
-              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true; title = ''; newPlan = { name: '', actions: []};  descriptionAction = 'plans'; getProcedures()" color="primary" variant="tonal"/>
+              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true; title = ''; newPlan = { name: '', actions: []};  descriptionAction = 'plans'; getProcedures()" color="primary" variant="tonal" density="comfortable"/>
             </div>
           </div>
         </v-card-title>
         <v-card-text v-if="client.plans && client.plans.length > 0" class="d-flex flex-column ga-3">
-          <div v-for="plan in client.plans" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-surface cursor-pointer" :key="plan.id">
+          <div v-for="plan in client.plans" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-surface cursor-pointer" :key="plan.id">
             <div @click="planView = true; currentPlan = plan" class="d-flex justify-space-between w-100">
               <div class="text-error">{{ getDateTime(plan.created_at) }}</div>
               <div>{{plan.name}}</div>
@@ -443,7 +443,7 @@
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Imagens</h4>
             <div class="d-flex ga-2 ml-auto">
-              <v-btn size="small" icon="mdi-plus" @click="addImageDialog = true" color="primary" variant="tonal"/>
+              <v-btn size="small" icon="mdi-plus" @click="addImageDialog = true" color="primary" variant="tonal" density="comfortable"/>
             </div>
           </div>
         </v-card-title>
@@ -820,6 +820,7 @@
         clientService.saveImage(data).then(() => {
           this.addImageDialog = false
           this.imageLoading = null
+          this.image = null
           this.$emit('save')
         },
         (error) => {
