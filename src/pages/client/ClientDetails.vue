@@ -204,6 +204,33 @@
         </v-card>
       </v-dialog>
       <v-dialog
+        v-model="imageDeleteDialog"
+        width="auto"
+      >
+        <v-card
+          max-width="400"
+          prepend-icon="mdi-alert"
+          text="Essa imagem não pode ser restaurada"
+          title="Deseja excluir essa imagem?"
+        >
+          <template v-slot:actions>
+            <v-btn
+              class="ms-auto"
+              text="Cancelar"
+              :disabled="loading"
+              @click="imageDeleteDialog = false"
+            ></v-btn>
+            <v-btn
+              text="Excluir"
+              color="error"
+              :disabled="deleteImageLoading"
+              :loading="deleteImageLoading"
+              @click="removeImage"
+            ></v-btn>
+          </template>
+        </v-card>
+      </v-dialog>
+      <v-dialog
         max-width="600"
         v-model="prescriptionDialog"
       >
@@ -300,7 +327,7 @@
         </v-card>
       </v-dialog>
       <v-dialog
-        max-width="600"
+        max-width="1200"
         v-model="imageDialog"
       >
         <v-card
@@ -309,7 +336,6 @@
         >
           <v-card-text>
             <v-carousel
-              height="200"
               class="rounded"
               show-arrows="hover"
               cycle
@@ -319,14 +345,19 @@
               <v-carousel-item
                 v-for="image in client.images" :key="image"
               >
-                <v-sheet
-                  height="100%"
-                >
-                  <div class="d-flex fill-height justify-center align-center">
-                    <div class="text-h2">
-                      <img :src="image.path" width="100%" />
-                    </div>
+                <v-sheet class="h-100">
+                  <div class="d-flex h-100">
+                    <img :src="image.path" id="box" class="ma-auto" width="100%" height="100%" />
                   </div>
+                  <v-btn
+                    id="overlay"
+                    text="tESTE"
+                    icon="mdi-delete"
+                    density="confortable"
+                    color="primary"
+                    variant="text"
+                    @click="imageDeleteDialog = true; selectedImage = image.id"
+                  ></v-btn>
                 </v-sheet>
               </v-carousel-item>
             </v-carousel>
@@ -460,12 +491,9 @@
               v-for="image in client.images" :key="image"
             >
               <v-sheet
-                height="100%"
               >
-                <div class="d-flex fill-height justify-center align-center">
-                  <div class="text-h2">
-                    <img :src="image.path" />
-                  </div>
+                <div class="d-flex justify-center align-center">
+                  <img width="10000" :src="image.path" />
                 </div>
               </v-sheet>
             </v-carousel-item>
@@ -593,6 +621,9 @@
         planForm: false,
         planView: false,
         planDeleteDialog: false,
+        imageDeleteDialog: false,
+        selectedImage: null,
+        deleteImageLoading: false,
         selectedPlan: null,
         selectedPrescription: null,
         prescriptionDeleteDialog: false,
@@ -708,6 +739,21 @@
         },
           (error) => {
             this.loading = false
+            toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
+          })
+      },
+      removeImage() {
+        this.deleteImageLoading = true
+        clientService.deleteImage(this.selectedImage).then(() => {
+          this.imageDeleteDialog = false
+          this.getClient()
+        },
+          (error) => {
+            this.deleteImageLoading = false
             toast.error((error.response &&
                     error.response.data &&
                     error.response.data.message) ||
@@ -851,5 +897,19 @@
 
 .profile-card {
   transition: ease-in-out 0.2s !important;
+}
+
+#box{
+    position:relative;
+    width: auto;
+    height: auto;
+    margin: auto;
+}
+#overlay{
+    position:absolute;
+    top:0px;
+    width: 50px;
+    height: 50px;
+    color: white;
 }
 </style>

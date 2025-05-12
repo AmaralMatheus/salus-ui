@@ -173,6 +173,7 @@
       addTransaction () {
         if (this.valid) {
           this.loading = true
+          console.log(this.client)
           const data = {
             date: this.transactionDate,
             description: this.description,

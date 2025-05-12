@@ -201,7 +201,7 @@
                 label="Status">
               </v-select>
             </v-col> -->
-            <v-col cols="12">
+            <v-col cols="12" v-if="this.currentUser">
               <v-textarea
                 v-model="client.comorbities"
                 :loading="loadingInfo"
@@ -212,7 +212,7 @@
                 label="Alerta de Segurance de Saude">
               </v-textarea>
             </v-col>
-            <v-col cols="12">
+            <v-col cols="12" v-if="this.currentUser">
               <v-textarea
                 v-model="client.description"
                 :loading="loadingInfo"
@@ -226,8 +226,8 @@
           </v-row>
           <div class="d-flex">
             <v-btn @click="$emit('cancel')" v-if="this.currentUser" variant="plain">Mande para o CLiente Responder</v-btn>
-            <v-btn class="ml-auto" @click="$emit('cancel')" variant="plain">Cancelar</v-btn>
-            <v-btn type="submit" variant="plain" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">SALVAR</v-btn>
+            <v-btn class="ml-auto" v-if="this.currentUser" @click="$emit('cancel')" variant="plain">Cancelar</v-btn>
+            <v-btn type="submit" :class="!this.currentUser ? 'ml-auto' : ''" variant="plain" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">SALVAR</v-btn>
           </div>
         </v-form>
       </v-card-text>
@@ -331,7 +331,8 @@
       this.loading = true
       this.getStates()
       if (this.currentUser) {
-        statusService.getAllStatus().then((response) => {
+        // statusService.getAllStatus(this.currentUser.company_id).then((response) => {
+        statusService.getAllStatus(1).then((response) => {
           this.statuses = response.data
           this.loading = false
         })
@@ -439,7 +440,6 @@
 
 <style>
 #box{
-    border:1px solid black;
     position:relative;
 }
 #overlay{

@@ -1,57 +1,63 @@
 <template>
   <v-row>
     <v-col cols="12" class="d-flex flex-column ga-6">
-      <v-card>
-        <v-card-title>
-          <v-row class="mt-0">
-            <v-col cols="12" sm="3" class="text-h6">Procedimentos</v-col>
-            <v-col cols="12" sm="9">
-              <v-row>
-                <v-col cols="12" sm="5" md="7" lg="8">
-                  <v-text-field
-                    v-model="search"
-                    variant="outlined"
-                    density="compact"
-                    hide-details="auto"
-                    append-inner-icon="mdi-magnify"
-                    placeholder="Buscar Usuário">
-                  </v-text-field>
-                </v-col>
-                <v-col cols="12" sm="7" md="5" lg="4">
-                  <v-btn block append-icon="mdi-plus" @click="procedureDialog = true" color="primary">Adicionar Procedimento</v-btn>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-        </v-card-title>
-        <v-data-table-server
-          v-model:items-per-page="itemsPerPage"
-          :headers="headers"
-          :items="serverItems"
-          :items-length="totalItems"
-          :loading="loading"
-          :search="search"
-          item-value="name"
-          @update:options="loadItems"
-          @click:row="viewRow"
-        >
-          <template v-slot:[`item.price`]="{ item }">
-            {{ item.price.toFixed(2) }} R$
-          </template>
-          <template v-slot:[`item.actions`]="{ item }">
-            <v-menu>
-              <template v-slot:activator="{ props }">
-                <v-icon :disabled="loading" v-bind="props">mdi-dots-vertical</v-icon>
+      <v-expansion-panels>
+        <v-expansion-panel>
+          <v-expansion-panel-title>
+            <v-row class="mt-0">
+              <v-col cols="12" sm="3" class="text-h6">Procedimentos</v-col>
+            </v-row>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
+            <v-row class="mt-0">
+              <v-col cols="12" sm="9">
+                <v-row>
+                  <v-col cols="12" sm="5" md="7" lg="8">
+                    <v-text-field
+                      v-model="search"
+                      variant="outlined"
+                      density="compact"
+                      hide-details="auto"
+                      append-inner-icon="mdi-magnify"
+                      placeholder="Buscar Usuário">
+                    </v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="7" md="5" lg="4">
+                    <v-btn block append-icon="mdi-plus" @click="procedureDialog = true" color="primary">Adicionar Procedimento</v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+            <v-data-table-server
+              v-model:items-per-page="itemsPerPage"
+              :headers="headers"
+              :items="serverItems"
+              :items-length="totalItems"
+              :loading="loading"
+              :search="search"
+              item-value="name"
+              @update:options="loadItems"
+              @click:row="viewRow"
+            >
+              <template v-slot:[`item.price`]="{ item }">
+                {{ item.price.toFixed(2) }} R$
               </template>
-        
-              <v-list>
-                <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="viewRow(null, {item})" title="Editar"></v-list-item>
-                <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
-              </v-list>
-            </v-menu>
-          </template>
-        </v-data-table-server>
-      </v-card>
+              <template v-slot:[`item.actions`]="{ item }">
+                <v-menu>
+                  <template v-slot:activator="{ props }">
+                    <v-icon :disabled="loading" v-bind="props">mdi-dots-vertical</v-icon>
+                  </template>
+            
+                  <v-list>
+                    <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="viewRow(null, {item})" title="Editar"></v-list-item>
+                    <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
+                  </v-list>
+                </v-menu>
+              </template>
+            </v-data-table-server>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </v-expansion-panels>
       <v-dialog
         v-model="procedureDialog"
         width="auto"

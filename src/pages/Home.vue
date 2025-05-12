@@ -60,9 +60,9 @@
         </v-row>
       </div>
       <v-card :loading="loading" :title="appointment ? 'Próximo paciente na agenda' : ''" :class="appointment ? 'next-appointment' : ''">
-        <v-card-text v-if="!loading && appointment?.client" class="d-flex flex-column ga-6">
-          <div class="d-flex ga-6 next-appointment-height">
-            <v-avatar color="surface-variant" size="57">
+        <v-card-text v-if="!loading && appointment?.client" class="d-flex flex-column next-appointment-height ga-6">
+          <div class="d-flex ma-auto ga-6">
+            <v-avatar color="surface-variant" size="120">
               <v-img :src="appointment.client.avatar ?? 'https://ui-avatars.com/api/?name='+appointment.client.name.replaceAll(' ', '+') + '&background=random'" cover></v-img>
             </v-avatar>
             <div class="d-flex flex-column ga-2">
@@ -78,6 +78,7 @@
                 <v-icon>mdi-phone-outline</v-icon>
                 <div>{{ appointment.client.phone ?? 'Nenhum telefone cadastrado'  }}</div>
               </div>
+              <v-btn v-if="!loading && appointment?.client" color="primary" class="text-white" variant="tonal" @click="view()">Ver Odontograma</v-btn>
             </div>
           </div>
         </v-card-text>
@@ -94,9 +95,6 @@
           ></v-skeleton-loader>
         </v-card-text>
         <v-spacer></v-spacer>
-        <v-card-actions>
-            <v-btn v-if="!loading && appointment?.client" color="primary" class="ml-auto text-white" variant="tonal" @click="view()">Ver Odontograma</v-btn>
-          </v-card-actions>
       </v-card>
     </v-col>
     <v-col>
@@ -312,7 +310,7 @@
 .next-appointment-height {
   background: linear-gradient(134.56deg, #D6C3C3 -6.74%, #DBA5D5 105.74%);
   color: white;
-  height: 282px;
+  height: 365px !important;
 }
 
 .action-card {

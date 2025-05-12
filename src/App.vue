@@ -32,43 +32,45 @@
         </div>
       </v-bottom-navigation>
       <v-main class="d-flex ga-5">
-        <v-list class="bg-transparent custom-navbar d-flex flex-column" density="compact" nav v-if="currentUser">
+        <div>
           <v-breadcrumbs v-if="currentUser" style="color: transparent" :items="['s']">
             <template v-slot:divider>
               <v-icon icon="mdi-chevron-right"></v-icon>
             </template>
           </v-breadcrumbs>
-          <v-list-item active-class="text-white bg-theme" value="home" :active="path === undefined" @click="$router.push('/home')">
-            <div class="d-flex ga-3 align-center">
-              <img class="cursor-pointer" :class="path === undefined ? 'active' : ''" :src="require('./assets/home-6-line.svg')"/>
-              <div>Home</div>
-            </div>
-          </v-list-item>
-          <v-list-item active-class="text-white bg-theme" value="pacientes" :active="path && path.toString().includes('client')" @click="$router.push('/pacientes')">
-            <div class="d-flex ga-3 align-center">
-              <img class="cursor-pointer" :class="path && path.toString().includes('client') ? 'active' : ''" :src="require('./assets/clientes.svg')"/>
-              <div>Pacientes</div>
-            </div>
-          </v-list-item>
-          <v-list-item active-class="text-white bg-theme" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')">
-            <div class="d-flex ga-3 align-center">
-              <img class="cursor-pointer" :class="path ==='agenda' ? 'active' : ''" :src="require('./assets/calendar-event-fill.svg')"/>
-              <div>Agenda</div>
-            </div>
-          </v-list-item>
-          <v-list-item active-class="text-white bg-theme" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')">
-            <div class="d-flex ga-3 align-center">
-              <img class="cursor-pointer" :class="path ==='financeiro' ? 'active' : ''" :src="require('./assets/coins-line.svg')"/>
-              <div>Financeiro</div>
-            </div>
-          </v-list-item>
-          <v-list-item class="mt-auto" v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
-            <div class="d-flex ga-3 align-center">
-              <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
-              <div>Configurações</div>
-            </div>
-          </v-list-item>
-        </v-list>
+          <v-list class="bg-transparent custom-navbar d-flex ga-3 flex-column" density="compact" nav v-if="currentUser">
+            <v-list-item active-class="text-white bg-theme" value="home" :active="path === undefined" @click="$router.push('/home')">
+              <div class="d-flex ga-3 align-center">
+                <img class="cursor-pointer" :class="path === undefined ? 'active' : ''" :src="require('./assets/home-6-line.svg')"/>
+                <div>Home</div>
+              </div>
+            </v-list-item>
+            <v-list-item active-class="text-white bg-theme" value="pacientes" :active="path && path.toString().includes('client')" @click="$router.push('/pacientes')">
+              <div class="d-flex ga-3 align-center">
+                <img class="cursor-pointer" :class="path && path.toString().includes('client') ? 'active' : ''" :src="require('./assets/clientes.svg')"/>
+                <div>Pacientes</div>
+              </div>
+            </v-list-item>
+            <v-list-item active-class="text-white bg-theme" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')">
+              <div class="d-flex ga-3 align-center">
+                <img class="cursor-pointer" :class="path ==='agenda' ? 'active' : ''" :src="require('./assets/calendar-event-fill.svg')"/>
+                <div>Agenda</div>
+              </div>
+            </v-list-item>
+            <v-list-item active-class="text-white bg-theme" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')">
+              <div class="d-flex ga-3 align-center">
+                <img class="cursor-pointer" :class="path ==='financeiro' ? 'active' : ''" :src="require('./assets/coins-line.svg')"/>
+                <div>Financeiro</div>
+              </div>
+            </v-list-item>
+            <v-list-item class="mt-auto" v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
+              <div class="d-flex ga-3 align-center">
+                <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
+                <div>Configurações</div>
+              </div>
+            </v-list-item>
+          </v-list>
+        </div>
         <div class="w-100">
           <v-breadcrumbs v-if="currentUser" :items="route.fullPath.split('/').map((link) => {
             if (link !== '') {
@@ -143,6 +145,15 @@ export default {
   -moz-box-shadow: 0px 0px 0px -0px rgba(0,0,0,0) !important;
   box-shadow:0px 0px 0px 0px rgba(0,0,0,0) !important;
 }
+.v-expansion-panel {
+  -webkit-box-shadow: 0px 0px 0px -0px rgba(128, 128, 128, 0.575) !important;
+  -moz-box-shadow: 0px 0px 0px -0px rgba(128, 128, 128, 0.486) !important;
+  box-shadow:0px 0px 0px 0px rgba(128, 128, 128, 0.473) !important;
+}
+
+.v-expansion-panel-title {
+  padding: 16px;
+}
 
 .bg-theme {
   background-color: #C62424;
@@ -162,6 +173,9 @@ html {
 .v-card {
   border-radius: 8px !important;
 }
+.v-expansion-panel {
+  border-radius: 8px !important;
+}
 
 html {
   font-family: 'montserrat' !important;
@@ -169,6 +183,9 @@ html {
 }
 
 .v-card {
+  color: #474747;
+}
+.v-expansion-panel {
   color: #474747;
 }
 
