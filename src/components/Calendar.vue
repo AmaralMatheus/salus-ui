@@ -330,8 +330,5 @@ eventModal.close(); // close the modal
 .event {
   height: -webkit-fill-available;
   z-index: 3;
-  -webkit-box-shadow: 6px 6px 26px -11px rgba(0,0,0,0.75) !important;
-  -moz-box-shadow: 6px 6px 26px -11px rgba(0,0,0,0.75) !important;
-  box-shadow: 6px 6px 26px -11px rgba(0,0,0,0.75) !important;
 }
 </style>

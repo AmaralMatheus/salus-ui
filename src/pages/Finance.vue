@@ -75,7 +75,7 @@
               {{ item.type === 1 ? 'Entrada' : 'Saída' }}
             </template>
             <template v-slot:[`item.method`]="{ item }">
-              {{ item.type === 1 ? 'Dinheiro' : item.type === 2 ? 'Cartão' : 'Pix' }}
+              {{ getTransaction(item.method) }}
             </template>
             <template v-slot:[`item.date`]="{ item }">
               {{ getDateTime(item.date) }}
@@ -192,6 +192,10 @@
       }
     },
     methods: {
+      getTransaction(type) {
+        const types = ['', 'Dinheiro', 'Cartão', 'Pix']
+        return types[type]
+      },
       loadItems ({ page, itemsPerPage, sortBy }) {
         this.loading = true
         if (sortBy.length <= 1) {

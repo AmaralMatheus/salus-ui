@@ -4,7 +4,7 @@
     max-width="700"
     width="auto"
   >
-    <v-form @submit.prevent="addTransaction" v-model="valid" >
+    <v-form ref="form" @submit.prevent="addTransaction" v-model="valid" >
       <v-card
         prepend-icon="mdi-calendar-edit-outline"
         title="Nova transação"
@@ -160,6 +160,8 @@
       }
     },
     created() {
+      console.log(this.$refs
+      )
       clientService.getAllClients().then((response) => {
         this.clients = response.data
         this.loading = false
@@ -173,7 +175,6 @@
       addTransaction () {
         if (this.valid) {
           this.loading = true
-          console.log(this.client)
           const data = {
             date: this.transactionDate,
             description: this.description,
@@ -184,6 +185,7 @@
           }
           transactionService.addTransaction(data).then(() => {
             this.$emit('reload')
+            this.loading = false
           },
             (error) => {
               this.loading = false

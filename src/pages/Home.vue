@@ -32,21 +32,33 @@
             </div>
           </v-col>
           <v-col cols="12" md="6">
-            <v-card class="h-100" :loading="loading" :title="transactions.length > 0 ? 'Ultimos 30 dias' : ''">
-              <v-card-text v-if="!loading && transactions.length > 0" class="d-flex flex-column ga-1">
-                <div v-for="transaction in transactions.slice(0,3)" :key="transaction.id">
-                  <div :class="transaction.type === 1 ? 'text-success' : 'text-error'">
-                    <v-icon>mdi-calendar-outline</v-icon> {{ transaction.type === 1 ? 'Entrada' : 'Saida' }} de R$ {{ transaction.amount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}
+            <v-card :loading="loading" :title="appointment ? 'Próximo paciente na agenda' : ''" :class="appointment ? 'next-appointment' : ''">
+              <v-card-text v-if="!loading && appointment?.client" class="d-flex flex-column next-appointment-height ga-6">
+                <div class="d-flex ma-auto ga-6">
+                  <v-avatar color="surface-variant" size="120">
+                    <v-img :src="appointment.client.avatar ?? 'https://ui-avatars.com/api/?name='+appointment.client.name.replaceAll(' ', '+') + '&background=random'" cover></v-img>
+                  </v-avatar>
+                  <div class="d-flex flex-column ga-2">
+                    <div class="d-flex ga-2 align-center">
+                      <v-icon>mdi-calendar-outline</v-icon>
+                      <div>{{ getDateTime(appointment.date) }}</div>
+                    </div>
+                    <div class="d-flex ga-2 align-center">
+                      <v-icon>mdi-account-outline</v-icon>
+                      <div>{{ appointment.client.name }}</div>
+                    </div>
+                    <div class="d-flex ga-2 align-center">
+                      <v-icon>mdi-phone-outline</v-icon>
+                      <div>{{ appointment.client.phone ?? 'Nenhum telefone cadastrado'  }}</div>
+                    </div>
+                    <v-btn v-if="!loading && appointment?.client" color="primary" class="text-white" variant="tonal" @click="view()">Ver Odontograma</v-btn>
                   </div>
                 </div>
               </v-card-text>
-              <v-card-text v-if="!loading && transactions.length > 0" class="d-flex pa-0 flex-column">
-                <Line style="height: 225px;" :data="info" :options="options" :key="info.datasets[0].data.length" />
-              </v-card-text>
-              <v-card-text v-else-if="!loading && transactions.length === 0" style="height: 345px" class="w-100 d-flex">
+              <v-card-text v-else-if="!loading && !appointment" style="height: 345px" class="w-100 d-flex">
                 <div class="ma-auto d-flex flex-column">
-                  <div class="mx-auto"><img src="../assets/no-finance.png" /></div>
-                  <div>Sem transações cadastradas</div>
+                  <div class="mx-auto"><img src="../assets/no-clients.png" /></div>
+                  <div>Sem pacientes marcados</div>
                 </div>
               </v-card-text>
               <v-card-text v-else>
@@ -55,37 +67,26 @@
                   type="article"
                 ></v-skeleton-loader>
               </v-card-text>
+              <v-spacer></v-spacer>
             </v-card>
           </v-col>
         </v-row>
       </div>
-      <v-card :loading="loading" :title="appointment ? 'Próximo paciente na agenda' : ''" :class="appointment ? 'next-appointment' : ''">
-        <v-card-text v-if="!loading && appointment?.client" class="d-flex flex-column next-appointment-height ga-6">
-          <div class="d-flex ma-auto ga-6">
-            <v-avatar color="surface-variant" size="120">
-              <v-img :src="appointment.client.avatar ?? 'https://ui-avatars.com/api/?name='+appointment.client.name.replaceAll(' ', '+') + '&background=random'" cover></v-img>
-            </v-avatar>
-            <div class="d-flex flex-column ga-2">
-              <div class="d-flex ga-2 align-center">
-                <v-icon>mdi-calendar-outline</v-icon>
-                <div>{{ getDateTime(appointment.date) }}</div>
-              </div>
-              <div class="d-flex ga-2 align-center">
-                <v-icon>mdi-account-outline</v-icon>
-                <div>{{ appointment.client.name }}</div>
-              </div>
-              <div class="d-flex ga-2 align-center">
-                <v-icon>mdi-phone-outline</v-icon>
-                <div>{{ appointment.client.phone ?? 'Nenhum telefone cadastrado'  }}</div>
-              </div>
-              <v-btn v-if="!loading && appointment?.client" color="primary" class="text-white" variant="tonal" @click="view()">Ver Odontograma</v-btn>
+      <v-card class="h-100" :loading="loading" :title="transactions.length > 0 ? 'Ultimos 30 dias' : ''">
+        <v-card-text v-if="!loading && transactions.length > 0" class="d-flex flex-column ga-1">
+          <div v-for="transaction in transactions.slice(0,3)" :key="transaction.id">
+            <div :class="transaction.type === 1 ? 'text-success' : 'text-error'">
+              <v-icon>mdi-calendar-outline</v-icon> {{ transaction.type === 1 ? 'Entrada' : 'Saida' }} de R$ {{ transaction.amount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}
             </div>
           </div>
         </v-card-text>
-        <v-card-text v-else-if="!loading && !appointment" style="height: 345px" class="w-100 d-flex">
+        <v-card-text v-if="!loading && transactions.length > 0" class="d-flex pa-0 flex-column">
+          <Line style="height: 225px;" :data="info" :options="options" :key="info.datasets[0].data.length" />
+        </v-card-text>
+        <v-card-text v-else-if="!loading && transactions.length === 0" style="height: 345px" class="w-100 d-flex">
           <div class="ma-auto d-flex flex-column">
-            <div class="mx-auto"><img src="../assets/no-clients.png" /></div>
-            <div>Sem pacientes marcados</div>
+            <div class="mx-auto"><img src="../assets/no-finance.png" /></div>
+            <div>Sem transações cadastradas</div>
           </div>
         </v-card-text>
         <v-card-text v-else>
@@ -94,7 +95,6 @@
             type="article"
           ></v-skeleton-loader>
         </v-card-text>
-        <v-spacer></v-spacer>
       </v-card>
     </v-col>
     <v-col>
@@ -310,7 +310,7 @@
 .next-appointment-height {
   background: linear-gradient(134.56deg, #D6C3C3 -6.74%, #DBA5D5 105.74%);
   color: white;
-  height: 365px !important;
+  height: 312.5px !important;
 }
 
 .action-card {
