@@ -493,7 +493,7 @@
               <v-sheet
               >
                 <div class="d-flex justify-center align-center">
-                  <img width="10000" :src="image.path" />
+                  <img width="500" :src="image.path" />
                 </div>
               </v-sheet>
             </v-carousel-item>
@@ -750,6 +750,7 @@
         this.deleteImageLoading = true
         clientService.deleteImage(this.selectedImage).then(() => {
           this.imageDeleteDialog = false
+          this.deleteImageLoading = false
           this.getClient()
         },
           (error) => {
