@@ -62,6 +62,7 @@
 
 <script>
 import userService from '../services/user.service'
+import appointmentService from '../services/appointment.service'
 import { toast } from 'vue3-toastify'
 
 export default {
@@ -118,7 +119,7 @@ export default {
       const data = {
         calendar: this.calendar
       }
-      userService.saveCalendar(data).then(() => {
+      appointmentService.saveCalendar(data).then(() => {
         this.$store.dispatch('auth/updateCalendar', this.calendar)
         this.loading = false
       },

@@ -63,7 +63,7 @@
                 <div>Financeiro</div>
               </div>
             </v-list-item>
-            <v-list-item class="mt-auto" v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
+            <v-list-item v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
               <div class="d-flex ga-3 align-center">
                 <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
                 <div>Configurações</div>

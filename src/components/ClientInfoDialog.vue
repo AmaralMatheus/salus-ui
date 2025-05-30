@@ -82,13 +82,13 @@
                     <v-combobox
                       readonly
                       clearable
+                      :items="teethNumber"
                       v-bind="props"
-                      :items="[16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]"
                       item-title="name"
                       item-value="name"
                       multiple
-                      :rules="rules"
-                      v-model="element.quantity"
+                      @click:clear="element.quantity = []"
+                      v-model="element.teethShow"
                       :loading="loading"
                       :disabled="loading"
                       variant="underlined"
@@ -111,6 +111,9 @@
                           <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : null" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
                           <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
                         </div>
+                      </div>
+                      <div class="d-flex">
+                        <v-btn color="primary" class="mb-2 ml-auto" @click="element.teethShow = element.quantity.map(el => teethNumber[el]).sort((a, b) => b - a)">Salvar</v-btn>
                       </div>
                     </v-list-item>
                   </v-list>
@@ -167,7 +170,7 @@
     computed: {
       id() {
         return this.$route.params.id
-      },
+      }
     },
     props: ['descriptionAction', 'client'],
     components: {

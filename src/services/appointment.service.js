@@ -3,7 +3,8 @@ import authHeader from './auth-header'
 
 class AppointmentService {
   getGoogleCalendarEvents(calendarId) {
-    return axios.get(process.env.G_CALENDAR_API_URL + calendarId + '/events?key=' + process.env.G_CALENDAR_TOKEN)
+    console.log(process.env)
+    return axios.get(process.env.VUE_APP_G_CALENDAR_API_URL + calendarId + '/events?key=' + process.env.VUE_APP_G_CALENDAR_TOKEN)
   }
   schedule(data) {
     return axios.post(process.env.VUE_APP_API_URL + 'appointments', data, { headers: authHeader() })
@@ -24,7 +25,7 @@ class AppointmentService {
     return axios.delete(process.env.VUE_APP_API_URL + 'appointments/' + id, { headers: authHeader() })
   }
   deleteGoogleAppointment(calendarId, id) {
-    return axios.delete(process.env.G_CALENDAR_API_URL + calendarId + '/events/' + id + '?key=' + process.env.G_CALENDAR_TOKEN)  
+    return axios.delete(process.env.VUE_APP_G_CALENDAR_API_URL + calendarId + '/events/' + id + '?key=' + process.env.VUE_APP_G_CALENDAR_TOKEN)  
   }
   getEvents(params) {
     return axios.get(process.env.VUE_APP_API_URL + 'events?' + params, { headers: authHeader() })

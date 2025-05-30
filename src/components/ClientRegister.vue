@@ -64,7 +64,7 @@
                     v-model="client.rg"
                     :loading="loadingInfo"
                     :disabled="loadingInfo"
-                    :rules="cpfRules"
+                    :rules="rgRules"
                     variant="outlined"
                     density="compact"
                     v-maska="'##.###.###-#'"
@@ -201,7 +201,7 @@
                 label="Status">
               </v-select>
             </v-col> -->
-            <v-col cols="12" v-if="this.currentUser">
+            <v-col cols="12" md="6" v-if="this.currentUser">
               <v-textarea
                 v-model="client.comorbities"
                 :loading="loadingInfo"
@@ -212,7 +212,7 @@
                 label="Alerta de Segurance de Saude">
               </v-textarea>
             </v-col>
-            <v-col cols="12" v-if="this.currentUser">
+            <v-col cols="12" md="6" v-if="this.currentUser">
               <v-textarea
                 v-model="client.description"
                 :loading="loadingInfo"
@@ -284,6 +284,17 @@
         value => {
           if (value) {
             if (value.length < 15) return 'Informe o telefone completo.'
+            if (value.length === 0) return true
+            return true
+          } else {
+            return true
+          }
+        },
+      ],
+      rgRules: [
+        value => {
+          if (value) {
+            if (value.length < 12) return 'Informe o RG completo.'
             if (value.length === 0) return true
             return true
           } else {
@@ -375,6 +386,7 @@
       getCities(){
         locationService.getCities(this.client.state).then((response) => {
           this.cities = response.data
+          this.client.city = parseInt(this.client.city)
         })
       },
       getStates(){
@@ -392,6 +404,8 @@
             response.data.status = response.data.status.id;
           }
           this.client = response.data
+          this.client.state = parseInt(this.client.state)
+          this.getCities()
           this.loadingInfo = false
         })
       },
