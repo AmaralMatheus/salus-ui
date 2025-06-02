@@ -2,15 +2,11 @@
   <v-row>
     <v-col cols="12" class="d-flex flex-column ga-6">
       <v-expansion-panels>
-        <v-expansion-panel>
-          <v-expansion-panel-title>
-            <v-row class="mt-0">
-              <v-col cols="12" sm="3" class="text-h6">Procedimentos</v-col>
-            </v-row>
-          </v-expansion-panel-title>
+        <v-expansion-panel>        
+          <v-expansion-panel-title class="text-h6">Procedimentos</v-expansion-panel-title>
           <v-expansion-panel-text>
             <v-row class="mt-0">
-              <v-col cols="12" sm="9">
+              <v-col cols="12">
                 <v-row>
                   <v-col cols="12" sm="5" md="7" lg="8">
                     <v-text-field
@@ -19,7 +15,7 @@
                       density="compact"
                       hide-details="auto"
                       append-inner-icon="mdi-magnify"
-                      placeholder="Buscar Usuário">
+                      placeholder="Buscar Procedimentos">
                     </v-text-field>
                   </v-col>
                   <v-col cols="12" sm="7" md="5" lg="4">

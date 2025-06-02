@@ -215,7 +215,7 @@
         const data = {
           client_id: this.id,
           description: this.description,
-          title: this.title,
+          title: this.title + ' Teste',
           name: this.title,
           actions: this.newPlan.actions,
           teeth: this.teeth

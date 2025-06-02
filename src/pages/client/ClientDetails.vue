@@ -83,7 +83,7 @@
               </div>
             </v-tabs-window-item>
           </v-tabs-window>
-          <v-tabs
+          <!-- <v-tabs
             v-model="tab"
             color="primary"
             align-tabs="center"
@@ -91,7 +91,7 @@
           >
             <v-tab :value="1">Permanentes</v-tab>
             <v-tab :value="2">Desiduos</v-tab>
-          </v-tabs>
+          </v-tabs> -->
         </v-card-text>
       </v-card>
       <v-skeleton-loader
@@ -536,7 +536,7 @@
             {{ item.price.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }} R$
           </template>
           <template v-slot:[`item.quantity`]="{ item }">
-            {{ item.teeth.length }}
+            <span v-for="tooth in item.teeth" :key="tooth">{{ [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28,48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38][tooth.type] }}{{ tooth !== item.teeth[item.teeth.length -1] ? ', ' : null}}</span>
           </template>
         </v-data-table-virtual>
       </v-card-text>
