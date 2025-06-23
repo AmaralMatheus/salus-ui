@@ -23,14 +23,10 @@
         </v-card>
         <v-expansion-panels>
           <v-expansion-panel>
-            <v-expansion-panel-title>
-              <v-row class="mt-0">
-                <v-col cols="12" sm="3" class="text-h6">Usuários</v-col>
-              </v-row>
-            </v-expansion-panel-title>
+            <v-expansion-panel-title class="text-h6">Usuários</v-expansion-panel-title>
             <v-expansion-panel-text>
               <v-row class="mt-0">
-                <v-col cols="12" sm="9">
+                <v-col cols="12">
                   <v-row>
                     <v-col cols="12" sm="5" md="7" lg="8">
                       <v-text-field

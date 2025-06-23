@@ -1,123 +1,129 @@
 <template>
-    <v-row>
-      <v-col cols="12" class="d-flex flex-column ga-6">
-        <v-card>
-          <v-card-title>
-            <v-row class="mt-0">
-              <v-col cols="12" sm="3" class="text-h6">Status</v-col>
-              <v-col cols="12" sm="9">
-                <v-row>
-                  <v-col cols="12" sm="5" md="7" lg="8">
-                    <v-text-field
-                      v-model="search"
-                      variant="outlined"
-                      density="compact"
-                      hide-details="auto"
-                      append-inner-icon="mdi-magnify"
-                      placeholder="Buscar Usuário">
-                    </v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="7" md="5" lg="4">
-                    <v-btn block append-icon="mdi-plus" @click="statusDialog = true" color="primary">Adicionar Status</v-btn>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-          </v-card-title>
-          <v-data-table-server
-            v-model:items-per-page="itemsPerPage"
-            :headers="headers"
-            :items="serverItems"
-            :items-length="totalItems"
-            :loading="loading"
-            :search="search"
-            item-value="name"
-            @update:options="loadItems"
-            @click:row="viewRow"
-          >
-            <template v-slot:[`item.actions`]="{ item }">
-              <v-menu>
-                <template v-slot:activator="{ props }">
-                  <v-icon :disabled="loading" v-bind="props">mdi-dots-vertical</v-icon>
-                </template>
-          
-                <v-list>
-                  <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="viewRow(null, {item})" title="Editar"></v-list-item>
-                  <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
-                </v-list>
-              </v-menu>
-            </template>
-          </v-data-table-server>
-        </v-card>
-        <v-dialog
-          v-model="statusDialog"
-          width="auto"
-        >
-          <v-card
-            width="700"
-            title="Cadastrar Status"
-          >
-            <v-card-text>
-              <v-row>
-                <v-col cols="12" sm="8">
-                  <v-text-field
-                    label="Nome"
-                    :rules="rules"
-                    hide-details="auto"
-                    :disabled="loading"
-                    variant="outlined"
-                    density="compact"
-                    v-model="status.name"
-                  ></v-text-field>  
-                </v-col>
-              </v-row>
-            </v-card-text>
-            <template v-slot:actions>
-              <v-btn
-                class="ms-auto"
-                text="Cancelar"
-                :disabled="loading"
-                @click="statusDialog = false; status = { name: '' }"
-              ></v-btn>
-              <v-btn
-                text="Salvar"
-                color="error"
-                :disabled="loading"
-                :loading="loading"
-                @click="save"
-              ></v-btn>
-            </template>
-          </v-card>
-        </v-dialog>
-        <v-dialog
-          v-model="dialog"
-          width="auto"
-        >
-          <v-card
-            max-width="400"
-            prepend-icon="mdi-alert-outline"
-            text="Esses dados não podem ser restaurados"
-            title="Deseja excluir esse Usuário?"
-          >
-            <template v-slot:actions>
-              <v-btn
-                class="ms-auto"
-                text="Cancelar"
-                :disabled="loading"
-                @click="dialog = false"
-              ></v-btn>
-              <v-btn
-                text="Excluir"
-                color="error"
-                :disabled="loading"
-                :loading="loading"
-                @click="remove"
-              ></v-btn>
-            </template>
-          </v-card>
-        </v-dialog>
-      </v-col>
-    </v-row>
+    <v-expansion-panels>
+      <v-expansion-panel>
+        <v-expansion-panel-title class="text-h6">Status</v-expansion-panel-title>
+        <v-expansion-panel-text>
+          <v-row>
+            <v-col cols="12" class="d-flex flex-column ga-6">
+              <v-card>
+                <v-card-title>
+                  <v-row class="mt-0">
+                    <v-col cols="12">
+                      <v-row>
+                        <v-col cols="12" sm="5" md="7" lg="8">
+                          <v-text-field
+                            v-model="search"
+                            variant="outlined"
+                            density="compact"
+                            hide-details="auto"
+                            append-inner-icon="mdi-magnify"
+                            placeholder="Buscar Status">
+                          </v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="7" md="5" lg="4">
+                          <v-btn block append-icon="mdi-plus" @click="statusDialog = true" color="primary">Adicionar Status</v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                  </v-row>
+                </v-card-title>
+                <v-data-table-server
+                  v-model:items-per-page="itemsPerPage"
+                  :headers="headers"
+                  :items="serverItems"
+                  :items-length="totalItems"
+                  :loading="loading"
+                  :search="search"
+                  item-value="name"
+                  @update:options="loadItems"
+                  @click:row="viewRow"
+                >
+                  <template v-slot:[`item.actions`]="{ item }">
+                    <v-menu>
+                      <template v-slot:activator="{ props }">
+                        <v-icon :disabled="loading" v-bind="props">mdi-dots-vertical</v-icon>
+                      </template>
+                
+                      <v-list>
+                        <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="viewRow(null, {item})" title="Editar"></v-list-item>
+                        <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </template>
+                </v-data-table-server>
+              </v-card>
+              <v-dialog
+                v-model="statusDialog"
+                width="auto"
+              >
+                <v-card
+                  width="700"
+                  title="Cadastrar Status"
+                >
+                  <v-card-text>
+                    <v-row>
+                      <v-col cols="12" sm="8">
+                        <v-text-field
+                          label="Nome"
+                          :rules="rules"
+                          hide-details="auto"
+                          :disabled="loading"
+                          variant="outlined"
+                          density="compact"
+                          v-model="status.name"
+                        ></v-text-field>  
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                  <template v-slot:actions>
+                    <v-btn
+                      class="ms-auto"
+                      text="Cancelar"
+                      :disabled="loading"
+                      @click="statusDialog = false; status = { name: '' }"
+                    ></v-btn>
+                    <v-btn
+                      text="Salvar"
+                      color="error"
+                      :disabled="loading"
+                      :loading="loading"
+                      @click="save"
+                    ></v-btn>
+                  </template>
+                </v-card>
+              </v-dialog>
+              <v-dialog
+                v-model="dialog"
+                width="auto"
+              >
+                <v-card
+                  max-width="400"
+                  prepend-icon="mdi-alert-outline"
+                  text="Esses dados não podem ser restaurados"
+                  title="Deseja excluir esse Usuário?"
+                >
+                  <template v-slot:actions>
+                    <v-btn
+                      class="ms-auto"
+                      text="Cancelar"
+                      :disabled="loading"
+                      @click="dialog = false"
+                    ></v-btn>
+                    <v-btn
+                      text="Excluir"
+                      color="error"
+                      :disabled="loading"
+                      :loading="loading"
+                      @click="remove"
+                    ></v-btn>
+                  </template>
+                </v-card>
+              </v-dialog>
+            </v-col>
+          </v-row>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
   </template>
   
   <script>

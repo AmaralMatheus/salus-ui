@@ -251,7 +251,7 @@
           <div class="d-flex">
             <v-btn @click="$emit('cancel')" v-if="this.currentUser" variant="plain">Mande para o CLiente Responder</v-btn>
             <v-btn class="ml-auto" v-if="this.currentUser" @click="$emit('cancel')" variant="plain">Cancelar</v-btn>
-            <v-btn type="submit" :class="!this.currentUser ? 'ml-auto' : ''" variant="plain" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">SALVAR</v-btn>
+            <v-btn @click="save" :class="!this.currentUser ? 'ml-auto' : ''" variant="plain" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">SALVAR</v-btn>
           </div>
         </v-form>
       </v-card-text>
@@ -385,6 +385,9 @@
     methods: {
       handleInputFile() {
         if (this.$refs.inputFile) this.$refs.inputFile.click()
+      },
+      getDate(date) {
+        console.log(date)
       },
       getAddress() {
         this.blockCity = false

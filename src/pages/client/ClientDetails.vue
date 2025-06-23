@@ -83,7 +83,7 @@
               </div>
             </v-tabs-window-item>
           </v-tabs-window>
-          <v-tabs
+          <!-- <v-tabs
             v-model="tab"
             color="primary"
             align-tabs="center"
@@ -91,7 +91,7 @@
           >
             <v-tab :value="1">Permanentes</v-tab>
             <v-tab :value="2">Desiduos</v-tab>
-          </v-tabs>
+          </v-tabs> -->
         </v-card-text>
       </v-card>
       <v-skeleton-loader
