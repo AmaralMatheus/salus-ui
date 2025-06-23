@@ -72,7 +72,7 @@ const calendarApp = createCalendar(
       /**
       * The number of days to display in week view
       */
-      nDays: 5,
+      nDays: 7,
 
       /**
       * The width in percentage of the event element in the week grid

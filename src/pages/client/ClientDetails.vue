@@ -523,33 +523,40 @@
     v-model="planView"
     width="auto"
   >
-    <v-card
-      width="600"
-      :title="'Plano de tratamento ' + currentPlan.name"
-    >
-      <v-card-text>
-        <v-data-table-virtual
-          :headers="planActionHeaders"
-          :items="currentPlan.actions"
-        >
-          <template v-slot:[`item.price`]="{ item }">
-            {{ item.price.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }} R$
-          </template>
-          <template v-slot:[`item.quantity`]="{ item }">
-            {{ item.teeth.length }}
-          </template>
-        </v-data-table-virtual>
-      </v-card-text>
-      <v-card-actions>
-        <div class="ml-2">Total: R$ {{ getTotal().toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}</div>
-        <v-spacer></v-spacer>
-        <v-btn
-          text="Fechar"
-          variant="plain"
-          @click="planView = false"
-        ></v-btn>
-      </v-card-actions>
-    </v-card>
+    <div ref="pdfContent">
+      <v-card
+        :title="'Plano de tratamento ' + (currentPlan.name ?? '')"
+      >
+        <v-card-text>
+          <v-data-table-virtual
+            :headers="planActionHeaders"
+            :items="currentPlan.actions"
+          >
+            <template v-slot:[`item.price`]="{ item }">
+              {{ item.price.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }} R$
+            </template>
+            <template v-slot:[`item.quantity`]="{ item }">
+              {{ item.teeth.length }}
+            </template>
+          </v-data-table-virtual>
+        </v-card-text>
+        <v-card-actions>
+          <div class="ml-2">Total: R$ {{ getTotal().toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}</div>
+          <v-spacer></v-spacer>
+          <v-btn
+            text="Fechar"
+            variant="plain"
+            @click="planView = false"
+          ></v-btn>
+          <v-btn
+            text="Exportar"
+            variant="plain"
+            color="primary"
+            @click="generatePDF"
+          ></v-btn>
+        </v-card-actions>
+      </v-card>
+    </div>
   </v-dialog>
   <v-dialog
     v-model="prescriptionView"
@@ -596,6 +603,7 @@
   import ClientRegister from '../../components/ClientRegister.vue'
   import { toast } from 'vue3-toastify'
   import AWS from '../../services/aws.service'
+  import html2pdf from "html2pdf.js"
 
   export default {
     computed: {
@@ -606,7 +614,7 @@
     components: {
       Scheduler,
       ClientInfoDialog,
-      ClientRegister
+      ClientRegister,
     },
     data () {
       return {
@@ -857,6 +865,10 @@
         this.client.images.push({path: data.Location})
         this.image = data.Location
         this.imageLoading = false
+      },
+      generatePDF() {
+        const doc = this.$refs.pdfContent
+        html2pdf(doc)
       },
       async saveImage() {
         this.imageLoading = true

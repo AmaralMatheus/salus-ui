@@ -34,7 +34,20 @@
             </v-col>
             <v-col cols="12" md="10">
               <v-row>
+
                 <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="client.register_id"
+                    :loading="loadingInfo"
+                    :disabled="loadingInfo"
+                    :rules="rules"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="Número do Prontuário">
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="5">
                   <v-text-field
                     v-model="client.name"
                     :loading="loadingInfo"
@@ -45,6 +58,21 @@
                     hide-details="auto"
                     label="Nome">
                   </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-select
+                    :items="statuses"
+                    item-title="name"
+                    item-value="id"
+                    :return-object="false"
+                    v-model="client.status"
+                    :loading="loadingInfo"
+                    :disabled="loadingInfo"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="Status">
+                  </v-select>
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
@@ -64,10 +92,8 @@
                     v-model="client.rg"
                     :loading="loadingInfo"
                     :disabled="loadingInfo"
-                    :rules="rgRules"
                     variant="outlined"
                     density="compact"
-                    v-maska="'##.###.###-#'"
                     hide-details="auto"
                     label="RG">
                   </v-text-field>
@@ -90,35 +116,48 @@
                     label="Gênero">
                   </v-select>
                 </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <v-text-field
-                    v-model="client.phone"
-                    :loading="loadingInfo"
-                    :disabled="loadingInfo"
-                    v-maska="'(##) #####-####'"
-                    :rules="phoneRule"
-                    variant="outlined"
-                    density="compact"
-                    hide-details="auto"
-                    label="Telefone">
-                  </v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <v-date-input
-                    v-model="client.birthday"
-                    :rules="dateRule"
-                    :loading="loadingInfo"
-                    :disabled="loadingInfo"
-                    prepend-icon=""
-                    v-maska="'##/##/####'"
-                    append-inner-icon="$calendar"
-                    variant="outlined"
-                    density="compact"
-                    hide-details="auto"
-                    label="Data de nascimento">
-                  </v-date-input>
-                </v-col>
               </v-row>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <v-text-field
+                v-model="client.phone"
+                :loading="loadingInfo"
+                :disabled="loadingInfo"
+                v-maska="phoneMask"
+                :rules="phoneRule"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                label="Telefone">
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <v-text-field
+                v-model="client.phone2"
+                :loading="loadingInfo"
+                :disabled="loadingInfo"
+                v-maska="phoneMask"
+                :rules="phoneRule"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                label="Telefone Alternativo">
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <v-date-input
+                v-model="client.birthday"
+                :rules="dateRule"
+                :loading="loadingInfo"
+                :disabled="loadingInfo"
+                prepend-icon=""
+                v-maska="'##/##/####'"
+                append-inner-icon="$calendar"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                label="Data de nascimento">
+              </v-date-input>
             </v-col>
             <v-col cols="12" sm="6" md="3">
               <v-text-field
@@ -186,21 +225,6 @@
                 label="E-mail">
               </v-text-field>
             </v-col>
-            <!-- <v-col cols="12" sm="6" md="2">
-              <v-select
-              :items="statuses"
-                item-title="name"
-                item-value="id"
-                :return-object="false"
-                v-model="client.status"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                label="Status">
-              </v-select>
-            </v-col> -->
             <v-col cols="12" md="6" v-if="this.currentUser">
               <v-textarea
                 v-model="client.comorbities"
@@ -253,6 +277,9 @@
       id() {
         return this.selectedClient
       },
+      phoneMask() {
+        return this.client.phone?.length < 15 ? '(##) ####-#####' : '(##) #####-####'
+      },
       currentUser() {
         return this.$store.state.auth.user
       },
@@ -283,7 +310,7 @@
       phoneRule: [
         value => {
           if (value) {
-            if (value.length < 15) return 'Informe o telefone completo.'
+            if (value.length < 14) return 'Informe o telefone completo.'
             if (value.length === 0) return true
             return true
           } else {

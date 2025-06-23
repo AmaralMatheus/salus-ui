@@ -32,9 +32,6 @@ class ClientService {
   saveImage(data) {
     return axios.post(process.env.VUE_APP_API_URL + 'images/save', data, { headers: authHeader() })
   }
-  saveProfileImage(data) {
-    return axios.post(process.env.VUE_APP_API_URL + 'users/image', data, { headers: authHeader() })
-  }
   deletePrescription(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'prescriptions/' + id, { headers: authHeader() })
   }

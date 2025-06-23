@@ -114,7 +114,7 @@ export default {
         </v-card-title>
         <v-card-text v-if="!list" class="overflow-y-scroll">
           <Calendar :show-header="false" :limits="{
-            start: '07:00',
+            start: '00:00',
             end: '23:59',
           }" @update="update" @delete="deleteEvent"/>
         </v-card-text>

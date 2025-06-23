@@ -38,7 +38,6 @@
       <v-form v-model="planForm" class="d-flex flex-column ga-4">
         <v-text-field
           label="Título"
-          :rules="rules"
           :disabled="loading"
           variant="outlined"
           density="compact"
@@ -103,12 +102,12 @@
                       <div class="d-flex justify-space-between align-baseline">
                         <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
                           <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : null" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
+                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : element.quantity = element.quantity.filter((currentTooth) => currentTooth !== tooth)" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
                         </div>
                       </div>
                       <div class="d-flex justify-space-between">
                         <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
-                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : null" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
+                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : element.quantity = element.quantity.filter((currentTooth) => currentTooth !== tooth)" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
                           <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
                         </div>
                       </div>
