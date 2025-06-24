@@ -527,7 +527,20 @@
       <v-card
         :title="'Plano de tratamento ' + (currentPlan.name ?? '')"
       >
-        <v-card-text>
+        <v-card-text class="border-s-xl border-error">
+          <div class="mb-5 d-flex justify-space-between">
+            <div>
+              <h1>Receituário</h1>
+              <p>{{ format(new Date(), 'dd/mm/yyyy') }}</p>
+            </div>
+            <img width="20" src="/favicon.svg" />
+          </div>
+          <div class="d-flex ga-3 align-center">
+            <h3>Paciente:</h3>
+            {{ client.name }}
+          </div>
+        </v-card-text>
+        <v-card-text class="border-s-xl">
           <v-data-table-virtual
             :headers="planActionHeaders"
             :items="currentPlan.actions"
@@ -603,7 +616,7 @@
   import ClientRegister from '../../components/ClientRegister.vue'
   import { toast } from 'vue3-toastify'
   import AWS from '../../services/aws.service'
-  import html2pdf from "html2pdf.js"
+  import html2pdf from 'html2pdf.js'
 
   export default {
     computed: {
