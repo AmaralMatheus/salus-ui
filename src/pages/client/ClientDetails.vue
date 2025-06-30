@@ -523,24 +523,11 @@
     v-model="planView"
     width="auto"
   >
-    <div ref="pdfContent">
+    <div>
       <v-card
         :title="'Plano de tratamento ' + (currentPlan.name ?? '')"
       >
-        <v-card-text class="border-s-xl border-error">
-          <div class="mb-5 d-flex justify-space-between">
-            <div>
-              <h1>Receituário</h1>
-              <p>{{ format(new Date(), 'dd/mm/yyyy') }}</p>
-            </div>
-            <img width="20" src="/favicon.svg" />
-          </div>
-          <div class="d-flex ga-3 align-center">
-            <h3>Paciente:</h3>
-            {{ client.name }}
-          </div>
-        </v-card-text>
-        <v-card-text class="border-s-xl">
+        <v-card-text>
           <v-data-table-virtual
             :headers="planActionHeaders"
             :items="currentPlan.actions"
@@ -575,19 +562,53 @@
     v-model="prescriptionView"
     width="auto"
   >
-    <v-card
-      width="600"
-      :title="'Receita de ' + getDateTime(currentPrescription.created_at)"
-    >
-      <v-card-text>
-        <div v-html="currentPrescription.description" />
-      </v-card-text>
+    <v-card width="1000">
+      <div ref="pdfContent" class="d-flex flex-column">
+        <div class="pb-10" style="border-left: solid 8px rgb(var(--v-theme-primary)); padding: 50px; padding-bottom: 0;">
+          <div class="mb-10 d-flex justify-space-between">
+            <div>
+              <h1>Receituário</h1>
+              <p>{{ format(new Date(), 'dd/mm/yyyy') }}</p>
+            </div>
+            <img width="20" src="/favicon.svg" />
+          </div>
+          <div class="d-flex ga-3 align-center">
+            <h3>Paciente:</h3>
+            {{ client.name }}
+          </div>
+        </div>
+        <div style="border-color: red; padding: 50px; padding-top: 0;" class="border-s-xl">
+          <div style="height: 500px;" class="pt-10" v-html="currentPrescription.description" />
+          <div style="height: 150px;" class="ma-auto text-center">
+            ______________________________________________
+            <br>
+            <b>{{ currentUser.user_name }}</b>
+            <br>
+            <div class="text-sm">80252 - SP</div>
+          </div>
+          <div class="ma-auto text-center text-medium-emphasis">
+            Rua Arlindo Luz, 825 - Centro - Ourinhos - SP
+          </div>
+          <div class="ma-auto text-center text-medium-emphasis">
+            CEP 87005-005 (44) 99770-3577 
+          </div>
+          <div class="ma-auto text-center text-medium-emphasis text-caption">
+            powered by Dental Salus 
+          </div>
+        </div>
+      </div>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
           text="Fechar"
           variant="plain"
           @click="prescriptionView = false"
+        ></v-btn>
+        <v-btn
+          text="Exportar"
+          variant="plain"
+          color="primary"
+          @click="generatePDF"
         ></v-btn>
       </v-card-actions>
     </v-card>
@@ -622,6 +643,9 @@
     computed: {
       id() {
         return this.$route.params.id
+      },
+      currentUser() {
+        return this.$store.state.auth.user
       },
     },
     components: {
@@ -881,7 +905,17 @@
       },
       generatePDF() {
         const doc = this.$refs.pdfContent
-        html2pdf(doc)
+        const options = {
+          filename: `receita.pdf`,
+          html2canvas: {
+            dpi: 192,
+            scale:4,
+            letterRendering: true,
+            useCORS: true
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }
+        html2pdf(doc, options)
       },
       async saveImage() {
         this.imageLoading = true
