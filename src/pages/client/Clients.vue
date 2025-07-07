@@ -20,6 +20,9 @@
                 <v-col cols="12" sm="7" md="5" lg="4">
                   <v-btn block append-icon="mdi-plus" @click="create()" color="primary">Adicionar Paciente</v-btn>
                 </v-col>
+                <v-col cols="12" sm="7" md="5" lg="4">
+                  <v-btn block append-icon="mdi-plus" @click="importFromFile()" color="primary">Importar Lista de Pacientes</v-btn>
+                </v-col>
               </v-row>
             </v-col>
           </v-row>
@@ -110,6 +113,12 @@
           itemsPerPage: 10,
           sortBy: []})"/>
       </v-dialog>
+      <v-dialog
+        v-model="importDialog"
+        max-width="800"
+      >
+        <v-file-input @update:modelValue="onFileChange" />
+      </v-dialog>
     </v-col>
   </v-row>
 </template>
@@ -132,6 +141,7 @@
       parseISO,
       schedulerDialog: false,
       newClientDialog: false,
+      importDialog: false,
       itemsPerPage: 5,
       dialog: false,
       selectedItem: null,
@@ -193,6 +203,54 @@
       create () {
         this.selectedItem = null
         this.newClientDialog = true
+      },
+      importFromFile () {
+        this.importDialog = true
+      },
+      onFileChange(file) {
+        var files = file;
+        this.createInput(files)
+      },
+      createInput(file) {
+        var reader = new FileReader()
+        reader.onload = () => {
+          this.loading = true
+          const clients = reader.result.split(/\r\n|\n/);
+          // Reading line by line
+          clients.forEach((client) => {
+            client = client.replaceAll('"','').split(',')
+            const clientRequest = {
+              name: client[0],
+              register_id: client[1],
+              cpf: client[2],
+              rg: client[3],
+              created_at: client[4],
+              birthday: client[5],
+              address: client[6] +', '+client[7],
+              address2: client[8],
+              city: '4115200',
+              state: '41',
+              cep: client[11],
+              phone: client[12],
+              email: client[13],
+              status: 1,
+              company_id: this.currentUser.company_id
+            }
+            clientService.saveClient(clientRequest).then(() => {
+            },
+            (error) => {
+              this.loadingRequest = false
+              toast.error((error.response &&
+                      error.response.data &&
+                      error.response.data.message) ||
+                    error.message ||
+                    error.toString())
+            })
+          })
+          this.loading = false
+        }
+        reader.readAsText(file)
+
       },
       update (row) {
         this.selectedItem = row.id

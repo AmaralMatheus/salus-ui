@@ -150,6 +150,13 @@
         loading: true,
         totalItems: 0,
       }),
+      created() {
+        this.loading = true
+        companyService.getCompany().then((response) => {
+          this.company = response.data
+          this.loading = false
+        })
+      },
       methods: {
         loadItems ({ page, itemsPerPage, sortBy }) {
           this.loading = true
@@ -162,9 +169,6 @@
           userService.getUsers(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
             this.serverItems = response.data.data
             this.totalItems = response.data.total
-          })
-          companyService.getCompany().then((response) => {
-            this.company = response.data
             this.loading = false
           })
         },
