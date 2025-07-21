@@ -34,7 +34,20 @@
             </v-col>
             <v-col cols="12" md="10">
               <v-row>
+
                 <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="client.register_id"
+                    :loading="loadingInfo"
+                    :disabled="loadingInfo"
+                    :rules="rules"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="Número do Prontuário">
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="5">
                   <v-text-field
                     v-model="client.name"
                     :loading="loadingInfo"
@@ -45,6 +58,21 @@
                     hide-details="auto"
                     label="Nome">
                   </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-select
+                    :items="statuses"
+                    item-title="name"
+                    item-value="id"
+                    :return-object="false"
+                    v-model="client.status"
+                    :loading="loadingInfo"
+                    :disabled="loadingInfo"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="Status">
+                  </v-select>
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
@@ -64,10 +92,8 @@
                     v-model="client.rg"
                     :loading="loadingInfo"
                     :disabled="loadingInfo"
-                    :rules="cpfRules"
                     variant="outlined"
                     density="compact"
-                    v-maska="'##.###.###-#'"
                     hide-details="auto"
                     label="RG">
                   </v-text-field>
@@ -90,35 +116,48 @@
                     label="Gênero">
                   </v-select>
                 </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <v-text-field
-                    v-model="client.phone"
-                    :loading="loadingInfo"
-                    :disabled="loadingInfo"
-                    v-maska="'(##) #####-####'"
-                    :rules="phoneRule"
-                    variant="outlined"
-                    density="compact"
-                    hide-details="auto"
-                    label="Telefone">
-                  </v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <v-date-input
-                    v-model="client.birthday"
-                    :rules="dateRule"
-                    :loading="loadingInfo"
-                    :disabled="loadingInfo"
-                    prepend-icon=""
-                    v-maska="'##/##/####'"
-                    append-inner-icon="$calendar"
-                    variant="outlined"
-                    density="compact"
-                    hide-details="auto"
-                    label="Data de nascimento">
-                  </v-date-input>
-                </v-col>
               </v-row>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <v-text-field
+                v-model="client.phone"
+                :loading="loadingInfo"
+                :disabled="loadingInfo"
+                v-maska="phoneMask"
+                :rules="phoneRule"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                label="Telefone">
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <v-text-field
+                v-model="client.phone2"
+                :loading="loadingInfo"
+                :disabled="loadingInfo"
+                v-maska="phoneMask"
+                :rules="phoneRule"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                label="Telefone Alternativo">
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <v-date-input
+                v-model="client.birthday"
+                :rules="dateRule"
+                :loading="loadingInfo"
+                :disabled="loadingInfo"
+                prepend-icon=""
+                v-maska="'##/##/####'"
+                append-inner-icon="$calendar"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                label="Data de nascimento">
+              </v-date-input>
             </v-col>
             <v-col cols="12" sm="6" md="3">
               <v-text-field
@@ -186,22 +225,7 @@
                 label="E-mail">
               </v-text-field>
             </v-col>
-            <!-- <v-col cols="12" sm="6" md="2">
-              <v-select
-              :items="statuses"
-                item-title="name"
-                item-value="id"
-                :return-object="false"
-                v-model="client.status"
-                :loading="loadingInfo"
-                :disabled="loadingInfo"
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                label="Status">
-              </v-select>
-            </v-col> -->
-            <v-col cols="12" v-if="this.currentUser">
+            <v-col cols="12" md="6" v-if="this.currentUser">
               <v-textarea
                 v-model="client.comorbities"
                 :loading="loadingInfo"
@@ -212,7 +236,7 @@
                 label="Alerta de Segurance de Saude">
               </v-textarea>
             </v-col>
-            <v-col cols="12" v-if="this.currentUser">
+            <v-col cols="12" md="6" v-if="this.currentUser">
               <v-textarea
                 v-model="client.description"
                 :loading="loadingInfo"
@@ -227,7 +251,7 @@
           <div class="d-flex">
             <v-btn @click="$emit('cancel')" v-if="this.currentUser" variant="plain">Mande para o CLiente Responder</v-btn>
             <v-btn class="ml-auto" v-if="this.currentUser" @click="$emit('cancel')" variant="plain">Cancelar</v-btn>
-            <v-btn type="submit" :class="!this.currentUser ? 'ml-auto' : ''" variant="plain" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">SALVAR</v-btn>
+            <v-btn @click="save" :class="!this.currentUser ? 'ml-auto' : ''" variant="plain" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">SALVAR</v-btn>
           </div>
         </v-form>
       </v-card-text>
@@ -252,6 +276,9 @@
     computed: {
       id() {
         return this.selectedClient
+      },
+      phoneMask() {
+        return this.client.phone?.length < 15 ? '(##) ####-#####' : '(##) #####-####'
       },
       currentUser() {
         return this.$store.state.auth.user
@@ -283,7 +310,18 @@
       phoneRule: [
         value => {
           if (value) {
-            if (value.length < 15) return 'Informe o telefone completo.'
+            if (value.length < 14) return 'Informe o telefone completo.'
+            if (value.length === 0) return true
+            return true
+          } else {
+            return true
+          }
+        },
+      ],
+      rgRules: [
+        value => {
+          if (value) {
+            if (value.length < 12) return 'Informe o RG completo.'
             if (value.length === 0) return true
             return true
           } else {
@@ -348,6 +386,9 @@
       handleInputFile() {
         if (this.$refs.inputFile) this.$refs.inputFile.click()
       },
+      getDate(date) {
+        console.log(date)
+      },
       getAddress() {
         this.blockCity = false
         this.blockState = false
@@ -375,6 +416,7 @@
       getCities(){
         locationService.getCities(this.client.state).then((response) => {
           this.cities = response.data
+          this.client.city = parseInt(this.client.city)
         })
       },
       getStates(){
@@ -392,6 +434,8 @@
             response.data.status = response.data.status.id;
           }
           this.client = response.data
+          this.client.state = parseInt(this.client.state)
+          this.getCities()
           this.loadingInfo = false
         })
       },

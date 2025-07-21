@@ -23,22 +23,21 @@
     <v-layout>
       <v-bottom-navigation color="primary" v-if="currentUser" class="d-md-none align-center">
         <div class="d-flex justify-space-between ga-3">
-          <v-icon :class="path === undefined ? 'bg-theme text-white' : ''" class="pa-5 rounded" @click="$router.push('/home')"><img class="cursor-pointer" :src="require('./assets/home-6-line.svg')"/></v-icon>
-          <v-icon :class="path && path.toString().includes('client') ? 'bg-theme text-white' : ''" class="pa-5 rounded" @click="$router.push('/pacientes')"><img class="cursor-pointer" :src="require('./assets/clientes.svg')"/></v-icon>
-          <v-icon :class="path === 'agenda' ? 'bg-theme text-white' : ''" class="pa-5 rounded" @click="$router.push('/agenda')"><img class="cursor-pointer" :src="require('./assets/calendar-event-fill.svg')"/></v-icon>
-          <v-icon :class="path === 'financeiro' ? 'bg-theme text-white' : ''" class="pa-5 rounded" @click="$router.push('/financeiro')"><img class="cursor-pointer" :src="require('./assets/coins-line.svg')"/></v-icon>
-          <v-icon :class="path && path.toString().includes('user') ? 'bg-theme text-white' : ''" class="pa-5 rounded" @click="$router.push('/ajustes')" v-if="currentUser.type === 1"><img class="cursor-pointer" :src="require('./assets/settings-3-line.svg')"/></v-icon>
-          <v-icon class="pa-5" @click="logOut">mdi-exit-to-app</v-icon>
+          <v-icon :class="path === undefined ? 'bg-theme' : ''" class="pa-5 rounded" @click="$router.push('/home')"><img :class="path === undefined ? 'active' : ''" class="cursor-pointer" :src="require('./assets/home-6-line.svg')"/></v-icon>
+          <v-icon :class="path && path.toString().includes('client') ? 'bg-theme' : ''" class="pa-5 rounded" @click="$router.push('/pacientes')"><img :class="path && path.toString().includes('client') ? 'active' : ''" class="cursor-pointer" :src="require('./assets/clientes.svg')"/></v-icon>
+          <v-icon :class="path === 'agenda' ? 'bg-theme' : ''" class="pa-5 rounded" @click="$router.push('/agenda')"><img :class="path === 'agenda' ? 'active' : ''" class="cursor-pointer" :src="require('./assets/calendar-event-fill.svg')"/></v-icon>
+          <v-icon :class="path === 'financeiro' ? 'bg-theme' : ''" class="pa-5 rounded" @click="$router.push('/financeiro')"><img :class="path === 'financeiro' ? 'active' : ''" class="cursor-pointer" :src="require('./assets/coins-line.svg')"/></v-icon>
+          <v-icon :class="path && path.toString().includes('user') ? 'bg-theme' : ''" class="pa-5 rounded" @click="$router.push('/ajustes')" v-if="currentUser.type === 1"><img :class="path && path.toString().includes('user') ? 'active' : ''" class="cursor-pointer" :src="require('./assets/settings-3-line.svg')"/></v-icon>
         </div>
       </v-bottom-navigation>
       <v-main class="d-flex ga-5">
-        <div>
+        <div class="custom-navbar">
           <v-breadcrumbs v-if="currentUser" style="color: transparent" :items="['s']">
             <template v-slot:divider>
               <v-icon icon="mdi-chevron-right"></v-icon>
             </template>
           </v-breadcrumbs>
-          <v-list class="bg-transparent custom-navbar d-flex ga-3 flex-column" density="compact" nav v-if="currentUser">
+          <v-list class="bg-transparent d-flex ga-3 flex-column" density="compact" nav v-if="currentUser">
             <v-list-item active-class="text-white bg-theme" value="home" :active="path === undefined" @click="$router.push('/home')">
               <div class="d-flex ga-3 align-center">
                 <img class="cursor-pointer" :class="path === undefined ? 'active' : ''" :src="require('./assets/home-6-line.svg')"/>
@@ -63,7 +62,7 @@
                 <div>Financeiro</div>
               </div>
             </v-list-item>
-            <v-list-item class="mt-auto" v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
+            <v-list-item v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
               <div class="d-flex ga-3 align-center">
                 <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
                 <div>Configurações</div>
@@ -224,7 +223,7 @@ td {
 
 @media (max-width: 959px) {
   .custom-navbar {
-    display: none;
+    display: none !important;
   }
 }
 
@@ -256,5 +255,9 @@ td {
 
 .v-main {
   --v-layout-bottom: 0px !important;
+}
+
+.v-expansion-panel__shadow{
+  box-shadow: none;
 }
 </style>

@@ -23,14 +23,10 @@
         </v-card>
         <v-expansion-panels>
           <v-expansion-panel>
-            <v-expansion-panel-title>
-              <v-row class="mt-0">
-                <v-col cols="12" sm="3" class="text-h6">Usuários</v-col>
-              </v-row>
-            </v-expansion-panel-title>
+            <v-expansion-panel-title class="text-h6">Usuários</v-expansion-panel-title>
             <v-expansion-panel-text>
               <v-row class="mt-0">
-                <v-col cols="12" sm="9">
+                <v-col cols="12">
                   <v-row>
                     <v-col cols="12" sm="5" md="7" lg="8">
                       <v-text-field
@@ -154,6 +150,13 @@
         loading: true,
         totalItems: 0,
       }),
+      created() {
+        this.loading = true
+        companyService.getCompany().then((response) => {
+          this.company = response.data
+          this.loading = false
+        })
+      },
       methods: {
         loadItems ({ page, itemsPerPage, sortBy }) {
           this.loading = true
@@ -166,9 +169,6 @@
           userService.getUsers(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
             this.serverItems = response.data.data
             this.totalItems = response.data.total
-          })
-          companyService.getCompany().then((response) => {
-            this.company = response.data
             this.loading = false
           })
         },

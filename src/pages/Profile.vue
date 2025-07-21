@@ -14,13 +14,13 @@
                 hide-details="auto"
                 label="Google Calendar id">
               </v-text-field>
-              <v-btn color="primary" density="compact" @click="saveCalendar">Salvar Calendário</v-btn>
+              <v-btn color="primary" @click="saveCalendar">Salvar Calendário</v-btn>
             </div>
             <v-alert type="info" variant="tonal">
               Adicione o id do google calendar para sincronizar os eventos com a sua agenda Google.
             </v-alert>
           </div>
-          <v-btn color="primary" density="compact" @click="addImageDialog=true">Atualizar foto do perfil</v-btn>
+          <v-btn color="primary" @click="addImageDialog=true">Atualizar foto do perfil</v-btn>
         </v-card-text>
       </v-card>
     </v-col>
@@ -62,6 +62,7 @@
 
 <script>
 import userService from '../services/user.service'
+import appointmentService from '../services/appointment.service'
 import { toast } from 'vue3-toastify'
 
 export default {
@@ -118,7 +119,7 @@ export default {
       const data = {
         calendar: this.calendar
       }
-      userService.saveCalendar(data).then(() => {
+      appointmentService.saveCalendar(data).then(() => {
         this.$store.dispatch('auth/updateCalendar', this.calendar)
         this.loading = false
       },

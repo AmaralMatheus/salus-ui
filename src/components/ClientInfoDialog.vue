@@ -38,7 +38,6 @@
       <v-form v-model="planForm" class="d-flex flex-column ga-4">
         <v-text-field
           label="Título"
-          :rules="rules"
           :disabled="loading"
           variant="outlined"
           density="compact"
@@ -82,13 +81,13 @@
                     <v-combobox
                       readonly
                       clearable
+                      :items="teethNumber"
                       v-bind="props"
-                      :items="[16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]"
                       item-title="name"
                       item-value="name"
                       multiple
-                      :rules="rules"
-                      v-model="element.quantity"
+                      @click:clear="element.quantity = []"
+                      v-model="element.teethShow"
                       :loading="loading"
                       :disabled="loading"
                       variant="underlined"
@@ -103,14 +102,17 @@
                       <div class="d-flex justify-space-between align-baseline">
                         <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
                           <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : null" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
+                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : element.quantity = element.quantity.filter((currentTooth) => currentTooth !== tooth)" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
                         </div>
                       </div>
                       <div class="d-flex justify-space-between">
                         <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
-                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : null" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
+                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : element.quantity = element.quantity.filter((currentTooth) => currentTooth !== tooth)" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
                           <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
                         </div>
+                      </div>
+                      <div class="d-flex">
+                        <v-btn color="primary" class="mb-2 ml-auto" @click="element.teethShow = element.quantity.map(el => teethNumber[el]).sort((a, b) => b - a)">Salvar</v-btn>
                       </div>
                     </v-list-item>
                   </v-list>
@@ -167,7 +169,7 @@
     computed: {
       id() {
         return this.$route.params.id
-      },
+      }
     },
     props: ['descriptionAction', 'client'],
     components: {
@@ -212,7 +214,7 @@
         const data = {
           client_id: this.id,
           description: this.description,
-          title: this.title,
+          title: this.title + ' Teste',
           name: this.title,
           actions: this.newPlan.actions,
           teeth: this.teeth

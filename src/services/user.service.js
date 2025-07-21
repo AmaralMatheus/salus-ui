@@ -20,6 +20,9 @@ class UserService {
   deleteUsers(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'users/' + id, { headers: authHeader() })
   }
+  saveProfileImage(data) {
+    return axios.post(process.env.VUE_APP_API_URL + 'users/image', data, { headers: authHeader() })
+  }
 }
 
 export default new UserService()
