@@ -415,8 +415,10 @@
       },
       getCities(){
         locationService.getCities(this.client.state).then((response) => {
-          this.cities = response.data
-          this.client.city = parseInt(this.client.city)
+          if (this.client.city) {
+            this.cities = response.data
+            this.client.city = parseInt(this.client.city)
+          }
         })
       },
       getStates(){
@@ -434,8 +436,10 @@
             response.data.status = response.data.status.id;
           }
           this.client = response.data
-          this.client.state = parseInt(this.client.state)
-          this.getCities()
+          if (this.client.state) {
+            this.client.state = parseInt(this.client.state)
+            this.getCities()
+          }
           this.loadingInfo = false
         })
       },

@@ -31,8 +31,8 @@
         </div>
       </v-bottom-navigation>
       <v-main class="d-flex ga-5">
-        <div class="custom-navbar">
-          <v-breadcrumbs v-if="currentUser" style="color: transparent" :items="['s']">
+        <div class="custom-navbar" v-if="currentUser">
+          <v-breadcrumbs style="color: transparent" :items="['s']">
             <template v-slot:divider>
               <v-icon icon="mdi-chevron-right"></v-icon>
             </template>

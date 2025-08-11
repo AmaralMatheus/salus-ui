@@ -7,7 +7,7 @@
             <v-col cols="12" sm="3" class="text-h6">Pacientes</v-col>
             <v-col cols="12" sm="9">
               <v-row>
-                <v-col cols="12" sm="5" md="7" lg="8">
+                <v-col cols="12" sm="5" md="7" lg="4">
                   <v-text-field
                     v-model="search"
                     variant="outlined"
@@ -21,7 +21,7 @@
                   <v-btn block append-icon="mdi-plus" @click="create()" color="primary">Adicionar Paciente</v-btn>
                 </v-col>
                 <v-col cols="12" sm="7" md="5" lg="4">
-                  <v-btn block append-icon="mdi-plus" @click="importFromFile()" color="primary">Importar Lista de Pacientes</v-btn>
+                  <v-btn block append-icon="mdi-plus" @click="importFromFile()" color="primary">Importar Pacientes</v-btn>
                 </v-col>
               </v-row>
             </v-col>

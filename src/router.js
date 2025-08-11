@@ -11,6 +11,7 @@ const Clients = () => import("./pages/client/Clients.vue")
 const ClientDetails = () => import("./pages/client/ClientDetails.vue")
 const ClientRegister = () => import("./components/ClientRegister.vue")
 const AnonymousRegister = () => import("./pages/AnonymousRegister.vue")
+const AnonymousOnboarding = () => import("./pages/AnonymousOnboarding.vue")
 const Finance = () => import("./pages/Finance.vue")
 const Agenda = () => import("./pages/Agenda.vue")
 
@@ -45,10 +46,16 @@ const routes = [
     component: Clients,
   },
   {
-    path: "/cadastro",
+    path: "/paciente/cadastro",
     name: "external-register",
     // lazy-loaded
     component: AnonymousRegister,
+  },
+  {
+    path: "/cadastro",
+    name: "external-onboarding",
+    // lazy-loaded
+    component: AnonymousOnboarding,
   },
   {
     path: "/pacientes/:id",

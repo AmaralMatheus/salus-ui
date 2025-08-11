@@ -2,6 +2,9 @@ import axios from 'axios'
 import authHeader from './auth-header'
 
 class CompanyService {
+  createCompany(data) {
+    return axios.post(process.env.VUE_APP_API_URL + 'companies', data,)
+  }
   saveProfileImage(data) {
     return axios.post(process.env.VUE_APP_API_URL + 'users/image', data, { headers: authHeader() })
   }
