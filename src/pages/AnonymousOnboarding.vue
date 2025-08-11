@@ -94,6 +94,7 @@
                 v-model="user.cro"
                 hide-details="auto"
                 label="CRO"
+                :rules="required"
                 required
                 :disabled="loading"
                 variant="outlined"
@@ -106,7 +107,7 @@
         <div class="d-flex mt-5 ga-5">
           <v-spacer></v-spacer>
           <v-btn @click="addUser" type="default">Adicionar Usuário</v-btn>
-          <v-btn :disabled="loading || !valid" color="primary" @click="save">Salvar</v-btn>
+          <v-btn :loading="loading" :disabled="!valid" color="primary" @click="save">Salvar</v-btn>
         </div>
       </v-card-text>
     </v-card>
@@ -121,7 +122,7 @@ export default {
     name: 'AnonymousOnboarding',
     data: () => ({
       companyName: '',
-      valid: false,
+      valid: true,
       users: [],
       required: [
         value => {
@@ -134,6 +135,7 @@ export default {
     methods: {
       addUser() {
         this.users.push({})
+        this.valid = true
       },
       async save() {
         if (!this.valid) return
@@ -143,7 +145,7 @@ export default {
           users: this.users
         }
         companyService.createCompany(company)
-          .then((response) => toast.success(response))
+          .then((response) => toast.success(response.message))
           .catch((err) => toast.error(err)).finally(() => {
             this.loading = false
         })
