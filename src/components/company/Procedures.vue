@@ -129,9 +129,9 @@
 </template>
 
 <script>
-  import procedureService from '../services/company.service'
+  import procedureService from '../../services/company.service'
   import { format, parseISO } from 'date-fns'
-  import CurrencyInput from '../components/CurrencyInput.vue'
+  import CurrencyInput from '../CurrencyInput.vue'
   import { toast } from 'vue3-toastify'
 
   export default {

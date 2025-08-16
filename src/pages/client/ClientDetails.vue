@@ -10,75 +10,81 @@
             >
               <div class="d-flex flex-column ga-3">
                 <div class="d-flex justify-space-between align-baseline">
-                  <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
-                      <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                      <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
-                      <v-tooltip
-                        activator="parent"
-                        location="bottom"
-                        :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
-                      >{{ getToothStatus(client.teeth[tooth].status) }}
-                        <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
+                  <v-menu
+                    class="cursor-pointer"
+                    v-for="tooth in client.teeth.filter((t) => t.type < 16)" :key="tooth.id"
+                    :close-on-content-click="false"
+                    open-on-hover
+                  >
+                    <template v-slot:activator="{props}">
+                      <div class="d-flex flex-column" v-bind="props">
+                        <div class="text-disabled text-caption">{{ teethNumber[tooth.type] }}</div>
+                        <img class="cursor-pointer" :class="!tooth.status ? '' : 'tooth-extracted'" :src="require('../../assets/Vector-'+tooth.type+'.svg')"/>
+                      </div>
+                    </template>
+
+                    <v-list>
+                      <v-list-item>
+                        <div class="text-h6">Status do dente: {{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
+                      </v-list-item>
+                      <v-list-item>
+                        <v-select
+                          density="compact"
+                          label="Alterar estado do dente"
+                          :items="teethStatuses"
+                          item-title="name"
+                          return-object
+                          :loading="loadingTeeth"
+                          @update:modelValue="updateToothStatus($event, tooth)"
+                          item-value="id"
+                        ></v-select>
+                        <div class="text-h6">Evoluções relacionadas</div>
+                        <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between" :key="evolution.id">
                           <div v-html="evolution.description"></div>
-                          <div>{{ getDateTime(evolution.created_at) }}</div>
+                          <div class="ml-3">{{ getDateTime(evolution.created_at) }}</div>
                         </div>
-                      </v-tooltip>
-                  </div>
-                </div>
-                <div class="d-flex justify-space-between">
-                  <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
-                      <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
-                      <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                      <v-tooltip
-                        activator="parent"
-                        location="bottom"
-                        :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
-                      >{{ getToothStatus(client.teeth[tooth].status) }}
-                        <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
-                          <div v-html="evolution.description"></div>
-                          <div>{{ getDateTime(evolution.created_at) }}</div>
-                        </div>
-                      </v-tooltip>
-                  </div>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </div>
               </div>
-            </v-tabs-window-item>
-            <v-tabs-window-item
-              :key="2"
-              :value="2"
-            >  
               <div class="d-flex flex-column ga-3">
                 <div class="d-flex justify-space-between align-baseline">
-                  <div v-for="tooth in [32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47]" class="d-flex flex-column" :key="tooth">
-                      <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                      <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+(tooth-32)+'.svg')"/>
-                      <v-tooltip
-                        activator="parent"
-                        location="bottom"
-                        :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
-                      >{{ getToothStatus(client.teeth[tooth].status) }}
-                        <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
+                  <v-menu
+                    class="cursor-pointer"
+                    v-for="tooth in client.teeth.filter((t) => t.type < 32 && t.type > 15)" :key="tooth.id"
+                    :close-on-content-click="false"
+                    open-on-hover
+                  >
+                    <template v-slot:activator="{props}">
+                      <div class="d-flex flex-column" v-bind="props">
+                        <div class="text-disabled text-caption">{{ teethNumber[tooth.type] }}</div>
+                        <img class="cursor-pointer" :class="!tooth.status ? '' : 'tooth-extracted'" :src="require('../../assets/Vector-'+tooth.type+'.svg')"/>
+                      </div>
+                    </template>
+
+                    <v-list>
+                      <v-list-item>
+                        <div class="text-h6">Status do dente: {{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
+                      </v-list-item>
+                      <v-list-item>
+                        <v-select
+                          density="compact"
+                          label="Alterar estado do dente"
+                          :items="teethStatuses"
+                          item-title="name"
+                          return-object
+                          @update:modelValue="updateToothStatus($event, tooth)"
+                          item-value="id"
+                        ></v-select>
+                        <div class="text-h6">Evoluções relacionadas</div>
+                        <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between" :key="evolution.id">
                           <div v-html="evolution.description"></div>
-                          <div>{{ getDateTime(evolution.created_at) }}</div>
+                          <div class="ml-3">{{ getDateTime(evolution.created_at) }}</div>
                         </div>
-                      </v-tooltip>
-                  </div>
-                </div>
-                <div class="d-flex justify-space-between">
-                  <div v-for="tooth in [48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63]" class="d-flex flex-column" :key="tooth">
-                      <img class="cursor-pointer" @click="updateToothStatus(tooth)" :class="client.teeth[tooth].status === 1 ? 'tooth-extracted' : ''" :src="require('../../assets/Vector-'+(tooth-32)+'.svg')"/>
-                      <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                      <v-tooltip
-                        activator="parent"
-                        location="bottom"
-                        :width="client.teeth[tooth].evolutions.length > 0 ? '600' : ''"
-                      >{{ getToothStatus(client.teeth[tooth].status) }}
-                        <div v-for="evolution in client.teeth[tooth].evolutions" class="d-flex justify-space-between" :key="evolution.id">
-                          <div v-html="evolution.description"></div>
-                          <div>{{ getDateTime(evolution.created_at) }}</div>
-                        </div>
-                      </v-tooltip>
-                  </div>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </div>
               </div>
             </v-tabs-window-item>
@@ -455,13 +461,13 @@
           </div>
         </v-card-title>
         <v-card-text v-if="client.plans && client.plans.length > 0" class="d-flex flex-column ga-3">
-          <div v-for="plan in client.plans" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-surface cursor-pointer" :key="plan.id">
+          <v-hover><div v-for="plan in client.plans" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-surface cursor-pointer" :key="plan.id">
             <div @click="planView = true; currentPlan = plan" class="d-flex justify-space-between w-100">
               <div class="text-error">{{ getDateTime(plan.created_at) }}</div>
               <div>{{plan.name}}</div>
             </div>
             <v-btn size="small" density="comfortable" icon="mdi-delete" @click="planDeleteDialog = true; selectedPlan = plan.id" color="error" variant="text"/>
-          </div>
+          </div></v-hover>
           <div @click="planDialog = true" class="text-none text-primary cursor-pointer d-flex align-center" >
             Ver todos os planos
             <v-icon icon="mdi-chevron-right"></v-icon>
@@ -630,11 +636,12 @@
 <script>
   import clientService from '../../services/client.service'
   import companyService from '../../services/company.service'
+  import statusService from '../../services/company.service'
   import planService from '../../services/plan.service'
   import { format, parseISO, differenceInYears } from 'date-fns'
-  import Scheduler from '../../components/Scheduler.vue'
-  import ClientInfoDialog from '../../components/ClientInfoDialog.vue'
-  import ClientRegister from '../../components/ClientRegister.vue'
+  import Scheduler from '../../components/agenda/Scheduler.vue'
+  import ClientInfoDialog from '../../components/client/ClientInfoDialog.vue'
+  import ClientRegister from '../../components/client/ClientRegister.vue'
   import { toast } from 'vue3-toastify'
   import AWS from '../../services/aws.service'
   import html2pdf from 'html2pdf.js'
@@ -675,6 +682,7 @@
         currentPlan: null,
         currentPrescription: null,
         prescriptionView: false,
+        teethStatuses: [],
         newPlan: {
           actions: [],
           name: ''
@@ -711,6 +719,7 @@
         planDialog: false,
         prescriptionDialog: false,
         imageDialog: false,
+        loadingTeeth: false,
         descriptionAction: '',
         dialog: false,
         descriptionDialog: false,
@@ -750,14 +759,17 @@
         })
         return total
       },
-      getClient() {
+      async getClient() {
         this.loading = true
-        clientService.getClient(this.id).then((response) => {
+        await clientService.getClient(this.id).then((response) => {
           if (response.data.birthday) {
             response.data.birthday = new Date(response.data.birthday)
           }
           this.client = response.data
           this.$store.dispatch('auth/updateEntityName', this.client.name)
+        })
+        statusService.getAllTeethStatus(this.currentUser.company_id).then((response) => {
+          this.teethStatuses = response.data
           this.loading = false
         })
       },
@@ -835,14 +847,11 @@
             return 'Extraído'
         }
       },
-      updateToothStatus(tooth) {
-        if (this.client.teeth[tooth].status < 1) {
-          this.client.teeth[tooth].status = this.client.teeth[tooth].status + 1
-        } else {
-          this.client.teeth[tooth].status = 0
-        }
-
-        clientService.updateToothStatus(this.client.teeth[tooth]).then(() => {
+      updateToothStatus(status, tooth) {
+        this.loadingTeeth = true
+        clientService.updateToothStatus(tooth.id, {status: status.id}).then((response) => {
+          tooth.status = status
+          toast.success(response.data.message)
         },
         (error) => {
           this.loading = false
@@ -851,6 +860,8 @@
                     error.response.data.message) ||
                   error.message ||
                   error.toString())
+        }).finally(() => {
+          this.loadingTeeth = false
         })
       },
       getDateTime(date) {

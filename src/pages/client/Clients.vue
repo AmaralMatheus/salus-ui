@@ -124,8 +124,8 @@
 </template>
 
 <script>
-  import Scheduler from '../../components/Scheduler.vue'
-  import ClientRegister from '../../components/ClientRegister.vue'
+  import Scheduler from '../../components/agenda/Scheduler.vue'
+  import ClientRegister from '../../components/client/ClientRegister.vue'
   import clientService from '../../services/client.service'
   import { format, parseISO } from 'date-fns'
   import { toast } from 'vue3-toastify'

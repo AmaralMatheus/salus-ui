@@ -132,10 +132,10 @@
   import transactionService from '../services/transaction.service'
   import appointmentService from '../services/appointment.service'
   import { format, parseISO } from 'date-fns'
-  import Calendar from '../components/Calendar.vue'
-  import Scheduler from '../components/Scheduler.vue'
+  import Calendar from '../components/agenda/Calendar.vue'
+  import Scheduler from '../components/agenda/Scheduler.vue'
   import Transaction from '../components/Transaction.vue'
-  import ClientRegister from '../components/ClientRegister.vue'
+  import ClientRegister from '../components/client/ClientRegister.vue'
   import {
     Chart as ChartJS,
     CategoryScale,

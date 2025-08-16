@@ -10,13 +10,13 @@
                   variant="outlined"
                   density="compact"
                   hide-details="auto"
-                  :loading="loading"
-                  :disabled="loading"
+                  :loading="pageLoading"
+                  :disabled="pageLoading"
                   placeholder="Nome da Empresa">
                 </v-text-field>
               </v-col>
               <v-col cols="4" sm="3" md="2">
-                <v-btn block @click="saveCompany()" :loading="loading" :disabled="loading" color="primary">Salvar</v-btn>
+                <v-btn block @click="saveCompany()" :loading="pageLoading" :disabled="pageLoading" color="primary">Salvar</v-btn>
               </v-col>
             </v-row>
           </v-card-text>
@@ -73,6 +73,7 @@
         </v-expansion-panels>
         <Procedures/>
         <Statuses/>
+        <TeethStatuses/>
         <v-dialog
           v-model="dialog"
           width="auto"
@@ -107,16 +108,18 @@
   <script>
     import userService from '../services/user.service'
     import companyService from '../services/company.service'
-    import Procedures from './Procedures.vue'
-    import Statuses from './Status.vue'
+    import Procedures from '../components/company/Procedures.vue'
+    import Statuses from '../components/company/Status.vue'
     import { format, parseISO } from 'date-fns'
     import { toast } from 'vue3-toastify'
+    import TeethStatuses from '@/components/company/TeethStatuses.vue'
 
     export default {
       name: 'UserList',
       components: {
         Procedures,
-        Statuses
+        Statuses,
+        TeethStatuses
       },
       data: () => ({
         format,
@@ -148,13 +151,14 @@
         ],
         serverItems: [],
         loading: true,
+        pageLoading: true,
         totalItems: 0,
       }),
       created() {
-        this.loading = true
+        this.pageLoading = true
         companyService.getCompany().then((response) => {
           this.company = response.data
-          this.loading = false
+          this.pageLoading = false
         })
       },
       methods: {
@@ -219,12 +223,12 @@
           return format(parseISO(date), 'dd/MM/yyyy kk:mm')
         },
         saveCompany() {
-          this.loading = true
+          this.pageLoading = true
           const data = {
             name: this.company.name
           }
           companyService.saveCompany(data).then(() => {
-            this.loading = false
+            this.pageLoading = false
           })
         }
       },

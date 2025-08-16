@@ -1,6 +1,6 @@
 <script>
-import Calendar from '../components/Calendar.vue'
-import Scheduler from '../components/Scheduler.vue'
+import Calendar from '../components/agenda/Calendar.vue'
+import Scheduler from '../components/agenda/Scheduler.vue'
 import appointmentService from '../services/appointment.service'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'vue3-toastify'

@@ -121,10 +121,10 @@
 </template>
 
 <script>
-  import clientService from '../services/client.service'
-  import appointmentService from '../services/appointment.service'
-  import procedureService from '../services/company.service'
-  import userService from '../services/user.service'
+  import clientService from '../../services/client.service'
+  import appointmentService from '../../services/appointment.service'
+  import procedureService from '../../services/company.service'
+  import userService from '../../services/user.service'
   import { vMaska } from "maska/vue"
   import { format, parseISO, setHours, setMinutes } from 'date-fns'
   import { VTimePicker } from 'vuetify/labs/VTimePicker'

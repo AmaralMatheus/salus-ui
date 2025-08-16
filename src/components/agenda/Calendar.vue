@@ -8,11 +8,11 @@ import {
   createViewWeek,
 } from '@schedule-x/calendar'
 import '@schedule-x/theme-default/dist/index.css'
-import appointmentService from '../services/appointment.service'
+import appointmentService from '../../services/appointment.service'
 import { createEventsServicePlugin } from '@schedule-x/events-service'
 import { format, parseISO, add } from "date-fns"
 import { ref, defineProps, defineComponent } from 'vue'
-import { auth } from '../store/auth.module'
+import { auth } from '../../store/auth.module'
 import { createEventModalPlugin } from '@schedule-x/event-modal'
 import { toast } from 'vue3-toastify'
 
