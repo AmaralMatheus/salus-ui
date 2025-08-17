@@ -36,7 +36,7 @@
               @click:row="viewRow"
             >
               <template v-slot:[`item.price`]="{ item }">
-                {{ item.price.toFixed(2) }} R$
+                {{ Number(item.price).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }} R$
               </template>
               <template v-slot:[`item.actions`]="{ item }">
                 <v-menu>
@@ -76,7 +76,7 @@
                 ></v-text-field>  
               </v-col>
               <v-col cols="12" sm="4">
-                <CurrencyInput v-model="procedure.price"></CurrencyInput>
+                <CurrencyInput v-model="procedure.price" label="Valor Unitário"></CurrencyInput>
               </v-col>
             </v-row>
           </v-card-text>
@@ -161,7 +161,7 @@
           sortable: true,
           key: 'name',
         },
-        { title: 'Preço', key: 'price', align: 'start', sortable: true },
+        { title: 'Valor Unitário', key: 'price', align: 'start', sortable: true },
         { title: '', key: 'actions', align: 'end', sortable: true },
       ],
       rules: [

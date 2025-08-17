@@ -15,7 +15,9 @@ export default {
     format,
     parseISO,
     list: false,
+    reload: false,
     schedulerDialog: false,
+    preselectedDate: null,
     itemsPerPage: 5,
     dialog: false,
     selectedItem: null,
@@ -54,6 +56,7 @@ export default {
     },
     loadItems ({ page, itemsPerPage, sortBy }) {
       this.loading = true
+      this.reload = Math.random()
       if (sortBy.length <= 1) {
         sortBy.push ({
           order: 'desc',
@@ -85,6 +88,10 @@ export default {
                   error.toString())
         })
     },
+    schedule(date) {
+      this.preselectedDate = date
+      this.schedulerDialog = true
+    },
     getDateTime(date) {
       return format(parseISO(date), 'dd/MM/yyyy kk:mm')
     },
@@ -106,7 +113,7 @@ export default {
                   <v-btn block @click="list = !list" color="primary">Ver {{ !list ? 'Lista' : 'Agenda'}}</v-btn>
                 </v-col>
                 <v-col cols="6" sm="4" md="3">
-                  <v-btn block append-icon="mdi-plus" @click="schedulerDialog = true" color="primary">Agendar</v-btn>
+                  <v-btn block append-icon="mdi-plus" @click="preselectedDate = null; schedulerDialog = true;" color="primary">Agendar</v-btn>
                 </v-col>
               </v-row>
             </v-col>
@@ -116,7 +123,7 @@ export default {
           <Calendar :show-header="false" :limits="{
             start: '00:00',
             end: '23:59',
-          }" @update="update" @delete="deleteEvent"/>
+          }" @update="update" @schedule="schedule" :reload="reload" @delete="deleteEvent"/>
         </v-card-text>
         <v-card-text v-else>
           <v-data-table-server
@@ -189,8 +196,9 @@ export default {
     v-model="schedulerDialog"
     max-width="800"
   >
-    <scheduler @cancel="schedulerDialog = false; selectedItem = null" :event="selectedItem" :client="selectedItem ? selectedItem.client : null" @reload="loadItems({page:1,
+    <scheduler @cancel="preselectedDate = null;schedulerDialog = false; selectedItem = null" :event="selectedItem" :client="selectedItem ? selectedItem.client : null" @reload="loadItems({page:1,
       itemsPerPage: 10,
-      sortBy: []})"/>
+      sortBy: []})"
+      :preselected-date="preselectedDate"/>
   </v-dialog>
 </template>

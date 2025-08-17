@@ -12,7 +12,7 @@
                 <div class="d-flex justify-space-between align-baseline">
                   <v-menu
                     class="cursor-pointer"
-                    v-for="tooth in client.teeth.filter((t) => t.type < 16)" :key="tooth.id"
+                    v-for="tooth in toothObjectUp" :key="tooth.id"
                     :close-on-content-click="false"
                     open-on-hover
                   >
@@ -52,7 +52,7 @@
                 <div class="d-flex justify-space-between align-baseline">
                   <v-menu
                     class="cursor-pointer"
-                    v-for="tooth in client.teeth.filter((t) => t.type < 32 && t.type > 15)" :key="tooth.id"
+                    v-for="tooth in toothObjectDown" :key="tooth.id"
                     :close-on-content-click="false"
                     open-on-hover
                   >
@@ -539,7 +539,7 @@
             :items="currentPlan.actions"
           >
             <template v-slot:[`item.price`]="{ item }">
-              {{ item.price.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }} R$
+              {{ Number(item.price).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }} R$
             </template>
             <template v-slot:[`item.quantity`]="{ item }">
               {{ item.teeth.length }}
@@ -547,18 +547,12 @@
           </v-data-table-virtual>
         </v-card-text>
         <v-card-actions>
-          <div class="ml-2">Total: R$ {{ getTotal().toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}</div>
+          <div class="ml-2">Total: R$ {{ Number(getTotal()).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}</div>
           <v-spacer></v-spacer>
           <v-btn
             text="Fechar"
             variant="plain"
             @click="planView = false"
-          ></v-btn>
-          <v-btn
-            text="Exportar"
-            variant="plain"
-            color="primary"
-            @click="generatePDF"
           ></v-btn>
         </v-card-actions>
       </v-card>
@@ -590,13 +584,13 @@
             <br>
             <b>{{ currentUser.user_name }}</b>
             <br>
-            <div class="text-sm">80252 - SP</div>
+            <div class="text-sm">{{ currentUser.cro }}</div>
           </div>
           <div class="ma-auto text-center text-medium-emphasis">
-            Rua Arlindo Luz, 825 - Centro - Ourinhos - SP
+            {{ company.address }} - {{ company.city }} - {{ company.state }}
           </div>
           <div class="ma-auto text-center text-medium-emphasis">
-            CEP 87005-005 (44) 99770-3577 
+            CEP {{ company.cep }} {{ company.phone }} 
           </div>
           <div class="ma-auto text-center text-medium-emphasis text-caption">
             powered by Dental Salus 
@@ -611,7 +605,7 @@
           @click="prescriptionView = false"
         ></v-btn>
         <v-btn
-          text="Exportar"
+          text="Imprimir"
           variant="plain"
           color="primary"
           @click="generatePDF"
@@ -645,6 +639,7 @@
   import { toast } from 'vue3-toastify'
   import AWS from '../../services/aws.service'
   import html2pdf from 'html2pdf.js'
+  import locationService from '../../services/location.service'
 
   export default {
     computed: {
@@ -654,6 +649,22 @@
       currentUser() {
         return this.$store.state.auth.user
       },
+      toothObjectUp() {
+        return [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map((toothType) => {
+          return this.client.teeth.filter((tooth) => tooth.type === toothType)[0] || {
+            type: toothType,
+            status: null
+          }
+        })
+      },
+      toothObjectDown() {
+        return [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].map((toothType) => {
+          return this.client.teeth.filter((tooth) => tooth.type === toothType)[0] || {
+            type: toothType,
+            status: null
+          }
+        })
+      }
     },
     components: {
       Scheduler,
@@ -714,9 +725,10 @@
             key: 'description',
           },
           { title: 'Quantidade', key: 'quantity', align: 'end' },
-          { title: 'Preço', key: 'price', align: 'end' },
+          { title: 'Valor Unitário', key: 'price', align: 'end' },
         ],
         planDialog: false,
+        company: {},
         prescriptionDialog: false,
         imageDialog: false,
         loadingTeeth: false,
@@ -768,6 +780,20 @@
           this.client = response.data
           this.$store.dispatch('auth/updateEntityName', this.client.name)
         })
+        this.company = await companyService.getCompany()
+        this.company = this.company.data
+
+        if (this.company.city) {
+          locationService.getCities(this.company.state).then((response) => {
+            this.company.city = response.data.filter((city) => city.id == this.company.city)[0].nome
+          })
+        }
+
+        if (this.company.state) {
+          locationService.getStates().then((response) => {
+            this.company.state = response.data.filter((state) => state.id == this.company.state)[0].nome
+          })
+        }
         statusService.getAllTeethStatus(this.currentUser.company_id).then((response) => {
           this.teethStatuses = response.data
           this.loading = false
@@ -849,8 +875,21 @@
       },
       updateToothStatus(status, tooth) {
         this.loadingTeeth = true
-        clientService.updateToothStatus(tooth.id, {status: status.id}).then((response) => {
-          tooth.status = status
+        const createTooth = {
+          status: status,
+          type: tooth.type,
+          client_id: this.client.id
+        }
+        if (this.client.teeth.filter((t) => t.type === tooth.type).length  === 0) {
+          this.client.teeth.push(createTooth)
+        } else {
+          this.client.teeth.map((t) => {
+            if (t.type === tooth.type) {
+              t.status = status
+            }
+          })
+        }
+        clientService.updateToothStatus(createTooth).then((response) => {
           toast.success(response.data.message)
         },
         (error) => {

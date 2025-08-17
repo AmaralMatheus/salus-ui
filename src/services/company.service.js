@@ -73,8 +73,8 @@ class CompanyService {
   getCompany() {
     return axios.get(process.env.VUE_APP_API_URL + 'companies', { headers: authHeader() })
   }
-  saveCompany(data) {
-    return axios.put(process.env.VUE_APP_API_URL + 'companies', data, { headers: authHeader() })
+  saveCompany(id, data) {
+    return axios.put(process.env.VUE_APP_API_URL + 'companies/'+id, data, { headers: authHeader() })
   }
 }
 

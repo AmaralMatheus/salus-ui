@@ -418,6 +418,8 @@
           if (this.client.city) {
             this.cities = response.data
             this.client.city = parseInt(this.client.city)
+          } else {
+            this.cities = response.data
           }
         })
       },

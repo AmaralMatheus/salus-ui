@@ -11,7 +11,7 @@ import '@schedule-x/theme-default/dist/index.css'
 import appointmentService from '../../services/appointment.service'
 import { createEventsServicePlugin } from '@schedule-x/events-service'
 import { format, parseISO, add } from "date-fns"
-import { ref, defineProps, defineComponent } from 'vue'
+import { ref, defineProps, defineComponent, watch, defineEmits } from 'vue'
 import { auth } from '../../store/auth.module'
 import { createEventModalPlugin } from '@schedule-x/event-modal'
 import { toast } from 'vue3-toastify'
@@ -22,7 +22,8 @@ defineComponent({
 
 const eventModal = createEventModalPlugin()
 
-const props = defineProps({ showHeader: Boolean, gridHeight: Number, limits: Object })
+const props = defineProps({ showHeader: Boolean, gridHeight: Number, limits: Object, reload: Number })
+const emit = defineEmits(['schedule'])
 const dialog = ref(false)
 const loading = ref(false)
 const selectedEvent = ref({})
@@ -95,7 +96,12 @@ const calendarApp = createCalendar(
       createViewMonthAgenda(),
     ],
     isDark: false,
-    events: []
+    events: [],
+    callbacks: {
+    onClickDateTime(dateTime) {
+      emit('schedule', dateTime)
+    }
+  }
   },
   [eventsServicePlugin, eventModal]
 )
@@ -136,6 +142,7 @@ function remove () {
 }
 
 function load() {
+  calendarApp.eventsService.remove()
   appointmentService.getAllAppointments().then((response) => {
     response.data.forEach((event) => {
       calendarApp.eventsService.add({
@@ -181,6 +188,10 @@ function getDateTime(date) {
 }
 
 load()
+
+watch(() => props.reload, () => {
+  load()
+})
 
 eventModal.close(); // close the modal
 </script>

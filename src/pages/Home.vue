@@ -76,7 +76,7 @@
         <v-card-text v-if="!loading && transactions.length > 0" class="d-flex flex-column ga-1">
           <div v-for="transaction in transactions.slice(0,3)" :key="transaction.id">
             <div :class="transaction.type === 1 ? 'text-success' : 'text-error'">
-              <v-icon>mdi-calendar-outline</v-icon> {{ transaction.type === 1 ? 'Entrada' : 'Saida' }} de R$ {{ transaction.amount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}
+              <v-icon>mdi-calendar-outline</v-icon> {{ transaction.type === 1 ? 'Entrada' : 'Saida' }} de R$ {{ Number(transaction.amount).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}
             </div>
           </div>
         </v-card-text>
