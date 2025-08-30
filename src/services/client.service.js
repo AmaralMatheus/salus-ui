@@ -23,8 +23,8 @@ class ClientService {
   saveDescription(data, action) {
     return axios.post(process.env.VUE_APP_API_URL + action, data, { headers: authHeader() })
   }
-  updateToothStatus(data) {
-    return axios.put(process.env.VUE_APP_API_URL + 'teeth/' + data.id, data, { headers: authHeader() })
+  updateToothStatus(tooth) {
+    return axios.put(process.env.VUE_APP_API_URL + 'teeth/', tooth, { headers: authHeader() })
   }
   deleteImage(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'image/' + id, { headers: authHeader() })

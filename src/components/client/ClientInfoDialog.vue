@@ -4,18 +4,20 @@
   >
     <v-card-text  v-if="descriptionAction === 'evolutions' || descriptionAction === 'prescriptions'">
       <div class="d-flex flex-column ga-3 mb-3" v-if="descriptionAction === 'evolutions'">
-        <div class="d-flex justify-space-between align-baseline">
-          <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
-            <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-            <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
+        <drag-select v-model="teeth" :multiple="true" background="rgba(255,82,82,0.28)">
+          <div class="d-flex justify-space-between align-baseline">
+            <drag-select-option v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :value="tooth" :key="tooth">
+              <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+              <img class="cursor-pointer" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+            </drag-select-option>
           </div>
-        </div>
-        <div class="d-flex justify-space-between">
-          <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
-            <img class="cursor-pointer" @click="teeth.push(tooth)" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
-            <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+          <div class="d-flex justify-space-between">
+            <drag-select-option v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :value="tooth" :key="tooth">
+              <img class="cursor-pointer" height="25" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+              <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+            </drag-select-option>
           </div>
-        </div>
+        </drag-select>
       </div>
       <v-row dense >
         <v-col cols="12">
@@ -59,7 +61,7 @@
                 <v-btn size="comfortable" icon="mdi-reorder-horizontal" disabled variant="plain"/>
                 <v-btn size="comfortable" icon="mdi-delete" @click="newPlan.actions = newPlan.actions.filter((action) => action !== element)" color="error" variant="plain"/>
               </v-col>
-              <v-col cols="11" sm="5" md="3">
+              <v-col cols="11" sm="3" md="2">
                 <v-combobox
                   :items="procedures"
                   item-title="name"
@@ -75,19 +77,20 @@
                   label="Procedimento">
                 </v-combobox>
               </v-col>
-              <v-col cols="11" sm="5" md="6">
-                <v-menu :close-on-content-click="false">
+              <v-col cols="11" sm="5" md="7">
+                <v-menu :close-on-content-click="false" @v-model="element.quantity">
                   <template v-slot:activator="{ props }">
                     <v-combobox
                       readonly
                       clearable
+                      :single-line="true"
                       :items="teethNumber"
                       v-bind="props"
                       item-title="name"
                       item-value="name"
                       multiple
                       @click:clear="element.quantity = []"
-                      v-model="element.teethShow"
+                      v-model="element.quantity"
                       :loading="loading"
                       :disabled="loading"
                       variant="underlined"
@@ -98,28 +101,27 @@
                   </template>
 
                   <v-list>
-                    <v-list-item>
-                      <div class="d-flex justify-space-between align-baseline">
-                        <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" class="d-flex flex-column" :key="tooth">
-                          <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : element.quantity = element.quantity.filter((currentTooth) => currentTooth !== tooth)" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
+                    <v-list-item class="no-select">
+                      <drag-select v-model="element.quantity" :multiple="true" background="rgba(255,82,82,0.28)">
+                        <div class="d-flex justify-space-between align-baseline">
+                          <drag-select-option v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :value="tooth" :key="tooth">
+                            <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                            <img class="cursor-pointer" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+                          </drag-select-option>
                         </div>
-                      </div>
-                      <div class="d-flex justify-space-between">
-                        <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" class="d-flex flex-column" :key="tooth">
-                          <img class="cursor-pointer" @click="!element.quantity.includes(tooth) ? element.quantity.push(tooth) : element.quantity = element.quantity.filter((currentTooth) => currentTooth !== tooth)" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../assets/Vector-'+tooth+'.svg')"/>
-                          <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                        <div class="d-flex justify-space-between">
+                          <drag-select-option v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :value="tooth" :key="tooth">
+                            <img class="cursor-pointer" height="25" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+                            <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                          </drag-select-option>
                         </div>
-                      </div>
-                      <div class="d-flex">
-                        <v-btn color="primary" class="mb-2 ml-auto" @click="element.teethShow = element.quantity.map(el => teethNumber[el]).sort((a, b) => b - a)">Salvar</v-btn>
-                      </div>
+                      </drag-select>
                     </v-list-item>
                   </v-list>
                 </v-menu>
               </v-col>
-              <v-col cols="11" sm="5" md="2">
-                <CurrencyInput variant="underlined" v-model="element.price"></CurrencyInput>
+              <v-col cols="11" sm="2" md="2">
+                <CurrencyInput variant="underlined" label="Valor Unitário" v-model="element.price"></CurrencyInput>
               </v-col>
             </v-row>
           </template>
@@ -156,14 +158,15 @@
 
 
 <script>
-  import clientService from '../services/client.service'
-  import companyService from '../services/company.service'
+  import clientService from '../../services/client.service'
+  import companyService from '../../services/company.service'
   import { format, parseISO } from 'date-fns'
   import { QuillEditor } from '@vueup/vue-quill'
   import '@vueup/vue-quill/dist/vue-quill.snow.css'
-  import CurrencyInput from './CurrencyInput.vue'
+  import CurrencyInput from '../CurrencyInput.vue'
   import draggable from 'vuedraggable'
   import { toast } from 'vue3-toastify'
+  import {DragSelect, DragSelectOption} from "@coleqiu/vue-drag-select"
 
   export default {
     computed: {
@@ -175,7 +178,9 @@
     components: {
       QuillEditor,
       CurrencyInput,
-      draggable
+      draggable,
+      DragSelect,
+      DragSelectOption
     },
     data () {
       return {
@@ -260,7 +265,7 @@
           element.price = event.price
           element.description = event.name
         }
-      },
+      }
     }
   }
 </script>
@@ -280,5 +285,21 @@
 
 .profile-card {
   transition: ease-in-out 0.2s !important;
+}
+
+.no-select {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.v-field__input{
+  overflow: hidden;
+  max-height: 32px;
+  white-space: nowrap; /* Prevents text from wrapping to the next line */
+  overflow: hidden; /* Hides any text that overflows the container */
+  text-overflow: ellipsis; 
 }
 </style>

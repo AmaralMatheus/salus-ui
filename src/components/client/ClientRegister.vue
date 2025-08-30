@@ -34,7 +34,6 @@
             </v-col>
             <v-col cols="12" md="10">
               <v-row>
-
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
                     v-model="client.register_id"
@@ -260,9 +259,9 @@
 </template>
 
 <script>
-  import clientService from '../services/client.service'
-  import statusService from '../services/company.service'
-  import locationService from '../services/location.service'
+  import clientService from '../../services/client.service'
+  import statusService from '../../services/company.service'
+  import locationService from '../../services/location.service'
   import { VDateInput } from 'vuetify/labs/VDateInput'
   import { vMaska } from "maska/vue"
   import { toast } from 'vue3-toastify'
@@ -292,6 +291,7 @@
         email: '',
         phone: '',
         address: '',
+        register_id: '',
         birthday: null,
       },
       statuses: [],
@@ -370,7 +370,7 @@
       this.getStates()
       if (this.currentUser) {
         // statusService.getAllStatus(this.currentUser.company_id).then((response) => {
-        statusService.getAllStatus(1).then((response) => {
+        statusService.getAllStatus(this.currentUser.company_id).then((response) => {
           this.statuses = response.data
           this.loading = false
         })
@@ -415,8 +415,12 @@
       },
       getCities(){
         locationService.getCities(this.client.state).then((response) => {
-          this.cities = response.data
-          this.client.city = parseInt(this.client.city)
+          if (this.client.city) {
+            this.cities = response.data
+            this.client.city = parseInt(this.client.city)
+          } else {
+            this.cities = response.data
+          }
         })
       },
       getStates(){
@@ -434,8 +438,10 @@
             response.data.status = response.data.status.id;
           }
           this.client = response.data
-          this.client.state = parseInt(this.client.state)
-          this.getCities()
+          if (this.client.state) {
+            this.client.state = parseInt(this.client.state)
+            this.getCities()
+          }
           this.loadingInfo = false
         })
       },

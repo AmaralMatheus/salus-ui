@@ -1,7 +1,7 @@
 <template>
     <v-expansion-panels>
       <v-expansion-panel>
-        <v-expansion-panel-title class="text-h6">Status</v-expansion-panel-title>
+        <v-expansion-panel-title class="text-h6">Status do Paciente</v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-row>
             <v-col cols="12" class="d-flex flex-column ga-6">
@@ -127,7 +127,7 @@
   </template>
   
   <script>
-    import statusService from '../services/company.service'
+    import statusService from '../../services/company.service'
     import { format, parseISO } from 'date-fns'
     import { toast } from 'vue3-toastify'
   

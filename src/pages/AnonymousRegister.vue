@@ -8,7 +8,7 @@
   </div>
 </template>
 <script>
-import ClientRegister from '@/components/ClientRegister.vue'
+import ClientRegister from '@/components/client/ClientRegister.vue'
 
 export default {
   name: "AnonymousRegister",

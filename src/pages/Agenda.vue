@@ -1,6 +1,6 @@
 <script>
-import Calendar from '../components/Calendar.vue'
-import Scheduler from '../components/Scheduler.vue'
+import Calendar from '../components/agenda/Calendar.vue'
+import Scheduler from '../components/agenda/Scheduler.vue'
 import appointmentService from '../services/appointment.service'
 import { format, parseISO, startOfWeek, addDays, isSameDay, isToday, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -16,7 +16,9 @@ export default {
     format,
     parseISO,
     list: false,
+    reload: false,
     schedulerDialog: false,
+    preselectedDate: null,
     itemsPerPage: 5,
     dialog: false,
     selectedItem: null,
@@ -121,6 +123,7 @@ export default {
     },
     loadItems ({ page, itemsPerPage, sortBy }) {
       this.loading = true
+      this.reload = Math.random()
       if (sortBy.length <= 1) {
         sortBy.push ({
           order: 'desc',
@@ -163,6 +166,10 @@ export default {
                   error.message ||
                   error.toString())
         })
+    },
+    schedule(date) {
+      this.preselectedDate = date
+      this.schedulerDialog = true
     },
     getDateTime(date) {
       try {
@@ -341,6 +348,7 @@ export default {
 </script>
 
 <template>
+<<<<<<< HEAD
   <div class="agenda-container">
     <!-- Header com navegação do calendário -->
     <div class="agenda-header">
@@ -363,6 +371,58 @@ export default {
               @click="nextMonth"
             ></v-btn>
           </div>
+=======
+  <v-row>
+    <v-col>
+      <v-card>
+        <v-card-title>
+          <v-row class="mt-0">
+            <v-col cols="12" sm="3" class="text-h6">Agenda</v-col>
+            <v-col cols="12" sm="9">
+              <v-row>
+                <v-spacer/>
+                <v-col cols="6" sm="4" md="3">
+                  <v-btn block @click="list = !list" color="primary">Ver {{ !list ? 'Lista' : 'Agenda'}}</v-btn>
+                </v-col>
+                <v-col cols="6" sm="4" md="3">
+                  <v-btn block append-icon="mdi-plus" @click="preselectedDate = null; schedulerDialog = true;" color="primary">Agendar</v-btn>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-card-title>
+        <v-card-text v-if="!list" class="overflow-y-scroll">
+          <Calendar :show-header="false" :limits="{
+            start: '00:00',
+            end: '23:59',
+          }" @update="update" @schedule="schedule" :reload="reload" @delete="deleteEvent"/>
+        </v-card-text>
+        <v-card-text v-else>
+          <v-data-table-server
+            v-model:items-per-page="itemsPerPage"
+            :headers="headers"
+            :items="serverItems"
+            :items-length="totalItems"
+            :loading="loading"
+            :search="search"
+            item-value="name"
+            @update:options="loadItems"
+          >
+            <template v-slot:[`item.client.name`]="{ item }">
+              {{ item.client.name }}
+            </template>
+            <template v-slot:[`item.date`]="{ item }">
+              {{ getDateTime(item.date) }}
+            </template>
+            <template v-slot:[`item.duration`]="{ item }">
+              {{ item.duration }} Minutos
+            </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <v-menu>
+                <template v-slot:activator="{ props }">
+                  <v-icon :disabled="loading" v-bind="props">mdi-dots-vertical</v-icon>
+                </template>
+>>>>>>> d5f75263fc5dd4514ba5846e6dcc45679e59ae2f
           
           <!-- Título do dia (apenas no modo diário) -->
           <div v-else-if="viewMode === 'daily'" class="day-title">
@@ -716,6 +776,7 @@ export default {
     v-model="schedulerDialog"
     max-width="800"
   >
+<<<<<<< HEAD
     <scheduler 
       @cancel="schedulerDialog = false; selectedItem = null" 
       :event="selectedItem" 
@@ -808,6 +869,12 @@ export default {
         ></v-btn>
       </v-card-actions>
     </v-card>
+=======
+    <scheduler @cancel="preselectedDate = null;schedulerDialog = false; selectedItem = null" :event="selectedItem" :client="selectedItem ? selectedItem.client : null" @reload="loadItems({page:1,
+      itemsPerPage: 10,
+      sortBy: []})"
+      :preselected-date="preselectedDate"/>
+>>>>>>> d5f75263fc5dd4514ba5846e6dcc45679e59ae2f
   </v-dialog>
 </template>
 

@@ -3,22 +3,124 @@
       <v-col cols="12" class="d-flex flex-column ga-6">
         <v-card title="Empresa">
           <v-card-text>
-            <v-row>
-              <v-col cols="8" sm="9" md="10">
-                <v-text-field
-                  v-model="company.name"
-                  variant="outlined"
-                  density="compact"
-                  hide-details="auto"
-                  :loading="loading"
-                  :disabled="loading"
-                  placeholder="Nome da Empresa">
-                </v-text-field>
-              </v-col>
-              <v-col cols="4" sm="3" md="2">
-                <v-btn block @click="saveCompany()" :loading="loading" :disabled="loading" color="primary">Salvar</v-btn>
-              </v-col>
-            </v-row>
+            <v-form ref="myForm" @submit.prevent="saveCompany" v-model="valid">
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-model="company.name"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    :rules="rules"
+                    :loading="pageLoading"
+                    :disabled="pageLoading"
+                    placeholder="Nome da Clinica">
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-model="company.cnpj"
+                    variant="outlined"
+                    density="compact"
+                    :rules="cnpjRules"
+                    hide-details="auto"
+                    :loading="pageLoading"
+                    :disabled="pageLoading"
+                    v-maska="'##.###.###/####-##'"
+                    placeholder="CNPJ da Clinica">
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-model="company.phone"
+                    :loading="pageLoading"
+                    :disabled="pageLoading"
+                    v-maska="phoneMask"
+                    :rules="phoneRule"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="Telefone">
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-model="company.email"
+                    :loading="pageLoading"
+                    :disabled="pageLoading"
+                    :rules="emailRules"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="E-mail">
+                  </v-text-field>
+                </v-col>
+                <v-divider class="mx-3"></v-divider>
+                <v-col cols="12" sm="6" md="2">
+                  <v-text-field
+                    v-model="company.cep"
+                    :loading="pageLoading"
+                    :disabled="pageLoading"
+                    :rules="cepRules"
+                    @change="getAddress"
+                    v-maska="'#####-###'"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="CEP">
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="4">
+                  <v-text-field
+                    v-model="company.address"
+                    :loading="pageLoading"
+                    :disabled="pageLoading"
+                    :rules="rules"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    label="Endereço">
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-autocomplete
+                  :items="states"
+                    item-title="nome"
+                    item-value="id"
+                    v-model="company.state"
+                    :loading="pageLoading"
+                    :return-object="false"
+                    :disabled="pageLoading || blockState"
+                    variant="outlined"
+                    :rules="rules"
+                    density="compact"
+                    hide-details="auto"
+                    @update:modelValue="getCities"
+                    label="Estado">
+                  </v-autocomplete>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-autocomplete
+                  :items="cities"
+                    item-title="nome"
+                    item-value="id"
+                    v-model="company.city"
+                    :return-object="false"
+                    :loading="pageLoading"
+                    :disabled="pageLoading || blockCity"
+                    :rules="rules"
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    :no-data-text="states.length > 0 ? 'Selecione um estado antes' : 'Selecione uma cidade'"
+                    label="Cidade">
+                  </v-autocomplete>
+                </v-col>
+                <v-col cols="12" class="d-flex">
+                  <v-btn class="ml-auto" @click="saveCompany()" :loading="pageLoading" :disabled="pageLoading || !valid" color="primary">Salvar</v-btn>
+                </v-col>
+              </v-row>
+            </v-form>
           </v-card-text>
         </v-card>
         <v-expansion-panels>
@@ -73,6 +175,7 @@
         </v-expansion-panels>
         <Procedures/>
         <Statuses/>
+        <TeethStatuses/>
         <v-dialog
           v-model="dialog"
           width="auto"
@@ -93,7 +196,7 @@
               <v-btn
                 text="Excluir"
                 color="error"
-                :disabled="loading"
+                :disabled="pageLoading"
                 :loading="loading"
                 @click="remove"
               ></v-btn>
@@ -107,23 +210,48 @@
   <script>
     import userService from '../services/user.service'
     import companyService from '../services/company.service'
-    import Procedures from './Procedures.vue'
-    import Statuses from './Status.vue'
+    import Procedures from '../components/company/Procedures.vue'
+    import Statuses from '../components/company/Status.vue'
     import { format, parseISO } from 'date-fns'
     import { toast } from 'vue3-toastify'
+    import TeethStatuses from '@/components/company/TeethStatuses.vue'
+    import locationService from '../services/location.service'
+    import { vMaska } from "maska/vue"
 
     export default {
       name: 'UserList',
       components: {
         Procedures,
-        Statuses
+        Statuses,
+        TeethStatuses
+      },
+      directives: { maska: vMaska },
+      computed: {
+        phoneMask() {
+          return this.company.phone?.length < 15 ? '(##) ####-#####' : '(##) #####-####'
+        },
+        currentUser() {
+          return this.$store.state.auth.user
+        },
       },
       data: () => ({
         format,
         parseISO,
+        valid: false,
         company: {
-          name: ''
+          cnpj: null,
+          name: null,
+          phone: null,
+          address: null,
+          state: null,
+          city: null,
+          cep: null,
+          email: null
         },
+        cities: [],
+        states: [],
+        blockCity: false,
+        blockState: false,
         message: false,
         itemsPerPage: 5,
         dialog: false,
@@ -146,15 +274,61 @@
             return 'Este campo não pode estar vazio.'
           },
         ],
+        phoneRule: [
+          value => {
+            if (value) {
+              if (value.length < 14) return 'Informe o telefone completo.'
+              if (value.length === 0) return 'Este campo não pode estar vazio.'
+              return true
+            } else {
+              return 'Este campo não pode estar vazio.'
+            }
+          },
+        ],
+        cnpjRules: [
+          value => {
+            if (value) {
+              if (value.length < '##.###.###/####-##'.length) return 'Informe o CNPJ completo.'
+              if (value.length === 0) return 'Este campo não pode estar vazio.'
+              return true
+            } else {
+              return 'Este campo não pode estar vazio.'
+            }
+          },
+        ],
+        cepRules: [
+          value => {
+            if (value) {
+              if (value.length < 9) return 'Informe o CEP completo.'
+              if (value.length === 0) return 'Este campo não pode estar vazio.'
+              return true
+            } else {
+              return 'Este campo não pode estar vazio.'
+            }
+          },
+        ],
+        emailRules: [
+          v => !!v || 'Este campo não pode estar vazio.',
+          v => /.+@.+\..+/.test(v) || 'Informe um e-mail valido',
+        ],
         serverItems: [],
         loading: true,
+        pageLoading: true,
         totalItems: 0,
       }),
-      created() {
-        this.loading = true
+      async created() {
+        this.pageLoading = true
+        await this.getStates()
         companyService.getCompany().then((response) => {
           this.company = response.data
-          this.loading = false
+          this.company.state = Number(this.company.state)
+          if (this.company.state) {
+            locationService.getCities(this.company.state).then((response) => {
+              this.cities = response.data
+              this.company.city = Number(this.company.city) 
+            })
+          }
+          this.pageLoading = false
         })
       },
       methods: {
@@ -170,6 +344,46 @@
             this.serverItems = response.data.data
             this.totalItems = response.data.total
             this.loading = false
+          })
+        },
+        getAddress() {
+          this.blockCity = false
+          this.blockState = false
+          if(this.company.cep.length === 9) {
+            locationService.getAddress(this.company.cep.replace('-', '')).then((response) => {
+              if (response.data.uf) {
+                this.company.state = this.states.filter((state) => state.sigla === response.data.uf)[0].id
+                this.blockState = true
+                const returnedCity = response.data.localidade 
+                locationService.getCities(this.company.state).then((response) => {
+                  this.cities = response.data
+                  if (returnedCity) {
+                    this.company.city = this.cities.filter((city) => {
+                      return city.nome === returnedCity
+                    })[0].id
+                    this.blockCity = true
+                  }
+                })
+              }
+
+              this.company.address = response.data.logradouro + (response.data.complemento ? ', ' + response.data.complemento : '')
+            })
+          }
+        },
+        getCities(){
+          this.company.city = null
+          locationService.getCities(this.company.state).then((response) => {
+            if (this.company.city) {
+              this.company.city = parseInt(this.company.city)
+              this.cities = response.data
+            } else {
+              this.cities = response.data
+            }
+          })
+        },
+        getStates(){
+          locationService.getStates().then((response) => {
+            this.states = response.data
           })
         },
         view (row) {
@@ -218,13 +432,19 @@
         getDateTime(date) {
           return format(parseISO(date), 'dd/MM/yyyy kk:mm')
         },
-        saveCompany() {
-          this.loading = true
-          const data = {
-            name: this.company.name
-          }
-          companyService.saveCompany(data).then(() => {
-            this.loading = false
+        async saveCompany() {
+          const { valid } = await this.$refs.myForm.validate();
+          if (!valid) return
+          this.pageLoading = true
+          companyService.saveCompany(this.currentUser.company_id, this.company).then((response) => {
+            toast.success(response.data.message)
+            this.pageLoading = false
+          }).catch((error) => {
+            toast.error((error.response &&
+              error.response.data &&
+              error.response.data.message) ||
+            error.message ||
+            error.toString())
           })
         }
       },

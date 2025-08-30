@@ -39,7 +39,7 @@
             ></v-select>
           </v-col>
           <v-col cols="12" :md="currentUser.type === 1 && client ? '6' : currentUser.type === 1 && !client ? '4' : '3'" v-if="!client">
-            <v-select
+            <v-autocomplete
               :items="clients"
               item-title="name"
               item-value="id"
@@ -51,7 +51,7 @@
               variant="outlined"
               density="compact"
               label="Paciente"
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
           <v-col cols="12" :md="currentUser.type === 1 && client ? '6' : currentUser.type === 1 && !client ? '4' : '3'">
             <v-text-field
@@ -106,7 +106,7 @@
         class="ms-auto"
         text="Cancelar"
         :disabled="loading"
-        @click="this.$emit('cancel'); scheduleDate = null; description = ''; procedures = []; duration = 60;"
+        @click="this.$emit('cancel'); clear()"
         ></v-btn>
         <v-btn
         text="Agendar"
@@ -121,10 +121,10 @@
 </template>
 
 <script>
-  import clientService from '../services/client.service'
-  import appointmentService from '../services/appointment.service'
-  import procedureService from '../services/company.service'
-  import userService from '../services/user.service'
+  import clientService from '../../services/client.service'
+  import appointmentService from '../../services/appointment.service'
+  import procedureService from '../../services/company.service'
+  import userService from '../../services/user.service'
   import { vMaska } from "maska/vue"
   import { format, parseISO, setHours, setMinutes } from 'date-fns'
   import { VTimePicker } from 'vuetify/labs/VTimePicker'
@@ -136,7 +136,7 @@
       VTimePicker
     },
     directives: { maska: vMaska },
-    props: {client: Object, event: Object},
+    props: {client: Object, event: Object, preselectedDate: Date},
     emits: ['cancel', 'reload'],
     data: () => ({
       format,
@@ -166,8 +166,13 @@
       }
     },
     created() {
+      this.clear()
+      console.log(this.preselectedDate)
+      if (this.preselectedDate) {
+        this.scheduleDate = parseISO(this.preselectedDate)
+        this.scheduleTime = parseISO(this.preselectedDate)
+      }
       if (this.event) {
-        console.log(this.event)
         this.scheduleDate = parseISO(this.event.date)
         this.scheduleTime = parseISO(this.event.date)
         this.user = this.event.user_id
@@ -186,6 +191,18 @@
       })
     },
     methods: {
+      clear() {
+        this.users = []
+        this.user = null
+        this.clients = []
+        this.allProcedures = []
+        this.customClient = null
+        this.scheduleDate = null
+        this.scheduleTime = null
+        this.description = ''
+        this.procedures = []
+        this.duration = 60
+      },
       schedule () {
         if (this.valid) {
           this.loading = true
@@ -206,6 +223,7 @@
             appointmentService.updateSchedule(this.event.id, data).then(() => {
               this.$emit('reload')
               this.$emit('cancel')
+              this.clear()
             },
               (error) => {
                 this.loading = false
@@ -219,6 +237,7 @@
             appointmentService.schedule(data).then(() => {
               this.$emit('reload')
               this.$emit('cancel')
+              this.clear()
             },
               (error) => {
                 this.loading = false

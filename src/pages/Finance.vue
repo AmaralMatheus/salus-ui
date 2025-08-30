@@ -3,17 +3,17 @@
     <v-row>
       <v-col cols="12" sm="4">
         <v-card title="Saldo">
-          <v-card-text :class="totalAmount >= 0 ? 'text-success' : 'text-error'">R$ {{ totalAmount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}</v-card-text>
+          <v-card-text :class="totalAmount >= 0 ? 'text-success' : 'text-error'">R$ {{ Number(totalAmount).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}</v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="4">
         <v-card title="Entradas">
-          <v-card-text class="text-success">R$ {{ incoming.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}</v-card-text>
+          <v-card-text class="text-success">R$ {{ Number(incoming).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}</v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" sm="4">
         <v-card title="Saídas">
-          <v-card-text class="text-error">R$ {{ outcoming.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}</v-card-text>
+          <v-card-text class="text-error">R$ {{ Number(outcoming).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}</v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12">
@@ -82,7 +82,7 @@
             </template>
             <template v-slot:[`item.amount`]="{ item }">
               <div :class="item.type === 1 ? 'text-success' : 'text-error'">
-                R$ {{ item.amount.toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") }}
+                R$ {{ Number(item.amount).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}
               </div>
             </template>
             <template v-slot:[`item.actions`]="{ item }">

@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@coleqiu/vue-drag-select": "^2.0.6-beta.1",
     "@schedule-x/event-modal": "^2.5.0",
     "@schedule-x/events-service": "^2.4.1",
     "@schedule-x/theme-default": "^2.4.0",

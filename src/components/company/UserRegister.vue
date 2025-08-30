@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col>
-      <v-card :loading="loadingInfo" :title="!id ? 'Cadastrar usuário' : 'Editar Usere'" :subtitle="user.name">
+      <v-card :loading="loadingInfo" :title="!id ? 'Cadastrar usuário' : 'Editar Usuário'" :subtitle="user.name">
         <v-card-text>
           <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
             <v-row>
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-  import userService from '../services/user.service'
+  import userService from '../../services/user.service'
   import { vMaska } from 'maska/vue'
   import { toast } from 'vue3-toastify'
 
