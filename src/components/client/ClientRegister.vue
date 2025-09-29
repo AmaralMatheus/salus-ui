@@ -232,7 +232,7 @@
                 variant="outlined"
                 density="compact"
                 hide-details="auto"
-                label="Alerta de Segurance de Saude">
+                label="Alerta de Segurança de Saúde">
               </v-textarea>
             </v-col>
             <v-col cols="12" md="6" v-if="this.currentUser">
@@ -243,7 +243,7 @@
                 variant="outlined"
                 density="compact"
                 hide-details="auto"
-                label="Anaminese">
+                label="Anamnese">
               </v-textarea>
             </v-col>
           </v-row>

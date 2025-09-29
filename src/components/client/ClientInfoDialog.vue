@@ -34,18 +34,52 @@
         <v-col cols="12">
           <quill-editor style="height:200px" placeholder="Descrição" contentType="html" v-model:content="description" theme="snow"></quill-editor>
         </v-col>
+        <div>
+          <v-chip v-for="template in templates" :key="template.id" class="cursor-pointer" @click="description = template.description" color="primary">{{ template.name }}</v-chip>
+        </div>
       </v-row>
     </v-card-text>
     <v-card-text v-else class="pb-0">
       <v-form v-model="planForm" class="d-flex flex-column ga-4">
-        <v-text-field
-          label="Título"
-          :disabled="loading"
-          variant="outlined"
-          density="compact"
-          hide-details
-          v-model="title"
-        ></v-text-field>
+        <v-row>
+          <v-col cols="8">
+            <v-text-field
+              label="Título"
+              :disabled="loading"
+              variant="outlined"
+              density="compact"
+              hide-details
+              v-model="title"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="4">
+            <v-select
+              :items="healthcare"
+              item-title="name"
+              item-value="id"
+              v-model="newPlan.healthcare_id"
+              :loading="loading"
+              :disabled="loading"
+              variant="outlined"
+              @update:modelValue="newPlan.actions = []"
+              density="compact"
+              hide-details="auto"
+              label="Plano de saúde"
+            ></v-select>
+          </v-col>
+          <v-col cols="12">
+            <v-textarea
+              v-model="newPlan.additional_info"
+              :loading="loading"
+              :disabled="loading"
+              rows="3"
+              variant="outlined"
+              density="compact"
+              hide-details="auto"
+              label="Observações">
+            </v-textarea>
+          </v-col>
+        </v-row>
         <div class="text-center" v-if="newPlan.actions?.length === 0">Cadastre os procedimentos para este plano de tratamento!</div>
         <draggable 
           v-model="newPlan.actions"
@@ -77,7 +111,7 @@
                   label="Procedimento">
                 </v-combobox>
               </v-col>
-              <v-col cols="11" sm="5" md="7">
+              <v-col cols="11" sm="5" md="5">
                 <v-menu :close-on-content-click="false" @v-model="element.quantity">
                   <template v-slot:activator="{ props }">
                     <v-combobox
@@ -104,14 +138,14 @@
                     <v-list-item class="no-select">
                       <drag-select v-model="element.quantity" :multiple="true" background="rgba(255,82,82,0.28)">
                         <div class="d-flex justify-space-between align-baseline">
-                          <drag-select-option v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :value="tooth" :key="tooth">
+                          <drag-select-option v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
                             <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                            <img class="cursor-pointer" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+                            <img class="cursor-pointer" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
                           </drag-select-option>
                         </div>
                         <div class="d-flex justify-space-between">
-                          <drag-select-option v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :value="tooth" :key="tooth">
-                            <img class="cursor-pointer" height="25" :class="element.quantity.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+                          <drag-select-option v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
+                            <img class="cursor-pointer" height="25" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
                             <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
                           </drag-select-option>
                         </div>
@@ -120,8 +154,8 @@
                   </v-list>
                 </v-menu>
               </v-col>
-              <v-col cols="11" sm="2" md="2">
-                <CurrencyInput variant="underlined" label="Valor Unitário" v-model="element.price"></CurrencyInput>
+              <v-col cols="11" sm="4" class="d-flex ga-2 align-center">
+                <CurrencyInput variant="underlined" label="Valor Unitário" v-model="element.price"></CurrencyInput> {{ (element.price * element.quantity.length).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}
               </v-col>
             </v-row>
           </template>
@@ -149,7 +183,7 @@
         text="Salvar"
         variant="tonal"
         :disabled="loading || (descriptionAction === 'evolutions' && !description) || (descriptionAction === 'plans' && !planForm) || (descriptionAction === 'prescriptions' && !description)"
-        :loading="loading"
+        :loading="saving"
         @click="saveDescription"
       ></v-btn>
     </v-card-actions>
@@ -188,9 +222,15 @@
         parseISO,
         tab: 1,
         procedures: [],
+        healthcare: [],
         expanded: false,
         actionSuggestions: [],
         planForm: false,
+        templates: [],
+        categoryName: [
+          'Sem Especialidade',
+          'Ortodontia'
+        ],
         currentPlan: null,
         newPlan: {
           actions: [],
@@ -201,6 +241,7 @@
         teeth: [],
         teethNumber: [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28,48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38],
         description: '',
+        saving: false,
         loading: false,
         rules: [
           value => {
@@ -211,21 +252,33 @@
       }
     },
     mounted() {
+      companyService.getAllHealthcare().then((response) => {
+        this.healthcare = response.data
+      })
       this.getProcedures()
+      companyService.getAllTemplates().then((response) => {
+        this.templates = response.data
+      })
+      this.loading = false
     },
     methods: {
       saveDescription() {
-        this.loading = true
+        this.saving = true
         const data = {
           client_id: this.id,
           description: this.description,
+          healthcare_id: this.newPlan.healthcare_id,
           title: this.title + ' Teste',
           name: this.title,
-          actions: this.newPlan.actions,
+          additional_info: this.newPlan.additional_info,
+          actions: this.newPlan.actions.map((action) => {
+            action.quantity = action.quantity.map((tooth) => this.teethNumber.indexOf(tooth))
+            return action
+          }),
           teeth: this.teeth
         }
         clientService.saveDescription(data, this.descriptionAction).then(() => {
-          this.loading = false
+          this.saving = false
           this.descriptionDialog = false
           this.description = ''
           this.title = ''
@@ -233,7 +286,7 @@
           this.newPlan.actions = []
         },
         (error) => {
-          this.loading = false
+          this.saving = false
           toast.error((error.response &&
                     error.response.data &&
                     error.response.data.message) ||
@@ -256,14 +309,20 @@
       },
       getProcedures() {
         companyService.getAllProcedures().then((response) => {
-          this.procedures = response.data
+          this.procedures = response.data.map((procedure) => {
+            procedure.name = this.categoryName[procedure.category_id]+' - '+procedure.name
+            return procedure
+          })
         })
       },
       setProcedure(event, element) {
-        console.log(event)
         if(typeof event === 'object' && event?.price) {
-          element.price = event.price
-          element.description = event.name
+          if (this.newPlan.healthcare_id && this.healthcare.filter((hc) => this.newPlan.healthcare_id === hc.id)[0].procedures?.filter((procedure) => procedure.procedure_id === event.id).length > 0) {
+            element.price = this.healthcare.filter((hc) => this.newPlan.healthcare_id === hc.id)[0].procedures.filter((procedure) => procedure.procedure_id === event.id)[0].price
+          } else {
+            element.price = event.price
+          }
+          element.description = event.name.split(' - ')[1]
         }
       }
     }

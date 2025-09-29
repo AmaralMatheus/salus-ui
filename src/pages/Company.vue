@@ -175,7 +175,9 @@
         </v-expansion-panels>
         <Procedures/>
         <Statuses/>
+        <HealthCare/>
         <TeethStatuses/>
+        <PrescriptionTemplate/>
         <v-dialog
           v-model="dialog"
           width="auto"
@@ -217,13 +219,17 @@
     import TeethStatuses from '@/components/company/TeethStatuses.vue'
     import locationService from '../services/location.service'
     import { vMaska } from "maska/vue"
+    import HealthCare from '@/components/company/HealthCare.vue'
+    import PrescriptionTemplate from '@/components/company/PrescriptionTemplate.vue'
 
     export default {
       name: 'UserList',
       components: {
         Procedures,
         Statuses,
-        TeethStatuses
+        TeethStatuses,
+        HealthCare,
+        PrescriptionTemplate
       },
       directives: { maska: vMaska },
       computed: {

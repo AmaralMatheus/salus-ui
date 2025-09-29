@@ -438,7 +438,7 @@
           </div>
         </v-card-title>
         <v-card-text v-if="client.prescriptions && client.prescriptions.length > 0" class="d-flex flex-column ga-3">
-          <div v-for="prescription in client.prescriptions" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between align-center text-none bg-surface" :key="prescription.id">
+          <div v-for="prescription in client.prescriptions" class="px-3 py-2 d-flex ga-3 justify-space-between align-center text-none  bg-red-lighten-5 rouded-sm" :key="prescription.id">
             <div @click="prescriptionView = true; currentPrescription = prescription" class="d-flex justify-space-between w-100">
               <div class="text-error">{{ getDateTime(prescription.created_at) }}</div>
             </div>
@@ -461,7 +461,7 @@
           </div>
         </v-card-title>
         <v-card-text v-if="client.plans && client.plans.length > 0" class="d-flex flex-column ga-3">
-          <v-hover><div v-for="plan in client.plans" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-surface cursor-pointer" :key="plan.id">
+          <v-hover><div v-for="plan in client.plans" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-red-lighten-5 rouded-sm cursor-pointer" :key="plan.id">
             <div @click="planView = true; currentPlan = plan" class="d-flex justify-space-between w-100">
               <div class="text-error">{{ getDateTime(plan.created_at) }}</div>
               <div>{{plan.name}}</div>
@@ -520,20 +520,23 @@
   </v-row>
   <v-dialog
     v-model="schedulerDialog"
-    max-width="800"
+    max-width="1200"
     width="auto"
   >
     <scheduler :client="this.client" @cancel="schedulerDialog = false" @reload="getClient"/>
   </v-dialog>
   <v-dialog
     v-model="planView"
-    width="auto"
+    width="1200"
   >
     <div>
       <v-card
         :title="'Plano de tratamento ' + (currentPlan.name ?? '')"
       >
         <v-card-text>
+          <div v-if="currentPlan.healthcare">
+            Plano de Saúde: {{ currentPlan.healthcare?.name }}
+          </div>
           <v-data-table-virtual
             :headers="planActionHeaders"
             :items="currentPlan.actions"
@@ -542,9 +545,12 @@
               {{ Number(item.price).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }} R$
             </template>
             <template v-slot:[`item.quantity`]="{ item }">
-              {{ item.teeth.length }}
+              {{ arraysEqual(item.teeth, [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28]) ? 'Região Superior' : ( arraysEqual(item.teeth, [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]) ? 'Região Inferior' : item.teeth.length + ' ' + item.teeth.map((t) => teethNumber[t.type])) }}
             </template>
           </v-data-table-virtual>
+          <div v-if="currentPlan.additional_info">
+            Observações: {{ currentPlan.additional_info }}
+          </div>
         </v-card-text>
         <v-card-actions>
           <div class="ml-2">Total: R$ {{ Number(getTotal()).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}</div>
@@ -615,13 +621,13 @@
   </v-dialog>
   <v-dialog
     v-model="descriptionDialog"
-    width="800"
+    width="1200"
   >
     <ClientInfoDialog :description-action="descriptionAction" :client="client" @cancel="descriptionDialog = false" @save="descriptionDialog = false;getClient()"/>
   </v-dialog>
   <v-dialog
     v-model="registeringDialog"
-    max-width="800"
+    max-width="1200"
   >
     <client-register :selectedClient="this.client.id" @cancel="registeringDialog = false" @reload="registeringDialog = false; getClient()"/>
   </v-dialog>
@@ -774,6 +780,7 @@
       async getClient() {
         this.loading = true
         await clientService.getClient(this.id).then((response) => {
+          console.log(response)
           if (response.data.birthday) {
             response.data.birthday = new Date(response.data.birthday)
           }
@@ -878,6 +885,7 @@
         const createTooth = {
           status: status,
           type: tooth.type,
+          id: tooth.id,
           client_id: this.client.id
         }
         if (this.client.teeth.filter((t) => t.type === tooth.type).length  === 0) {
@@ -926,7 +934,6 @@
         })
       },
       setProcedure(event, element) {
-        console.log(event)
         if(typeof event === 'object') {
           element.price = event.price
           element.description = event.name
@@ -939,7 +946,6 @@
         reader.onload = () => {
           this.image = file
         }
-        console.log(file)
         this.file = file;
         const params = {
           Bucket: 'dental-salus',
@@ -988,6 +994,24 @@
                   error.toString())
         })
       },
+      arraysEqual(arr1, arr2) {
+        // Check if both are arrays and have the same length
+        if (!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length !== arr2.length) {
+          console.log('n deu')
+          return false;
+        }
+
+        // Iterate and compare each element
+        for (let i = 0; i < arr1.length; i++) {
+          // If elements are objects, a recursive deep comparison might be needed
+          // For primitive values, strict equality (===) is sufficient
+          if (arr2.includes(arr1[i])) {
+            console.log('n deu2')
+            return false;
+          }
+        }
+        return true;
+      }
     }
   }
 </script>
