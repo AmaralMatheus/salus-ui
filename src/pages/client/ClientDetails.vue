@@ -438,7 +438,7 @@
           </div>
         </v-card-title>
         <v-card-text v-if="client.prescriptions && client.prescriptions.length > 0" class="d-flex flex-column ga-3">
-          <div v-for="prescription in client.prescriptions" class="px-3 py-2 d-flex ga-3 justify-space-between align-center text-none  bg-red-lighten-5 rouded-sm" :key="prescription.id">
+          <div v-for="prescription in client.prescriptions" class="px-3 py-2 d-flex ga-3 justify-space-between align-center text-none cursor-pointer bg-red-lighten-5 rounded-sm" :key="prescription.id">
             <div @click="prescriptionView = true; currentPrescription = prescription" class="d-flex justify-space-between w-100">
               <div class="text-error">{{ getDateTime(prescription.created_at) }}</div>
             </div>
@@ -461,7 +461,7 @@
           </div>
         </v-card-title>
         <v-card-text v-if="client.plans && client.plans.length > 0" class="d-flex flex-column ga-3">
-          <v-hover><div v-for="plan in client.plans" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-red-lighten-5 rouded-sm cursor-pointer" :key="plan.id">
+          <v-hover><div v-for="plan in client.plans" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-red-lighten-5 rounded-sm cursor-pointer" :key="plan.id">
             <div @click="planView = true; currentPlan = plan" class="d-flex justify-space-between w-100">
               <div class="text-error">{{ getDateTime(plan.created_at) }}</div>
               <div>{{plan.name}}</div>
@@ -780,7 +780,6 @@
       async getClient() {
         this.loading = true
         await clientService.getClient(this.id).then((response) => {
-          console.log(response)
           if (response.data.birthday) {
             response.data.birthday = new Date(response.data.birthday)
           }
@@ -997,7 +996,6 @@
       arraysEqual(arr1, arr2) {
         // Check if both are arrays and have the same length
         if (!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length !== arr2.length) {
-          console.log('n deu')
           return false;
         }
 
@@ -1006,7 +1004,6 @@
           // If elements are objects, a recursive deep comparison might be needed
           // For primitive values, strict equality (===) is sufficient
           if (arr2.includes(arr1[i])) {
-            console.log('n deu2')
             return false;
           }
         }

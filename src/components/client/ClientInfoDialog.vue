@@ -34,8 +34,8 @@
         <v-col cols="12">
           <quill-editor style="height:200px" placeholder="Descrição" contentType="html" v-model:content="description" theme="snow"></quill-editor>
         </v-col>
-        <div>
-          <v-chip v-for="template in templates" :key="template.id" class="cursor-pointer" @click="description = template.description" color="primary">{{ template.name }}</v-chip>
+        <div class="d-flex flex-wrap mt-2 ga-2">
+          <v-chip variant="outlined" v-for="template in templates" :key="template.id" class="cursor-pointer" @click="description += template.description" color="primary">{{ template.name }}+</v-chip>
         </div>
       </v-row>
     </v-card-text>
@@ -72,10 +72,11 @@
               v-model="newPlan.additional_info"
               :loading="loading"
               :disabled="loading"
-              rows="3"
+              class="h-auto"
+              :rows="3"
               variant="outlined"
               density="compact"
-              hide-details="auto"
+              hide-details
               label="Observações">
             </v-textarea>
           </v-col>
@@ -155,7 +156,8 @@
                 </v-menu>
               </v-col>
               <v-col cols="11" sm="4" class="d-flex ga-2 align-center">
-                <CurrencyInput variant="underlined" label="Valor Unitário" v-model="element.price"></CurrencyInput> {{ (element.price * element.quantity.length).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}
+                <CurrencyInput :hint="element.priceSource ? 'Preço para o plano '+healthcare.filter((hc) => hc.id === newPlan.healthcare_id)[0].name : ''" variant="underlined" label="Valor Unitário" v-model="element.price"></CurrencyInput>
+                <CurrencyInput label="Valor Total" readonly :value="'R$ '+(element.price * element.quantity.length).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')" variant="underlined"></CurrencyInput>
               </v-col>
             </v-row>
           </template>
@@ -319,8 +321,10 @@
         if(typeof event === 'object' && event?.price) {
           if (this.newPlan.healthcare_id && this.healthcare.filter((hc) => this.newPlan.healthcare_id === hc.id)[0].procedures?.filter((procedure) => procedure.procedure_id === event.id).length > 0) {
             element.price = this.healthcare.filter((hc) => this.newPlan.healthcare_id === hc.id)[0].procedures.filter((procedure) => procedure.procedure_id === event.id)[0].price
+            element.priceSource = true
           } else {
             element.price = event.price
+            element.priceSource = null
           }
           element.description = event.name.split(' - ')[1]
         }
