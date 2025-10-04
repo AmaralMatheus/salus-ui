@@ -94,7 +94,7 @@
                           item-title="name"
                           item-value="name"
                           :rules="rules"
-                          v-model="element.procedure.name"
+                          v-model="element.procedure"
                           :loading="loading"
                           :disabled="loading"
                           variant="underlined"
