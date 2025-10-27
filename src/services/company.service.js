@@ -20,8 +20,8 @@ class CompanyService {
   updateProcedure(id, data) {
     return axios.put(process.env.VUE_APP_API_URL + 'procedures/' + id, data, { headers: authHeader() })
   }
-  getAllProcedures() {
-    return axios.get(process.env.VUE_APP_API_URL + 'procedures/all', { headers: authHeader() })
+  getAllProcedures(id = 0) {
+    return axios.get(process.env.VUE_APP_API_URL + 'procedures/all/'+id, { headers: authHeader() })
   }
   deleteProcedure(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'procedures/' + id, { headers: authHeader() })
@@ -88,8 +88,8 @@ class CompanyService {
   deleteTeethStatus(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'teeth-status/' + id, { headers: authHeader() })
   }
-  getCompany() {
-    return axios.get(process.env.VUE_APP_API_URL + 'companies', { headers: authHeader() })
+  getCompany(id) {
+    return axios.get(process.env.VUE_APP_API_URL + 'companies/'+id, { headers: authHeader() })
   }
   saveCompany(id, data) {
     return axios.put(process.env.VUE_APP_API_URL + 'companies/'+id, data, { headers: authHeader() })

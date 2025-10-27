@@ -35,6 +35,9 @@ class ClientService {
   deletePrescription(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'prescriptions/' + id, { headers: authHeader() })
   }
+  approveEvolution(id) {
+    return axios.put(process.env.VUE_APP_API_URL + 'evolutions/approve/' + id, null, { headers: authHeader() })
+  }
 }
 
 export default new ClientService()

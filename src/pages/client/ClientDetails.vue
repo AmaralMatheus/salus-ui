@@ -1,5 +1,5 @@
 <template>
-  <v-row>
+  <v-row :class="this.currentUser ? '' : 'mt-2'">
     <v-col cols="12" sm="6" md="7" lg="8">
       <v-card v-if="!loading" title="Odontograma">
         <v-card-text>
@@ -23,7 +23,7 @@
                       </div>
                     </template>
 
-                    <v-list>
+                    <v-list :class="this.currentUser ? '' : 'hidden'">
                       <v-list-item>
                         <div class="text-h6">Status do dente: {{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
                       </v-list-item>
@@ -106,7 +106,7 @@
         type="article"
       ></v-skeleton-loader>
       <div class="d-flex mt-6">
-        <v-btn v-if="!loading" @click="descriptionDialog = true; description = ''; descriptionAction = 'evolutions'" class="ma-auto mb-6">Adicionar Evolução</v-btn>
+        <v-btn v-if="!loading && this.currentUser" @click="descriptionDialog = true; description = ''; descriptionAction = 'evolutions'" class="ma-auto mb-6">Adicionar Evolução</v-btn>
       </div>
       <div v-if="client.evolutions && client.evolutions.length < 1" class="d-flex ma-auto" style="width: max-content">
         Não há evoluções cadastradas!
@@ -116,13 +116,26 @@
           <v-card-text>
             <div class="mx-5" v-html="evolution.description"></div>
             <v-divider class="my-3"/>
-            <div class="d-flex flex-column align-baseline">
-              <div class="d-flex ml-auto ga-2 align-baseline">
-                <div>Dr. {{evolution.user.name}}</div>
-                <div class="text-medium-emphasis">CRO {{ evolution.user.cro }}</div>
+            <div class="d-flex align-center">
+              <div v-if="evolution.client_approved_at" class="mr-auto d-flex ga-2">
+                Aprovado pelo paciente dia <div class="text-primary">{{ getDateTime(evolution.client_approved_at) }}</div>
               </div>
-              <div class="ml-auto text-medium-emphasis">
-                <div>{{ getDateTime(evolution.created_at) }}</div>
+              <div v-else class="mr-auto">
+                <v-btn
+                  v-if="!this.currentUser"
+                  class="ms-auto"
+                  text="Aprovar"
+                  @click="selectedEvolution = evolution; approveDialog = true"
+                ></v-btn>
+              </div>
+              <div class="d-flex flex-column align-baseline">
+                <div class="d-flex ml-auto ga-2 align-baseline">
+                  <div>Dr. {{evolution.user.name}}</div>
+                  <div class="text-medium-emphasis">CRO {{ evolution.user.cro }}</div>
+                </div>
+                <div class="ml-auto text-medium-emphasis">
+                  <div>{{ getDateTime(evolution.created_at) }}</div>
+                </div>
               </div>
             </div>
           </v-card-text>
@@ -356,6 +369,7 @@
                     <img :src="image.path" id="box" class="ma-auto" width="100%" height="100%" />
                   </div>
                   <v-btn
+                    v-if="this.currentUser"
                     id="overlay"
                     text="tESTE"
                     icon="mdi-delete"
@@ -384,7 +398,7 @@
         <v-card-title>
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">{{ client.name }}</h4>
-            <div class="d-flex ga-2 ml-auto">
+            <div class="d-flex ga-2 ml-auto" v-if="this.currentUser">
               <v-btn size="small" icon="mdi-calendar-outline" @click="schedulerDialog = true" color="info" variant="tonal" density="comfortable"/>
               <v-btn size="small" icon="mdi-pencil" @click="update" color="warning" variant="tonal" density="comfortable"/>
               <v-btn size="small" icon="mdi-delete" @click="dialog = true" color="error" variant="tonal" density="comfortable"/>
@@ -433,7 +447,7 @@
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Receitas</h4>
             <div class="d-flex ga-2 ml-auto">
-              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true;  title = ''; description = ''; descriptionAction = 'prescriptions'" color="primary" variant="tonal" density="comfortable"/>
+              <v-btn v-if="this.currentUser" size="small" icon="mdi-plus" @click="descriptionDialog = true;  title = ''; description = ''; descriptionAction = 'prescriptions'" color="primary" variant="tonal" density="comfortable"/>
             </div>
           </div>
         </v-card-title>
@@ -442,7 +456,7 @@
             <div @click="prescriptionView = true; currentPrescription = prescription" class="d-flex justify-space-between w-100">
               <div class="text-error">{{ getDateTime(prescription.created_at) }}</div>
             </div>
-            <v-btn size="small" density="comfortable" icon="mdi-delete" @click="prescriptionDeleteDialog = true; selectedPrescription = prescription.id" color="error" variant="text"/>
+            <v-btn v-if="this.currentUser" size="small" density="comfortable" icon="mdi-delete" @click="prescriptionDeleteDialog = true; selectedPrescription = prescription.id" color="error" variant="text"/>
           </div>
           <div @click="prescriptionDialog = true" class="text-none text-primary cursor-pointer d-flex align-center" >
             Ver todas as receitas
@@ -456,7 +470,7 @@
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Planos de Tratamento</h4>
             <div class="d-flex ga-2 ml-auto">
-              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true; title = ''; newPlan = { name: '', actions: []};  descriptionAction = 'plans'; getProcedures()" color="primary" variant="tonal" density="comfortable"/>
+              <v-btn v-if="this.currentUser" size="small" icon="mdi-plus" @click="descriptionDialog = true; title = ''; newPlan = { name: '', actions: []};  descriptionAction = 'plans'; getProcedures()" color="primary" variant="tonal" density="comfortable"/>
             </div>
           </div>
         </v-card-title>
@@ -466,7 +480,7 @@
               <div class="text-error">{{ getDateTime(plan.created_at) }}</div>
               <div>{{plan.name}}</div>
             </div>
-            <v-btn size="small" density="comfortable" icon="mdi-delete" @click="planDeleteDialog = true; selectedPlan = plan.id" color="error" variant="text"/>
+            <v-btn size="small" density="comfortable" icon="mdi-delete" v-if="this.currentUser" @click="planDeleteDialog = true; selectedPlan = plan.id" color="error" variant="text"/>
           </div></v-hover>
           <div @click="planDialog = true" class="text-none text-primary cursor-pointer d-flex align-center" >
             Ver todos os planos
@@ -535,7 +549,7 @@
       >
         <v-card-text>
           <div v-if="currentPlan.healthcare">
-            Plano de Saúde: {{ currentPlan.healthcare?.name }}
+            Tabela de Preço: {{ currentPlan.healthcare?.name }}
           </div>
           <v-data-table-virtual
             :headers="planActionHeaders"
@@ -545,7 +559,7 @@
               {{ Number(item.price).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }} R$
             </template>
             <template v-slot:[`item.quantity`]="{ item }">
-              {{ arraysEqual(item.teeth, [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28]) ? 'Região Superior' : ( arraysEqual(item.teeth, [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]) ? 'Região Inferior' : item.teeth.length + ' ' + item.teeth.map((t) => teethNumber[t.type])) }}
+              {{ arraysEqual(item.teeth, [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28]) ? 'Região Superior' : ( arraysEqual(item.teeth, [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]) ? 'Região Inferior' : item.teeth.length + ' dente' + ( item.teeth.length === 1 ? ': ' : 's: ' ) + item.teeth.map((t) => teethNumber[t.type])) }}
             </template>
           </v-data-table-virtual>
           <div v-if="currentPlan.additional_info">
@@ -631,6 +645,33 @@
   >
     <client-register :selectedClient="this.client.id" @cancel="registeringDialog = false" @reload="registeringDialog = false; getClient()"/>
   </v-dialog>
+  <v-dialog
+    v-model="approveDialog"
+    width="auto"
+  >
+    <v-card width="600">
+      <v-card-title>
+        Aprovar evolução?
+      </v-card-title>
+      <v-card-text>
+        Uma vez aprovada, você concorda com que tá nela
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          text="Cancelar"
+          variant="plain"
+          @click="approveDialog = false"
+        ></v-btn>
+        <v-btn
+          text="Aprovar"
+          variant="plain"
+          color="primary"
+          @click="approveEvolution"
+        ></v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -689,6 +730,7 @@
         actionSuggestions: [],
         planForm: false,
         planView: false,
+        selectedEvolution: null,
         planDeleteDialog: false,
         imageDeleteDialog: false,
         selectedImage: null,
@@ -700,6 +742,7 @@
         currentPrescription: null,
         prescriptionView: false,
         teethStatuses: [],
+        approveDialog: false,
         newPlan: {
           actions: [],
           name: ''
@@ -786,7 +829,7 @@
           this.client = response.data
           this.$store.dispatch('auth/updateEntityName', this.client.name)
         })
-        this.company = await companyService.getCompany()
+        this.company = await companyService.getCompany(this.currentUser ? this.currentUser.company_id : this.client.company_id)
         this.company = this.company.data
 
         if (this.company.city) {
@@ -800,7 +843,7 @@
             this.company.state = response.data.filter((state) => state.id == this.company.state)[0].nome
           })
         }
-        statusService.getAllTeethStatus(this.currentUser.company_id).then((response) => {
+        statusService.getAllTeethStatus(this.currentUser ? this.currentUser.company_id : this.client.company_id).then((response) => {
           this.teethStatuses = response.data
           this.loading = false
         })
@@ -971,6 +1014,21 @@
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         }
         html2pdf(doc, options)
+      },
+      async approveEvolution() {
+        this.loading = true
+        this.approveDialog = false
+        clientService.approveEvolution(this.selectedEvolution.id).then(() => {
+          this.getClient()
+        },
+        (error) => {
+          this.loading = false
+          toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
+        })
       },
       async saveImage() {
         this.imageLoading = true

@@ -64,7 +64,7 @@
               @update:modelValue="newPlan.actions = []"
               density="compact"
               hide-details="auto"
-              label="Plano de saúde"
+              label="Tabela de preço"
             ></v-select>
           </v-col>
           <v-col cols="12">
@@ -98,6 +98,21 @@
               </v-col>
               <v-col cols="11" sm="3" md="2">
                 <v-combobox
+                  :items="categories"
+                  item-title="name"
+                  item-value="id"
+                  :rules="rules"
+                  :loading="loading"
+                  :disabled="loading"
+                  variant="underlined"
+                  density="compact"
+                  hide-details="auto"
+                  @update:modelValue="getProcedures"
+                  label="Procedimento">
+                </v-combobox>
+              </v-col>
+              <v-col cols="11" sm="3" md="2">
+                <v-combobox
                   :items="procedures"
                   item-title="name"
                   item-value="name"
@@ -112,7 +127,7 @@
                   label="Procedimento">
                 </v-combobox>
               </v-col>
-              <v-col cols="11" sm="5" md="5">
+              <v-col cols="11" sm="5" md="3">
                 <v-menu :close-on-content-click="false" @v-model="element.quantity">
                   <template v-slot:activator="{ props }">
                     <v-combobox
@@ -241,6 +256,7 @@
         title: '',
         image: null,
         teeth: [],
+        categories: [{id: 1, name: 'Ortodontia'}],
         teethNumber: [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28,48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38],
         description: '',
         saving: false,
@@ -309,8 +325,8 @@
       getDateTime(date) {
         return format(parseISO(date), 'dd/MM/yyyy kk:mm')
       },
-      getProcedures() {
-        companyService.getAllProcedures().then((response) => {
+      getProcedures(event) {
+        companyService.getAllProcedures(event ? event.id : 0).then((response) => {
           this.procedures = response.data.map((procedure) => {
             procedure.name = this.categoryName[procedure.category_id]+' - '+procedure.name
             return procedure

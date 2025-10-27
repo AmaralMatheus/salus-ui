@@ -107,8 +107,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-const publicPages = ['/login', '/cadastro', '/home'];
-const authRequired = !publicPages.includes(to.path);
+const publicPages = ['/login', '/cadastro', '/home', '/pacientes/'];
+const authRequired = !publicPages.includes(to.path) && !to.path.includes('pacientes/');
 const loggedIn = localStorage.getItem('user');
 
 // trying to access a restricted page + not logged in

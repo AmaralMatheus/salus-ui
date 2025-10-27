@@ -325,8 +325,9 @@
       async created() {
         this.pageLoading = true
         await this.getStates()
-        companyService.getCompany().then((response) => {
+        companyService.getCompany(this.currentUser.company_id).then((response) => {
           this.company = response.data
+          console.log(this.company)
           this.company.state = Number(this.company.state)
           if (this.company.state) {
             locationService.getCities(this.company.state).then((response) => {

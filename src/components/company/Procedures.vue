@@ -38,6 +38,9 @@
               <template v-slot:[`item.price`]="{ item }">
                 {{ Number(item.price).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }} R$
               </template>
+              <template v-slot:[`item.category_id`]="{ item }">
+                {{ getCategory(item.category_id) }}
+              </template>
               <template v-slot:[`item.actions`]="{ item }">
                 <v-menu>
                   <template v-slot:activator="{ props }">
@@ -87,7 +90,7 @@
                   variant="outlined"
                   density="compact"
                   hide-details="auto"
-                  label="Especialidate">
+                  label="Especialidade">
                 </v-select>
               </v-col>
               <v-col cols="12" sm="4">
@@ -177,6 +180,7 @@
           sortable: true,
           key: 'name',
         },
+        { title: 'Especialidade', key: 'category_id', align: 'start', sortable: true },
         { title: 'Valor Unitário', key: 'price', align: 'start', sortable: true },
         { title: '', key: 'actions', align: 'end', sortable: true },
       ],
@@ -227,6 +231,12 @@
                   error.message ||
                   error.toString())
           })
+      },
+      getCategory(id) {
+        switch (id) {
+          case 1: return 'Ortodontia'
+          default: return 'Sem especialidade'
+        }
       },
       save() {
         this.loading = true

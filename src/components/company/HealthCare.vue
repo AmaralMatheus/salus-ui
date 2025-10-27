@@ -3,7 +3,7 @@
     <v-col cols="12" class="d-flex flex-column ga-6">
       <v-expansion-panels>
         <v-expansion-panel>        
-          <v-expansion-panel-title class="text-h6">Planos de Saúde</v-expansion-panel-title>
+          <v-expansion-panel-title class="text-h6">Tabelas de Preço</v-expansion-panel-title>
           <v-expansion-panel-text>
             <v-row class="mt-0">
               <v-col cols="12">
@@ -57,7 +57,7 @@
       >
         <v-card
           width="700"
-          title="Cadastrar Plano de Saúde"
+          title="Cadastrar Tabela de Preço"
         >
           <v-card-text>
             <v-row>
@@ -73,7 +73,7 @@
                 ></v-text-field>  
               </v-col>
               <v-col cols="12">
-                <div class="text-center" v-if="healthcare.procedures?.length === 0">Cadastre os procedimentos para este plano de saúde!</div>
+                <div class="text-center" v-if="healthcare.procedures?.length === 0">Cadastre os procedimentos para este tabela de preço!</div>
                 <draggable
                   v-else 
                   v-model="healthcare.procedures"
