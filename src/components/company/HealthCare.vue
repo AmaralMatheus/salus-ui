@@ -204,6 +204,7 @@
           sortable: true,
           key: 'name',
         },
+        { title: '', key: 'actions', align: 'end', sortable: true },
       ],
       rules: [
         value => {

@@ -128,7 +128,7 @@ class CompanyService {
   getAllTemplates() {
     return axios.get(process.env.VUE_APP_API_URL + 'templates/all',  { headers: authHeader() })
   }
-  deleteTemplates(id) {
+  deleteTemplate(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'templates/' + id, { headers: authHeader() })
   }
 }

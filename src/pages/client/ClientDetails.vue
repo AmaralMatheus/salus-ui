@@ -125,7 +125,7 @@
                   v-if="!this.currentUser"
                   class="ms-auto"
                   text="Aprovar"
-                  @click="selectedEvolution = evolution; approveDialog = true"
+                  @click="selectedEvolution = evolution; approveMode = 'evolution'; approveDialog = true"
                 ></v-btn>
               </div>
               <div class="d-flex flex-column align-baseline">
@@ -366,7 +366,7 @@
               >
                 <v-sheet class="h-100">
                   <div class="d-flex h-100">
-                    <img :src="image.path" id="box" class="ma-auto" width="100%" height="100%" />
+                    <img :src="image" id="box" class="ma-auto" width="100%" height="100%" />
                   </div>
                   <v-btn
                     v-if="this.currentUser"
@@ -476,9 +476,14 @@
         </v-card-title>
         <v-card-text v-if="client.plans && client.plans.length > 0" class="d-flex flex-column ga-3">
           <v-hover><div v-for="plan in client.plans" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-red-lighten-5 rounded-sm cursor-pointer" :key="plan.id">
-            <div @click="planView = true; currentPlan = plan" class="d-flex justify-space-between w-100">
+            <div @click="planView = true; currentPlan = plan" class="d-flex justify-space-between align-center ga-3 w-100">
               <div class="text-error">{{ getDateTime(plan.created_at) }}</div>
-              <div>{{plan.name}}</div>
+              <v-tooltip v-if="plan.client_approved_at" :text="'Aprovado pelo paciente dia ' + getDateTime(plan.client_approved_at)">
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props">mdi-checkbox-marked-circle-outline</v-icon>
+                </template>
+              </v-tooltip>
+              <div class="ml-auto">{{plan.name}}</div>
             </div>
             <v-btn size="small" density="comfortable" icon="mdi-delete" v-if="this.currentUser" @click="planDeleteDialog = true; selectedPlan = plan.id" color="error" variant="text"/>
           </div></v-hover>
@@ -513,7 +518,7 @@
               <v-sheet
               >
                 <div class="d-flex justify-center align-center">
-                  <img width="500" :src="image.path" />
+                  <img width="500" :src="image" />
                 </div>
               </v-sheet>
             </v-carousel-item>
@@ -543,40 +548,81 @@
     v-model="planView"
     width="1200"
   >
-    <div>
-      <v-card
-        :title="'Plano de tratamento ' + (currentPlan.name ?? '')"
-      >
-        <v-card-text>
-          <div v-if="currentPlan.healthcare">
-            Tabela de Preço: {{ currentPlan.healthcare?.name }}
+    <v-card width="1000">
+      <div ref="pdfContent" class="d-flex flex-column">
+        <div class="pb-10" style="border-left: solid 8px rgb(var(--v-theme-primary)); padding: 50px; padding-bottom: 0;">
+          <div class="mb-10 d-flex justify-space-between">
+            <div>
+              <h1>Plano de tratamento {{ currentPlan.name ?? ''}}</h1>
+              <p>{{ getDateTime(currentPlan.created_at) }}</p>
+            </div>
+            <img width="20" src="/favicon.svg" />
           </div>
-          <v-data-table-virtual
-            :headers="planActionHeaders"
-            :items="currentPlan.actions"
-          >
-            <template v-slot:[`item.price`]="{ item }">
-              {{ Number(item.price).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }} R$
-            </template>
-            <template v-slot:[`item.quantity`]="{ item }">
-              {{ arraysEqual(item.teeth, [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28]) ? 'Região Superior' : ( arraysEqual(item.teeth, [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]) ? 'Região Inferior' : item.teeth.length + ' dente' + ( item.teeth.length === 1 ? ': ' : 's: ' ) + item.teeth.map((t) => teethNumber[t.type])) }}
-            </template>
-          </v-data-table-virtual>
-          <div v-if="currentPlan.additional_info">
-            Observações: {{ currentPlan.additional_info }}
+          <div class="d-flex ga-3 align-center">
+            <h3>Paciente:</h3>
+            {{ client.name }}
           </div>
-        </v-card-text>
-        <v-card-actions>
-          <div class="ml-2">Total: R$ {{ Number(getTotal()).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}</div>
-          <v-spacer></v-spacer>
-          <v-btn
-            text="Fechar"
-            variant="plain"
-            @click="planView = false"
-          ></v-btn>
-        </v-card-actions>
-      </v-card>
-    </div>
+        </div>
+        <div style="border-color: red; padding: 50px; padding-top: 0;" class="border-s-xl">
+          <div class="pb-5">
+            <div v-if="currentPlan.healthcare">
+              Tabela de Preço: {{ currentPlan.healthcare?.name }}
+            </div>
+            <v-data-table-virtual
+              :headers="planActionHeaders"
+              :items="currentPlan.actions"
+            >
+              <template v-slot:[`item.price`]="{ item }">
+                {{ Number(item.price).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }} R$
+              </template>
+              <template v-slot:[`item.quantity`]="{ item }">
+                {{ arraysEqual(item.teeth, [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28]) ? 'Região Superior' : ( arraysEqual(item.teeth, [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]) ? 'Região Inferior' : item.teeth.length + ' dente' + ( item.teeth.length === 1 ? ': ' : 's: ' ) + item.teeth.map((t) => teethNumber[t.type])) }}
+              </template>
+            </v-data-table-virtual>
+            <div class="ml-2">Total: R$ {{ Number(getTotal()).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}</div>
+            <div v-if="currentPlan.additional_info">
+              Observações: {{ currentPlan.additional_info }}
+            </div>
+          </div>
+          <div style="height: 150px;" class="ma-auto text-center">
+            ______________________________________________
+            <br>
+            <b>{{ currentUser.user_name }}</b>
+            <br>
+            <div class="text-sm">{{ currentUser.cro }}</div>
+          </div>
+          <div class="ma-auto text-center text-medium-emphasis">
+            {{ company.address }} - {{ company.city }} - {{ company.state }}
+          </div>
+          <div class="ma-auto text-center text-medium-emphasis">
+            CEP {{ company.cep }} {{ company.phone }} 
+          </div>
+          <div class="ma-auto text-center text-medium-emphasis text-caption">
+            powered by Dental Salus 
+          </div>
+        </div>
+      </div>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          v-if="!this.currentUser"
+          text="Aprovar"
+          variant="plain"
+          @click="selectedPlan = currentPlan; approveMode = 'plan'; approveDialog = true"
+        ></v-btn>
+        <v-btn
+          text="Fechar"
+          variant="plain"
+          @click="planView = false"
+        ></v-btn>
+        <v-btn
+          text="Imprimir"
+          variant="plain"
+          color="primary"
+          @click="generatePDF"
+        ></v-btn>
+      </v-card-actions>
+    </v-card>
   </v-dialog>
   <v-dialog
     v-model="prescriptionView"
@@ -588,7 +634,7 @@
           <div class="mb-10 d-flex justify-space-between">
             <div>
               <h1>Receituário</h1>
-              <p>{{ format(new Date(), 'dd/mm/yyyy') }}</p>
+              <p>{{ getDateTime(currentPrescription.created_at) }}</p>
             </div>
             <img width="20" src="/favicon.svg" />
           </div>
@@ -651,7 +697,7 @@
   >
     <v-card width="600">
       <v-card-title>
-        Aprovar evolução?
+        Aprovar {{ approveMode === 'evolution' ? 'Evolução' : 'Plano' }}?
       </v-card-title>
       <v-card-text>
         Uma vez aprovada, você concorda com que tá nela
@@ -664,6 +710,14 @@
           @click="approveDialog = false"
         ></v-btn>
         <v-btn
+          v-if="approveMode === 'plan'"
+          text="Aprovar"
+          variant="plain"
+          color="primary"
+          @click="approvePlan"
+        ></v-btn>
+        <v-btn
+          v-else
           text="Aprovar"
           variant="plain"
           color="primary"
@@ -723,6 +777,7 @@
         format,
         parseISO,
         tab: 1,
+        approveMode: 'evolution',
         imageLoading: false,
         registeringDialog: false,
         procedures: [],
@@ -1019,6 +1074,21 @@
         this.loading = true
         this.approveDialog = false
         clientService.approveEvolution(this.selectedEvolution.id).then(() => {
+          this.getClient()
+        },
+        (error) => {
+          this.loading = false
+          toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
+        })
+      },
+      async approvePlan() {
+        this.loading = true
+        this.approveDialog = false
+        clientService.approvePlan(this.selectedPlan.id).then(() => {
           this.getClient()
         },
         (error) => {

@@ -44,6 +44,7 @@
               <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
                 <v-select
                 :items="[
+                    {label: 'Dentista', id: 0},
                     {label: 'Administrador', id: 1},
                     {label: 'Secretaria', id: 2},
                   ]"
