@@ -990,7 +990,7 @@
         }
         this.file = file;
         const params = {
-          Bucket: 'dental-salus',
+          Bucket: 'dental-salus-images',
           Key: this.file.name,
           Body: this.file,
           ContentType: this.file.type
