@@ -1,7 +1,7 @@
 <template>
     <v-expansion-panels>
       <v-expansion-panel>
-        <v-expansion-panel-title class="text-h6">Templates de Receita</v-expansion-panel-title>
+        <v-expansion-panel-title class="text-h6">Modelos de Receituário</v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-row>
             <v-col cols="12" class="d-flex flex-column ga-6">
@@ -17,11 +17,11 @@
                             density="compact"
                             hide-details="auto"
                             append-inner-icon="mdi-magnify"
-                            placeholder="Buscar Template">
+                            placeholder="Buscar Modelo">
                           </v-text-field>
                         </v-col>
                         <v-col cols="12" sm="7" md="5" lg="4">
-                          <v-btn block append-icon="mdi-plus" @click="templateDialog = true" color="primary">Adicionar Template</v-btn>
+                          <v-btn block append-icon="mdi-plus" @click="templateDialog = true" color="primary">Adicionar Modelo</v-btn>
                         </v-col>
                       </v-row>
                     </v-col>
@@ -58,7 +58,7 @@
               >
                 <v-card
                   width="700"
-                  title="Cadastrar Template"
+                  title="Cadastrar Modelo"
                 >
                   <v-card-text>
                     <v-row>
@@ -103,7 +103,7 @@
                   max-width="400"
                   prepend-icon="mdi-alert-outline"
                   text="Esses dados não podem ser restaurados"
-                  title="Deseja excluir esse Usuário?"
+                  title="Deseja excluir esse modelo?"
                 >
                   <template v-slot:actions>
                     <v-btn
@@ -160,7 +160,8 @@
             align: 'start',
             sortable: true,
             key: 'name',
-          }
+          },
+          { title: '', key: 'actions', align: 'end', sortable: true },
         ],
         rules: [
           value => {

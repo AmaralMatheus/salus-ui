@@ -38,6 +38,9 @@ class ClientService {
   approveEvolution(id) {
     return axios.put(process.env.VUE_APP_API_URL + 'evolutions/approve/' + id, null, { headers: authHeader() })
   }
+  approvePlan(id) {
+    return axios.put(process.env.VUE_APP_API_URL + 'plans/approve/' + id, null, { headers: authHeader() })
+  }
 }
 
 export default new ClientService()
