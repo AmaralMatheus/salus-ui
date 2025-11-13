@@ -180,7 +180,7 @@
         <PrescriptionTemplate/>
         <v-dialog
           v-model="dialog"
-          width="auto"
+          width="auto" 
         >
           <v-card
             max-width="400"
