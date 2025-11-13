@@ -353,8 +353,17 @@
           prepend-icon="mdi-image-outline"
           title="Imagens"
         >
-          <v-card-text>
-            <v-carousel
+          <v-card-text class="custom-height">
+            <viewer :options="{
+                toolbar: true,
+                title: false,
+                playable: false,
+                inline: true,
+                zIndex: 11
+              }" :images="client.images.map((image) => image.path)">
+              <img v-for="src in client.images.map((image) => image.path)" :key="src" :src="src" class="image-gallery">
+            </viewer>
+            <!-- <v-carousel
               class="rounded"
               show-arrows="hover"
               cycle
@@ -366,7 +375,7 @@
               >
                 <v-sheet class="h-100">
                   <div class="d-flex h-100">
-                    <img :src="image" id="box" class="ma-auto" width="100%" height="100%" />
+                    <img :src="image.path" id="box" class="ma-auto" width="100%" height="100%" />
                   </div>
                   <v-btn
                     v-if="this.currentUser"
@@ -380,7 +389,7 @@
                   ></v-btn>
                 </v-sheet>
               </v-carousel-item>
-            </v-carousel>
+            </v-carousel> -->
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -518,7 +527,7 @@
               <v-sheet
               >
                 <div class="d-flex justify-center align-center">
-                  <img width="500" :src="image" />
+                  <img width="500" :src="image.path" />
                 </div>
               </v-sheet>
             </v-carousel-item>
@@ -741,6 +750,8 @@
   import AWS from '../../services/aws.service'
   import html2pdf from 'html2pdf.js'
   import locationService from '../../services/location.service'
+  import 'viewerjs/dist/viewer.css'
+  import { component as Viewer } from "v-viewer"
 
   export default {
     computed: {
@@ -768,6 +779,7 @@
       }
     },
     components: {
+      Viewer,
       Scheduler,
       ClientInfoDialog,
       ClientRegister,
@@ -1052,8 +1064,8 @@
         }
   
         const data = await AWS.upload(params).promise()
-        this.client.images.push({path: data.Location})
         this.image = data.Location
+        console.log(this.image)
         this.imageLoading = false
       },
       generatePDF() {
@@ -1110,6 +1122,7 @@
           this.addImageDialog = false
           this.imageLoading = null
           this.image = null
+          this.getClient()
           this.$emit('save')
         },
         (error) => {
@@ -1170,5 +1183,18 @@
     width: 50px;
     height: 50px;
     color: white;
+}
+
+.image-gallery {
+  height: 1px;
+  width: 1px;
+}
+
+.viewer-container .viewer-backdrop {
+  height: 1000px !important;
+}
+
+.custom-height {
+  height: 1000px !important;
 }
 </style>
