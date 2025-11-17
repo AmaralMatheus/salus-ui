@@ -24,7 +24,7 @@ class ClientService {
     return axios.post(process.env.VUE_APP_API_URL + action, data, { headers: authHeader() })
   }
   updateToothStatus(tooth) {
-    return axios.put(process.env.VUE_APP_API_URL + 'teeth/', tooth, { headers: authHeader() })
+    return axios.post(process.env.VUE_APP_API_URL + 'teeth', tooth, { headers: authHeader() })
   }
   deleteImage(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'image/' + id, { headers: authHeader() })
@@ -34,6 +34,12 @@ class ClientService {
   }
   deletePrescription(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'prescriptions/' + id, { headers: authHeader() })
+  }
+  approveEvolution(id) {
+    return axios.put(process.env.VUE_APP_API_URL + 'evolutions/approve/' + id, null, { headers: authHeader() })
+  }
+  approvePlan(id) {
+    return axios.put(process.env.VUE_APP_API_URL + 'plans/approve/' + id, null, { headers: authHeader() })
   }
 }
 

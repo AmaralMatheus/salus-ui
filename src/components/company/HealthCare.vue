@@ -3,7 +3,7 @@
     <v-col cols="12" class="d-flex flex-column ga-6">
       <v-expansion-panels>
         <v-expansion-panel>        
-          <v-expansion-panel-title class="text-h6">Procedimentos</v-expansion-panel-title>
+          <v-expansion-panel-title class="text-h6">Tabelas de Preço</v-expansion-panel-title>
           <v-expansion-panel-text>
             <v-row class="mt-0">
               <v-col cols="12">
@@ -15,11 +15,11 @@
                       density="compact"
                       hide-details="auto"
                       append-inner-icon="mdi-magnify"
-                      placeholder="Buscar Procedimentos">
+                      placeholder="Buscar Planos">
                     </v-text-field>
                   </v-col>
                   <v-col cols="12" sm="7" md="5" lg="4">
-                    <v-btn block append-icon="mdi-plus" @click="procedureDialog = true" color="primary">Adicionar Procedimento</v-btn>
+                    <v-btn block append-icon="mdi-plus" @click="healthcareDialog = true" color="primary">Adicionar Plano</v-btn>
                   </v-col>
                 </v-row>
               </v-col>
@@ -35,12 +35,6 @@
               @update:options="loadItems"
               @click:row="viewRow"
             >
-              <template v-slot:[`item.price`]="{ item }">
-                {{ Number(item.price).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }} R$
-              </template>
-              <template v-slot:[`item.category_id`]="{ item }">
-                {{ getCategory(item.category_id) }}
-              </template>
               <template v-slot:[`item.actions`]="{ item }">
                 <v-menu>
                   <template v-slot:activator="{ props }">
@@ -58,16 +52,16 @@
         </v-expansion-panel>
       </v-expansion-panels>
       <v-dialog
-        v-model="procedureDialog"
+        v-model="healthcareDialog"
         width="auto"
       >
         <v-card
           width="700"
-          title="Cadastrar Procedimento"
+          title="Cadastrar Tabela de Preço"
         >
           <v-card-text>
             <v-row>
-              <v-col cols="12" sm="4">
+              <v-col cols="12">
                 <v-text-field
                   label="Nome"
                   :rules="rules"
@@ -75,27 +69,55 @@
                   :disabled="loading"
                   variant="outlined"
                   density="compact"
-                  v-model="procedure.name"
+                  v-model="healthcare.name"
                 ></v-text-field>  
               </v-col>
-              <v-col cols="12" sm="4">
-                <v-select
-                :items="[{name: 'Sem especialidade', id: 0}, {name: 'Ortodontia', id: 1}]"
-                  item-title="name"
-                  item-value="id"
-                  v-model="procedure.category_id"
-                  :loading="loadingInfo"
-                  :disabled="loadingInfo"
-                  :rules="rules"
-                  variant="outlined"
-                  density="compact"
-                  hide-details="auto"
-                  label="Especialidade">
-                </v-select>
+              <v-col cols="12">
+                <div class="text-center" v-if="healthcare.procedures?.length === 0">Cadastre os procedimentos para este tabela de preço!</div>
+                <draggable
+                  v-else 
+                  v-model="healthcare.procedures"
+                  @start="drag=true" 
+                  @end="drag=false" 
+                  item-key="order">
+                  <!-- the row will go here -->
+                    
+                  <template #item="{element}">
+                    <v-row dense>
+                      <v-col class="d-flex mx-auto align-center ga-2 mt-1" cols="1">
+                        <v-btn size="comfortable" icon="mdi-reorder-horizontal" disabled variant="plain"/>
+                        <v-btn size="comfortable" icon="mdi-delete" @click="healthcare.procedures = healthcare.procedures.filter((action) => action !== element)" color="error" variant="plain"/>
+                      </v-col>
+                      <v-col cols="11" md="6">
+                        <v-combobox
+                          :items="procedures"
+                          item-title="name"
+                          item-value="name"
+                          :rules="rules"
+                          v-model="element.procedure"
+                          :loading="loading"
+                          :disabled="loading"
+                          variant="underlined"
+                          density="compact"
+                          hide-details="auto"
+                          @update:modelValue="setProcedure($event, element)"
+                          label="Procedimento">
+                        </v-combobox>
+                      </v-col>
+                      <v-col cols="12" md="4">
+                        <CurrencyInput variant="underlined" label="Valor Unitário" v-model="element.price"></CurrencyInput>
+                      </v-col>
+                    </v-row>
+                  </template>
+                </draggable>
               </v-col>
-              <v-col cols="12" sm="4">
-                <CurrencyInput v-model="procedure.price" label="Valor Unitário"></CurrencyInput>
-              </v-col>
+              <v-btn
+                text="Adicionar Procedimento"
+                variant="outlined"
+                class="mx-auto"
+                color="primary"
+                @click="healthcare.procedures.push({price: 0, description: null, order: healthcare.procedures.length})"
+              ></v-btn>
             </v-row>
           </v-card-text>
           <template v-slot:actions>
@@ -103,7 +125,7 @@
               class="ms-auto"
               text="Cancelar"
               :disabled="loading"
-              @click="procedureDialog = false; procedure = { name: '', price: 0 }"
+              @click="healthcareDialog = false; healthcare = { name: '', procedures: [] }"
             ></v-btn>
             <v-btn
               text="Salvar"
@@ -123,7 +145,7 @@
           max-width="400"
           prepend-icon="mdi-alert-outline"
           text="Esses dados não podem ser restaurados"
-          title="Deseja excluir esse procedimento?"
+          title="Deseja excluir esse plano?"
         >
           <template v-slot:actions>
             <v-btn
@@ -147,30 +169,32 @@
 </template>
 
 <script>
-  import procedureService from '../../services/company.service'
+  import healthcareService from '../../services/company.service'
+  import companyService from '../../services/company.service'
   import { format, parseISO } from 'date-fns'
   import CurrencyInput from '../CurrencyInput.vue'
   import { toast } from 'vue3-toastify'
+  import draggable from 'vuedraggable'
 
   export default {
-    name: 'ProcedureList',
+    name: 'HealthcareList',
     components: {
-      CurrencyInput
+      CurrencyInput,
+      draggable,
     },
     data: () => ({
       format,
       parseISO,
-      categories: [],
       company: {
         name: ''
       },
-      procedure: {
+      healthcare: {
         name: '',
-        price: ''
+        procedures: []
       },
       itemsPerPage: 5,
       dialog: false,
-      procedureDialog: false,
+      healthcareDialog: false,
       selectedItem: null,
       search: '',
       headers: [
@@ -180,8 +204,6 @@
           sortable: true,
           key: 'name',
         },
-        { title: 'Especialidade', key: 'category_id', align: 'start', sortable: true },
-        { title: 'Valor Unitário', key: 'price', align: 'start', sortable: true },
         { title: '', key: 'actions', align: 'end', sortable: true },
       ],
       rules: [
@@ -193,11 +215,20 @@
       serverItems: [],
       loading: true,
       totalItems: 0,
+      procedures: []
     }),
+    mounted() {
+      this.getProcedures()
+    },
     methods: {
+      getProcedures() {
+        companyService.getAllProcedures().then((response) => {
+          this.procedures = response.data
+        })
+      },
       viewRow (event, row) {
-        this.procedureDialog = true
-        this.procedure = row.item
+        this.healthcareDialog = true
+        this.healthcare = row.item
       },
       loadItems ({ page, itemsPerPage, sortBy }) {
         this.loading = true
@@ -207,7 +238,7 @@
             key: 'id'
           })
         }
-        procedureService.getProcedures(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
+        healthcareService.getHealthcareList(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
           this.serverItems = response.data.data
           this.totalItems = response.data.total
           this.loading = false
@@ -215,7 +246,7 @@
       },
       remove () {
         this.loading = true
-        procedureService.deleteProcedure(this.selectedItem.id).then(() => {
+        healthcareService.deleteHealthcare(this.selectedItem.id).then(() => {
           this.dialog = false
           this.loadItems({
             page:1,
@@ -232,19 +263,25 @@
                   error.toString())
           })
       },
-      getCategory(id) {
-        switch (id) {
-          case 1: return 'Ortodontia'
-          default: return 'Sem especialidade'
+
+      setProcedure(event, element) {
+        console.log(event)
+        if(typeof event === 'object' && event?.price) {
+          element.price = event.price
+          element.procedure_id = event.id
+          if (this.healthcare.procedures.filter((procedure) => procedure.procedure_id === element.id).length > 0) {
+            element.price = this.healthcare.procedures.filter((procedure) => procedure.procedure_id === element.id)[0].price
+          }
+          element.description = event.name
         }
       },
       save() {
         this.loading = true
-        if (this.procedure.id) {
-          procedureService.updateProcedure(this.procedure.id, this.procedure).then(() => {
+        if (this.healthcare.id) {
+          healthcareService.updateHealthcare(this.healthcare.id, this.healthcare).then(() => {
             this.loading = false
-            this.procedureDialog = false
-            this.procedure = { name: '', price: 0 }
+            this.healthcareDialog = false
+            this.healthcare = { name: '', price: 0 }
             this.loadItems({
               page:1,
               itemsPerPage: 10,
@@ -252,10 +289,10 @@
             })
           })
         } else {
-          procedureService.saveProcedure(this.procedure).then(() => {
+          healthcareService.saveHealthcare(this.healthcare).then(() => {
             this.loading = false
-            this.procedureDialog = false
-            this.procedure = { name: '', price: 0 }
+            this.healthcareDialog = false
+            this.healthcare = { name: '', price: 0 }
             this.loadItems({
               page:1,
               itemsPerPage: 10,

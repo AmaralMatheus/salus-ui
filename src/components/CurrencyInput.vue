@@ -1,27 +1,43 @@
 <template>
-  <v-text-field
-    v-model="formattedValue"
-    ref="inputRef"
-    :rules="[
-      value => {
-        if (value) return true
-        return 'Este campo não pode estar vazio.'
-      },
-    ]"
-    :loading="loading"
-    :disabled="loading"
-    hide-details="auto"
-    :variant="variant ?? 'outlined'"
-    density="compact"
-    :label="props.label || 'Valor'">
-  </v-text-field>
+  <div class="w-100">
+    <v-text-field
+      ref="inputRef"
+      v-if="value"
+      :loading="loading"
+      :disabled="loading"
+      hide-details="auto"
+      :variant="variant ?? 'outlined'"
+      density="compact"
+      :label="props.label || 'Valor'"
+      :model-value="value"
+      :readonly="readonly">
+    </v-text-field>
+    <v-text-field
+      v-model="formattedValue"
+      ref="inputRef"
+      :rules="[
+        value => {
+          if (value) return true
+          return 'Este campo não pode estar vazio.'
+        },
+      ]"
+      v-else
+      :loading="loading"
+      :disabled="loading"
+      hide-details="auto"
+      :variant="variant ?? 'outlined'"
+      density="compact"
+      :label="props.label || 'Valor'">
+    </v-text-field>
+    <div class="text-caption text-disabled">{{ hint }}</div>
+  </div>
 </template>
 
 <script setup>
   import { useCurrencyInput } from 'vue-currency-input'
   import { watchEffect, defineProps, watch } from 'vue'
 
-  const props = defineProps({ modelValue: Number, loading: Boolean, variant: String, label: String })
+  const props = defineProps({ readonly: Boolean, modelValue: Number, loading: Boolean, variant: String, label: String, hint: String, value: Number })
 
   const { inputRef, formattedValue, setValue } = useCurrencyInput({
     currency: 'BRL',

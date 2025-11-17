@@ -175,10 +175,12 @@
         </v-expansion-panels>
         <Procedures/>
         <Statuses/>
+        <HealthCare/>
         <TeethStatuses/>
+        <PrescriptionTemplate/>
         <v-dialog
           v-model="dialog"
-          width="auto"
+          width="auto" 
         >
           <v-card
             max-width="400"
@@ -217,13 +219,17 @@
     import TeethStatuses from '@/components/company/TeethStatuses.vue'
     import locationService from '../services/location.service'
     import { vMaska } from "maska/vue"
+    import HealthCare from '@/components/company/HealthCare.vue'
+    import PrescriptionTemplate from '@/components/company/PrescriptionTemplate.vue'
 
     export default {
       name: 'UserList',
       components: {
         Procedures,
         Statuses,
-        TeethStatuses
+        TeethStatuses,
+        HealthCare,
+        PrescriptionTemplate
       },
       directives: { maska: vMaska },
       computed: {
@@ -319,8 +325,9 @@
       async created() {
         this.pageLoading = true
         await this.getStates()
-        companyService.getCompany().then((response) => {
+        companyService.getCompany(this.currentUser.company_id).then((response) => {
           this.company = response.data
+          console.log(this.company)
           this.company.state = Number(this.company.state)
           if (this.company.state) {
             locationService.getCities(this.company.state).then((response) => {

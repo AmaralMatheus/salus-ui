@@ -153,9 +153,9 @@
           sortable: true,
           key: 'name',
         },
+        { title: 'Status', key: 'status', align: 'start', sortable: true },
         { title: 'Ultima Consulta', key: 'last_appointment', align: 'start', sortable: true },
         { title: 'Próxima Consulta', key: 'next_appointment', align: 'start', sortable: true },
-        { title: 'Status', key: 'status', align: 'start', sortable: true },
         { title: '', key: 'actions', align: 'end', sortable: true },
       ],
       rules: [

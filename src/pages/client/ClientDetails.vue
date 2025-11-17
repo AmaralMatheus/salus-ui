@@ -1,5 +1,5 @@
 <template>
-  <v-row>
+  <v-row :class="this.currentUser ? '' : 'mt-2'">
     <v-col cols="12" sm="6" md="7" lg="8">
       <v-card v-if="!loading" title="Odontograma">
         <v-card-text>
@@ -23,7 +23,7 @@
                       </div>
                     </template>
 
-                    <v-list>
+                    <v-list :class="this.currentUser ? '' : 'hidden'">
                       <v-list-item>
                         <div class="text-h6">Status do dente: {{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
                       </v-list-item>
@@ -106,7 +106,7 @@
         type="article"
       ></v-skeleton-loader>
       <div class="d-flex mt-6">
-        <v-btn v-if="!loading" @click="descriptionDialog = true; description = ''; descriptionAction = 'evolutions'" class="ma-auto mb-6">Adicionar Evolução</v-btn>
+        <v-btn v-if="!loading && this.currentUser" @click="descriptionDialog = true; description = ''; descriptionAction = 'evolutions'" class="ma-auto mb-6">Adicionar Evolução</v-btn>
       </div>
       <div v-if="client.evolutions && client.evolutions.length < 1" class="d-flex ma-auto" style="width: max-content">
         Não há evoluções cadastradas!
@@ -116,13 +116,26 @@
           <v-card-text>
             <div class="mx-5" v-html="evolution.description"></div>
             <v-divider class="my-3"/>
-            <div class="d-flex flex-column align-baseline">
-              <div class="d-flex ml-auto ga-2 align-baseline">
-                <div>Dr. {{evolution.user.name}}</div>
-                <div class="text-medium-emphasis">CRO {{ evolution.user.cro }}</div>
+            <div class="d-flex align-center">
+              <div v-if="evolution.client_approved_at" class="mr-auto d-flex ga-2">
+                Aprovado pelo paciente dia <div class="text-primary">{{ getDateTime(evolution.client_approved_at) }}</div>
               </div>
-              <div class="ml-auto text-medium-emphasis">
-                <div>{{ getDateTime(evolution.created_at) }}</div>
+              <div v-else class="mr-auto">
+                <v-btn
+                  v-if="!this.currentUser"
+                  class="ms-auto"
+                  text="Aprovar"
+                  @click="selectedEvolution = evolution; approveMode = 'evolution'; approveDialog = true"
+                ></v-btn>
+              </div>
+              <div class="d-flex flex-column align-baseline">
+                <div class="d-flex ml-auto ga-2 align-baseline">
+                  <div>Dr. {{evolution.user.name}}</div>
+                  <div class="text-medium-emphasis">CRO {{ evolution.user.cro }}</div>
+                </div>
+                <div class="ml-auto text-medium-emphasis">
+                  <div>{{ getDateTime(evolution.created_at) }}</div>
+                </div>
               </div>
             </div>
           </v-card-text>
@@ -340,8 +353,17 @@
           prepend-icon="mdi-image-outline"
           title="Imagens"
         >
-          <v-card-text>
-            <v-carousel
+          <v-card-text class="custom-height">
+            <viewer :options="{
+                toolbar: true,
+                title: false,
+                playable: false,
+                inline: true,
+                zIndex: 11
+              }" :images="client.images.map((image) => image.path)">
+              <img v-for="src in client.images.map((image) => image.path)" :key="src" :src="src" class="image-gallery">
+            </viewer>
+            <!-- <v-carousel
               class="rounded"
               show-arrows="hover"
               cycle
@@ -356,6 +378,7 @@
                     <img :src="image.path" id="box" class="ma-auto" width="100%" height="100%" />
                   </div>
                   <v-btn
+                    v-if="this.currentUser"
                     id="overlay"
                     text="tESTE"
                     icon="mdi-delete"
@@ -366,7 +389,7 @@
                   ></v-btn>
                 </v-sheet>
               </v-carousel-item>
-            </v-carousel>
+            </v-carousel> -->
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -384,7 +407,7 @@
         <v-card-title>
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">{{ client.name }}</h4>
-            <div class="d-flex ga-2 ml-auto">
+            <div class="d-flex ga-2 ml-auto" v-if="this.currentUser">
               <v-btn size="small" icon="mdi-calendar-outline" @click="schedulerDialog = true" color="info" variant="tonal" density="comfortable"/>
               <v-btn size="small" icon="mdi-pencil" @click="update" color="warning" variant="tonal" density="comfortable"/>
               <v-btn size="small" icon="mdi-delete" @click="dialog = true" color="error" variant="tonal" density="comfortable"/>
@@ -433,16 +456,16 @@
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Receitas</h4>
             <div class="d-flex ga-2 ml-auto">
-              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true;  title = ''; description = ''; descriptionAction = 'prescriptions'" color="primary" variant="tonal" density="comfortable"/>
+              <v-btn v-if="this.currentUser" size="small" icon="mdi-plus" @click="descriptionDialog = true;  title = ''; description = ''; descriptionAction = 'prescriptions'" color="primary" variant="tonal" density="comfortable"/>
             </div>
           </div>
         </v-card-title>
         <v-card-text v-if="client.prescriptions && client.prescriptions.length > 0" class="d-flex flex-column ga-3">
-          <div v-for="prescription in client.prescriptions" variant="tonal" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between align-center text-none bg-surface" :key="prescription.id">
+          <div v-for="prescription in client.prescriptions" class="px-3 py-2 d-flex ga-3 justify-space-between align-center text-none cursor-pointer bg-red-lighten-5 rounded-sm" :key="prescription.id">
             <div @click="prescriptionView = true; currentPrescription = prescription" class="d-flex justify-space-between w-100">
               <div class="text-error">{{ getDateTime(prescription.created_at) }}</div>
             </div>
-            <v-btn size="small" density="comfortable" icon="mdi-delete" @click="prescriptionDeleteDialog = true; selectedPrescription = prescription.id" color="error" variant="text"/>
+            <v-btn v-if="this.currentUser" size="small" density="comfortable" icon="mdi-delete" @click="prescriptionDeleteDialog = true; selectedPrescription = prescription.id" color="error" variant="text"/>
           </div>
           <div @click="prescriptionDialog = true" class="text-none text-primary cursor-pointer d-flex align-center" >
             Ver todas as receitas
@@ -456,17 +479,22 @@
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Planos de Tratamento</h4>
             <div class="d-flex ga-2 ml-auto">
-              <v-btn size="small" icon="mdi-plus" @click="descriptionDialog = true; title = ''; newPlan = { name: '', actions: []};  descriptionAction = 'plans'; getProcedures()" color="primary" variant="tonal" density="comfortable"/>
+              <v-btn v-if="this.currentUser" size="small" icon="mdi-plus" @click="descriptionDialog = true; title = ''; newPlan = { name: '', actions: []};  descriptionAction = 'plans'; getProcedures()" color="primary" variant="tonal" density="comfortable"/>
             </div>
           </div>
         </v-card-title>
         <v-card-text v-if="client.plans && client.plans.length > 0" class="d-flex flex-column ga-3">
-          <v-hover><div v-for="plan in client.plans" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-surface cursor-pointer" :key="plan.id">
-            <div @click="planView = true; currentPlan = plan" class="d-flex justify-space-between w-100">
+          <v-hover><div v-for="plan in client.plans" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-red-lighten-5 rounded-sm cursor-pointer" :key="plan.id">
+            <div @click="planView = true; currentPlan = plan" class="d-flex justify-space-between align-center ga-3 w-100">
               <div class="text-error">{{ getDateTime(plan.created_at) }}</div>
-              <div>{{plan.name}}</div>
+              <v-tooltip v-if="plan.client_approved_at" :text="'Aprovado pelo paciente dia ' + getDateTime(plan.client_approved_at)">
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props">mdi-checkbox-marked-circle-outline</v-icon>
+                </template>
+              </v-tooltip>
+              <div class="ml-auto">{{plan.name}}</div>
             </div>
-            <v-btn size="small" density="comfortable" icon="mdi-delete" @click="planDeleteDialog = true; selectedPlan = plan.id" color="error" variant="text"/>
+            <v-btn size="small" density="comfortable" icon="mdi-delete" v-if="this.currentUser" @click="planDeleteDialog = true; selectedPlan = plan.id" color="error" variant="text"/>
           </div></v-hover>
           <div @click="planDialog = true" class="text-none text-primary cursor-pointer d-flex align-center" >
             Ver todos os planos
@@ -520,43 +548,90 @@
   </v-row>
   <v-dialog
     v-model="schedulerDialog"
-    max-width="800"
+    max-width="1200"
     width="auto"
   >
     <scheduler :client="this.client" @cancel="schedulerDialog = false" @reload="getClient"/>
   </v-dialog>
   <v-dialog
     v-model="planView"
-    width="auto"
+    width="1200"
   >
-    <div>
-      <v-card
-        :title="'Plano de tratamento ' + (currentPlan.name ?? '')"
-      >
-        <v-card-text>
-          <v-data-table-virtual
-            :headers="planActionHeaders"
-            :items="currentPlan.actions"
-          >
-            <template v-slot:[`item.price`]="{ item }">
-              {{ Number(item.price).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }} R$
-            </template>
-            <template v-slot:[`item.quantity`]="{ item }">
-              {{ item.teeth.length }}
-            </template>
-          </v-data-table-virtual>
-        </v-card-text>
-        <v-card-actions>
-          <div class="ml-2">Total: R$ {{ Number(getTotal()).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}</div>
-          <v-spacer></v-spacer>
-          <v-btn
-            text="Fechar"
-            variant="plain"
-            @click="planView = false"
-          ></v-btn>
-        </v-card-actions>
-      </v-card>
-    </div>
+    <v-card width="1000">
+      <div ref="pdfContent" class="d-flex flex-column">
+        <div class="pb-10" style="border-left: solid 8px rgb(var(--v-theme-primary)); padding: 50px; padding-bottom: 0;">
+          <div class="mb-10 d-flex justify-space-between">
+            <div>
+              <h1>Plano de tratamento {{ currentPlan.name ?? ''}}</h1>
+              <p>{{ getDateTime(currentPlan.created_at) }}</p>
+            </div>
+            <img width="20" src="/favicon.svg" />
+          </div>
+          <div class="d-flex ga-3 align-center">
+            <h3>Paciente:</h3>
+            {{ client.name }}
+          </div>
+        </div>
+        <div style="border-color: red; padding: 50px; padding-top: 0;" class="border-s-xl">
+          <div class="pb-5">
+            <div v-if="currentPlan.healthcare">
+              Tabela de Preço: {{ currentPlan.healthcare?.name }}
+            </div>
+            <v-data-table-virtual
+              :headers="planActionHeaders"
+              :items="currentPlan.actions"
+            >
+              <template v-slot:[`item.price`]="{ item }">
+                {{ Number(item.price).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }} R$
+              </template>
+              <template v-slot:[`item.quantity`]="{ item }">
+                {{ arraysEqual(item.teeth, [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28]) ? 'Região Superior' : ( arraysEqual(item.teeth, [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]) ? 'Região Inferior' : item.teeth.length + ' dente' + ( item.teeth.length === 1 ? ': ' : 's: ' ) + item.teeth.map((t) => teethNumber[t.type])) }}
+              </template>
+            </v-data-table-virtual>
+            <div class="ml-2">Total: R$ {{ Number(getTotal()).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}</div>
+            <div v-if="currentPlan.additional_info">
+              Observações: {{ currentPlan.additional_info }}
+            </div>
+          </div>
+          <div style="height: 150px;" class="ma-auto text-center">
+            ______________________________________________
+            <br>
+            <b>{{ currentUser.user_name }}</b>
+            <br>
+            <div class="text-sm">{{ currentUser.cro }}</div>
+          </div>
+          <div class="ma-auto text-center text-medium-emphasis">
+            {{ company.address }} - {{ company.city }} - {{ company.state }}
+          </div>
+          <div class="ma-auto text-center text-medium-emphasis">
+            CEP {{ company.cep }} {{ company.phone }} 
+          </div>
+          <div class="ma-auto text-center text-medium-emphasis text-caption">
+            powered by Dental Salus 
+          </div>
+        </div>
+      </div>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          v-if="!this.currentUser"
+          text="Aprovar"
+          variant="plain"
+          @click="selectedPlan = currentPlan; approveMode = 'plan'; approveDialog = true"
+        ></v-btn>
+        <v-btn
+          text="Fechar"
+          variant="plain"
+          @click="planView = false"
+        ></v-btn>
+        <v-btn
+          text="Imprimir"
+          variant="plain"
+          color="primary"
+          @click="generatePDF"
+        ></v-btn>
+      </v-card-actions>
+    </v-card>
   </v-dialog>
   <v-dialog
     v-model="prescriptionView"
@@ -568,7 +643,7 @@
           <div class="mb-10 d-flex justify-space-between">
             <div>
               <h1>Receituário</h1>
-              <p>{{ format(new Date(), 'dd/mm/yyyy') }}</p>
+              <p>{{ getDateTime(currentPrescription.created_at) }}</p>
             </div>
             <img width="20" src="/favicon.svg" />
           </div>
@@ -615,15 +690,50 @@
   </v-dialog>
   <v-dialog
     v-model="descriptionDialog"
-    width="800"
+    width="1200"
   >
     <ClientInfoDialog :description-action="descriptionAction" :client="client" @cancel="descriptionDialog = false" @save="descriptionDialog = false;getClient()"/>
   </v-dialog>
   <v-dialog
     v-model="registeringDialog"
-    max-width="800"
+    max-width="1200"
   >
     <client-register :selectedClient="this.client.id" @cancel="registeringDialog = false" @reload="registeringDialog = false; getClient()"/>
+  </v-dialog>
+  <v-dialog
+    v-model="approveDialog"
+    width="auto"
+  >
+    <v-card width="600">
+      <v-card-title>
+        Aprovar {{ approveMode === 'evolution' ? 'Evolução' : 'Plano' }}?
+      </v-card-title>
+      <v-card-text>
+        Uma vez aprovada, você concorda com que tá nela
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          text="Cancelar"
+          variant="plain"
+          @click="approveDialog = false"
+        ></v-btn>
+        <v-btn
+          v-if="approveMode === 'plan'"
+          text="Aprovar"
+          variant="plain"
+          color="primary"
+          @click="approvePlan"
+        ></v-btn>
+        <v-btn
+          v-else
+          text="Aprovar"
+          variant="plain"
+          color="primary"
+          @click="approveEvolution"
+        ></v-btn>
+      </v-card-actions>
+    </v-card>
   </v-dialog>
 </template>
 
@@ -640,6 +750,8 @@
   import AWS from '../../services/aws.service'
   import html2pdf from 'html2pdf.js'
   import locationService from '../../services/location.service'
+  import 'viewerjs/dist/viewer.css'
+  import { component as Viewer } from "v-viewer"
 
   export default {
     computed: {
@@ -667,6 +779,7 @@
       }
     },
     components: {
+      Viewer,
       Scheduler,
       ClientInfoDialog,
       ClientRegister,
@@ -676,6 +789,7 @@
         format,
         parseISO,
         tab: 1,
+        approveMode: 'evolution',
         imageLoading: false,
         registeringDialog: false,
         procedures: [],
@@ -683,6 +797,7 @@
         actionSuggestions: [],
         planForm: false,
         planView: false,
+        selectedEvolution: null,
         planDeleteDialog: false,
         imageDeleteDialog: false,
         selectedImage: null,
@@ -694,6 +809,7 @@
         currentPrescription: null,
         prescriptionView: false,
         teethStatuses: [],
+        approveDialog: false,
         newPlan: {
           actions: [],
           name: ''
@@ -780,7 +896,7 @@
           this.client = response.data
           this.$store.dispatch('auth/updateEntityName', this.client.name)
         })
-        this.company = await companyService.getCompany()
+        this.company = await companyService.getCompany(this.currentUser ? this.currentUser.company_id : this.client.company_id)
         this.company = this.company.data
 
         if (this.company.city) {
@@ -794,7 +910,7 @@
             this.company.state = response.data.filter((state) => state.id == this.company.state)[0].nome
           })
         }
-        statusService.getAllTeethStatus(this.currentUser.company_id).then((response) => {
+        statusService.getAllTeethStatus(this.currentUser ? this.currentUser.company_id : this.client.company_id).then((response) => {
           this.teethStatuses = response.data
           this.loading = false
         })
@@ -878,6 +994,7 @@
         const createTooth = {
           status: status,
           type: tooth.type,
+          id: tooth.id,
           client_id: this.client.id
         }
         if (this.client.teeth.filter((t) => t.type === tooth.type).length  === 0) {
@@ -926,7 +1043,6 @@
         })
       },
       setProcedure(event, element) {
-        console.log(event)
         if(typeof event === 'object') {
           element.price = event.price
           element.description = event.name
@@ -939,18 +1055,17 @@
         reader.onload = () => {
           this.image = file
         }
-        console.log(file)
         this.file = file;
         const params = {
-          Bucket: 'dental-salus',
+          Bucket: 'dental-salus-images',
           Key: this.file.name,
           Body: this.file,
           ContentType: this.file.type
         }
   
         const data = await AWS.upload(params).promise()
-        this.client.images.push({path: data.Location})
         this.image = data.Location
+        console.log(this.image)
         this.imageLoading = false
       },
       generatePDF() {
@@ -967,6 +1082,36 @@
         }
         html2pdf(doc, options)
       },
+      async approveEvolution() {
+        this.loading = true
+        this.approveDialog = false
+        clientService.approveEvolution(this.selectedEvolution.id).then(() => {
+          this.getClient()
+        },
+        (error) => {
+          this.loading = false
+          toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
+        })
+      },
+      async approvePlan() {
+        this.loading = true
+        this.approveDialog = false
+        clientService.approvePlan(this.selectedPlan.id).then(() => {
+          this.getClient()
+        },
+        (error) => {
+          this.loading = false
+          toast.error((error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                  error.message ||
+                  error.toString())
+        })
+      },
       async saveImage() {
         this.imageLoading = true
         const data = {
@@ -977,6 +1122,7 @@
           this.addImageDialog = false
           this.imageLoading = null
           this.image = null
+          this.getClient()
           this.$emit('save')
         },
         (error) => {
@@ -988,6 +1134,22 @@
                   error.toString())
         })
       },
+      arraysEqual(arr1, arr2) {
+        // Check if both are arrays and have the same length
+        if (!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length !== arr2.length) {
+          return false;
+        }
+
+        // Iterate and compare each element
+        for (let i = 0; i < arr1.length; i++) {
+          // If elements are objects, a recursive deep comparison might be needed
+          // For primitive values, strict equality (===) is sufficient
+          if (arr2.includes(arr1[i])) {
+            return false;
+          }
+        }
+        return true;
+      }
     }
   }
 </script>
@@ -1021,5 +1183,18 @@
     width: 50px;
     height: 50px;
     color: white;
+}
+
+.image-gallery {
+  height: 1px;
+  width: 1px;
+}
+
+.viewer-container .viewer-backdrop {
+  height: 1000px !important;
+}
+
+.custom-height {
+  height: 1000px !important;
 }
 </style>
