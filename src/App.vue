@@ -240,7 +240,7 @@ td {
 }
 
 .active {
-  filter: invert(0%) sepia(100%) saturate(1000%) hue-rotate(180deg) brightness(300%) contrast(110%);
+    filter: invert(0) sepia(100%) saturate(1000%) hue-rotate(180deg) brightness(300%) contrast(110%)
 }
 
 .v-app-bar-nav-icon {
