@@ -2,7 +2,7 @@
   <v-row>
     <v-col cols="12" md="8" class="d-flex flex-column ga-6">
       <div>
-        <v-row>agenda/
+        <v-row>
           <v-col cols="12" md="6" class="d-flex flex-column ga-6">
             <v-card @click="newClientDialog = true" class="action-card cursor-pointer" title="Ações Rápidas">
               <v-card-text class="d-flex h-100">
