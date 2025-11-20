@@ -99,7 +99,6 @@
       </v-dialog>
       <v-dialog
         v-model="schedulerDialog"
-        max-width="800"
       >
         <scheduler :client="this.selectedItem" @cancel="schedulerDialog = false" @reload="loadItems({page:1,
           itemsPerPage: 10,

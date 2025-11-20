@@ -721,7 +721,7 @@ export default {
   
   <v-dialog
     v-model="schedulerDialog"
-    max-width="800"
+    width="auto"
   >
     <scheduler 
       @cancel="schedulerDialog = false; selectedItem = null" 

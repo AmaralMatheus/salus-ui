@@ -146,7 +146,6 @@
   </v-row>
   <v-dialog
     v-model="schedulerDialog"
-    max-width="800"
     width="auto"
   >
     <scheduler @cancel="schedulerDialog = false" @reload="init"/>

@@ -34,7 +34,7 @@
         <v-col cols="12">
           <quill-editor style="height:200px" placeholder="Descrição" contentType="html" v-model:content="description" theme="snow"></quill-editor>
         </v-col>
-        <div class="d-flex flex-wrap mt-2 ga-2">
+        <div class="d-flex flex-wrap mt-2 ga-2" v-if="descriptionAction === 'prescriptions'">
           <v-chip variant="outlined" v-for="template in templates" :key="template.id" class="cursor-pointer" @click="description += template.description" color="primary">{{ template.name }}+</v-chip>
         </div>
       </v-row>

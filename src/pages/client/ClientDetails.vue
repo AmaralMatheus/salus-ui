@@ -527,7 +527,7 @@
               <v-sheet
               >
                 <div class="d-flex justify-center align-center">
-                  <img width="500" :src="image.path" />
+                  <img width="500" :src="image.path"  @click="imageDialog = true" />
                 </div>
               </v-sheet>
             </v-carousel-item>
@@ -548,7 +548,6 @@
   </v-row>
   <v-dialog
     v-model="schedulerDialog"
-    max-width="1200"
     width="auto"
   >
     <scheduler :client="this.client" @cancel="schedulerDialog = false" @reload="getClient"/>
