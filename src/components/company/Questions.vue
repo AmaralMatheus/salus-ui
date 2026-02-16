@@ -1,7 +1,7 @@
 <template>
     <v-expansion-panels>
       <v-expansion-panel>
-        <v-expansion-panel-title class="text-h6">Status de Dente</v-expansion-panel-title>
+        <v-expansion-panel-title class="text-h6">Perguntas de Anamnese</v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-row>
             <v-col cols="12" class="d-flex flex-column ga-6">
@@ -17,11 +17,11 @@
                             density="compact"
                             hide-details="auto"
                             append-inner-icon="mdi-magnify"
-                            placeholder="Buscar Status">
+                            placeholder="Buscar Pergunta">
                           </v-text-field>
                         </v-col>
                         <v-col cols="12" sm="7" md="5" lg="4">
-                          <v-btn block append-icon="mdi-plus" @click="statusDialog = true" color="primary">Adicionar Status</v-btn>
+                          <v-btn block append-icon="mdi-plus" @click="questionDialog = true" color="primary">Adicionar Question</v-btn>
                         </v-col>
                       </v-row>
                     </v-col>
@@ -34,7 +34,7 @@
                   :items-length="totalItems"
                   :loading="loading"
                   :search="search"
-                  item-value="name"
+                  item-value="title"
                   @update:options="loadItems"
                   @click:row="viewRow"
                 >
@@ -45,20 +45,20 @@
                       </template>
                 
                       <v-list>
-                        <v-list-item :disabled="item.default" prepend-icon="mdi-pencil" density="comfortable" @click="viewRow(null, {item})" title="Editar"></v-list-item>
-                        <v-list-item :disabled="item.default" prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
+                        <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="viewRow(null, {item})" title="Editar"></v-list-item>
+                        <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
                       </v-list>
                     </v-menu>
                   </template>
                 </v-data-table-server>
               </v-card>
               <v-dialog
-                v-model="statusDialog"
+                v-model="questionDialog"
                 width="auto"
               >
                 <v-card
                   width="700"
-                  title="Cadastrar Status"
+                  title="Cadastrar Question"
                 >
                   <v-card-text>
                     <v-row>
@@ -70,7 +70,7 @@
                           :disabled="loading"
                           variant="outlined"
                           density="compact"
-                          v-model="status.name"
+                          v-model="question.title"
                         ></v-text-field>  
                       </v-col>
                     </v-row>
@@ -80,7 +80,7 @@
                       class="ms-auto"
                       text="Cancelar"
                       :disabled="loading"
-                      @click="statusDialog = false; status = { name: '' }"
+                      @click="questionDialog = false; question = { title: '' }"
                     ></v-btn>
                     <v-btn
                       text="Salvar"
@@ -127,32 +127,29 @@
   </template>
   
   <script>
-    import statusService from '../../services/company.service'
+    import companyService from '../../services/company.service'
     import { format, parseISO } from 'date-fns'
     import { toast } from 'vue3-toastify'
   
     export default {
-      name: 'StatusList',
+      name: 'QuestionList',
       data: () => ({
         format,
         parseISO,
-        company: {
-          name: ''
-        },
-        status: {
-          name: ''
+        question: {
+          title: ''
         },
         itemsPerPage: 5,
         dialog: false,
-        statusDialog: false,
+        questionDialog: false,
         selectedItem: null,
         search: '',
         headers: [
           {
-            title: 'Nome',
+            title: 'Titulo',
             align: 'start',
             sortable: true,
-            key: 'name',
+            key: 'title',
           },
           { title: '', key: 'actions', align: 'end', sortable: true },
         ],
@@ -168,8 +165,8 @@
       }),
       methods: {
         viewRow (event, row) {
-          this.statusDialog = true
-          this.status = row.item
+          this.questionDialog = true
+          this.question = row.item
         },
         loadItems ({ page, itemsPerPage, sortBy }) {
           this.loading = true
@@ -179,7 +176,7 @@
               key: 'id'
             })
           }
-          statusService.getTeethStatus(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
+          companyService.getQuestion(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}&search=${this.search}`).then((response) => {
             this.serverItems = response.data.data
             this.totalItems = response.data.total
             this.loading = false
@@ -187,7 +184,7 @@
         },
         remove () {
           this.loading = true
-          statusService.deleteTeethStatus(this.selectedItem.id).then(() => {
+          companyService.deleteQuestion(this.selectedItem.id).then(() => {
             this.dialog = false
             this.loadItems({
               page:1,
@@ -206,11 +203,11 @@
         },
         save() {
           this.loading = true
-          if (this.status.id) {
-            statusService.updateTeethStatus(this.status.id, this.status).then(() => {
+          if (this.question.id) {
+            companyService.updateQuestion(this.question.id, this.question).then(() => {
               this.loading = false
-              this.statusDialog = false
-              this.status = { name: '' }
+              this.questionDialog = false
+              this.question = { title: '' }
               this.loadItems({
                 page:1,
                 itemsPerPage: 10,
@@ -218,10 +215,10 @@
               })
             })
           } else {
-            statusService.saveTeethStatus(this.status).then(() => {
+            companyService.saveQuestion(this.question).then(() => {
               this.loading = false
-              this.statusDialog = false
-              this.status = { name: '' }
+              this.questionDialog = false
+              this.question = { title: '' }
               this.loadItems({
                 page:1,
                 itemsPerPage: 10,

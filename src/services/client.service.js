@@ -3,7 +3,7 @@ import authHeader from './auth-header'
 
 class ClientService {
   getAllClients() {
-    return axios.get(process.env.VUE_APP_API_URL + 'clients/all', { headers: authHeader() })
+    return axios.get(process.env.VUE_APP_API_URL + 'client/all', { headers: authHeader() })
   }
   getClients(params) {
     return axios.get(process.env.VUE_APP_API_URL + 'clients?' + params, { headers: authHeader() })

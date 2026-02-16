@@ -1,6 +1,6 @@
 <template>
   <div >
-    <v-card :class="!this.currentUser ? 'mt-5' : ''" :loading="loadingInfo" :title="!id ? 'Cadastrar paciente' : 'Editar Paciente'" :subtitle="client.name">
+    <v-card width="1200" :class="!this.currentUser ? 'mt-5' : ''" :loading="loadingInfo" :title="!id ? 'Cadastrar paciente' : 'Editar Paciente'" :subtitle="client.name">
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
           <v-row>
@@ -224,7 +224,7 @@
                 label="E-mail">
               </v-text-field>
             </v-col>
-            <v-col cols="12" md="6" v-if="this.currentUser">
+            <v-col cols="12" v-if="this.currentUser">
               <v-textarea
                 v-model="client.comorbities"
                 :loading="loadingInfo"
@@ -235,15 +235,15 @@
                 label="Alerta de Segurança de Saúde">
               </v-textarea>
             </v-col>
-            <v-col cols="12" md="6" v-if="this.currentUser">
+            <v-col cols="12" v-for="question in questions">
               <v-textarea
-                v-model="client.description"
+                v-model="question.answer"
                 :loading="loadingInfo"
                 :disabled="loadingInfo"
                 variant="outlined"
                 density="compact"
                 hide-details="auto"
-                label="Anamnese">
+                :label="question.title">
               </v-textarea>
             </v-col>
           </v-row>
@@ -297,6 +297,7 @@
       statuses: [],
       cities: [],
       states: [],
+      questions: [],
       blockCity: false,
       blockState: false,
       loadingRequest: false,
@@ -363,10 +364,11 @@
       ],
     }),
     created() {
+      this.loading = true
       if (this.id) {
         this.getClient()
       }
-      this.loading = true
+      this.getQuestions()
       this.getStates()
       if (this.currentUser) {
         // statusService.getAllStatus(this.currentUser.company_id).then((response) => {
@@ -387,7 +389,6 @@
         if (this.$refs.inputFile) this.$refs.inputFile.click()
       },
       getDate(date) {
-        console.log(date)
       },
       getAddress() {
         this.blockCity = false
@@ -437,6 +438,15 @@
           if (response.data.status) {
             response.data.status = response.data.status.id;
           }
+          if (response.data.answers) {
+            response.data.answers.forEach((answer) => {
+              this.questions.forEach((question) => {
+                if (question.id === answer.question_id) {
+                  question.answer = answer.content
+                }
+              })
+            })
+          }
           this.client = response.data
           if (this.client.state) {
             this.client.state = parseInt(this.client.state)
@@ -445,8 +455,14 @@
           this.loadingInfo = false
         })
       },
+      getQuestions() {
+        statusService.getAllQuestion().then((response) => {
+          this.questions = response.data
+        })
+      },
       save() {
         this.loadingRequest = true
+        this.client.questions = this.questions
         if (!this.valid) return
         if (this.id) {
           clientService.updateClient(this.id, this.client).then(() => {
@@ -477,7 +493,6 @@
         }
       },
       convertToBase64(file) {
-        console.log(file)
         const reader = new FileReader()
         reader.readAsDataURL(file)
         reader.onload = () => {

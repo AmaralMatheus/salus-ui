@@ -72,7 +72,7 @@
           </v-col>
         </v-row>
       </div>
-      <v-card class="h-100" :loading="loading" title="Últimos 30 dias">
+      <!-- <v-card class="h-100" :loading="loading" title="Últimos 30 dias">
         <v-card-text v-if="!loading && transactions.length > 0" class="d-flex flex-column ga-2">
           <div v-for="transaction in transactions.slice(0, 2)" :key="transaction.id" class="transaction-item">
             <div class="transaction-icon" :class="transaction.type === 1 ? 'income' : 'expense'">
@@ -110,7 +110,7 @@
             type="article"
           ></v-skeleton-loader>
         </v-card-text>
-      </v-card>
+      </v-card> -->
     </v-col>
     <v-col>
       <v-card :loading="loading" title="Agenda do dia">
@@ -153,7 +153,7 @@
 
   <v-dialog
     v-model="newClientDialog"
-    max-width="800"
+    max-width="1300"
   >
     <client-register :selectedClient="this.selectedItem" @cancel="newClientDialog = false" @reload="newClientDialog = false"/>
   </v-dialog>
@@ -302,7 +302,6 @@
       getFinancialResume() {
         transactionService.getTransactions('page=1&itemsPerPage=30&sort=date&order=asc').then((response) => {
           this.transactions = response.data.list.data
-          console.log('Transactions data:', this.transactions) // Debug
           this.prepareChartData()
         })
       },

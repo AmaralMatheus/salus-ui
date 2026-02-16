@@ -128,13 +128,13 @@
   import userService from '../../services/user.service'
   import { vMaska } from "maska/vue"
   import { format, parseISO, setHours, setMinutes } from 'date-fns'
-  import { VTimePicker } from 'vuetify/labs/VTimePicker'
+  // import { VTimePicker } from 'vuetify/labs/VTimePicker'
   import { toast } from 'vue3-toastify'
 
   export default {
     name: 'ClientScheduler',
     components: {
-      VTimePicker
+      // VTimePicker
     },
     directives: { maska: vMaska },
     props: {client: Object, event: Object, preselectedDate: Date},
@@ -168,7 +168,6 @@
     },
     created() {
       this.clear()
-      console.log(this.preselectedDate)
       if (this.preselectedDate) {
         this.scheduleDate = parseISO(this.preselectedDate)
         this.scheduleTime = parseISO(this.preselectedDate)
@@ -207,7 +206,6 @@
       schedule () {
         if (this.valid) {
           this.loading = true
-          console.log(typeof this.scheduleTime === 'string' || this.scheduleTime instanceof String)
           if (typeof this.scheduleTime === 'string' || this.scheduleTime instanceof String) {
             this.scheduleDate = setHours(this.scheduleDate,this.scheduleTime.split(':')[0])
             this.scheduleDate = setMinutes(this.scheduleDate,this.scheduleTime.split(':')[1])

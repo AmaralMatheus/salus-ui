@@ -160,8 +160,6 @@
       }
     },
     created() {
-      console.log(this.$refs
-      )
       clientService.getAllClients().then((response) => {
         this.clients = response.data
         this.loading = false

@@ -26,6 +26,8 @@
                   variant="outlined"
                   density="compact"
                   hide-details="auto"
+                  :error="!!errors.email"
+                  :error-messages="errors.email"
                   label="E-mail">
                 </v-text-field>
               </v-col>
@@ -91,6 +93,7 @@
         email: '',
         type: 1,
       },
+      errors: {},
       loadingRequest: false,
       loadingInfo: false,
       rules: [
@@ -110,6 +113,13 @@
         },
       ],
     }),
+    watch: {
+      'user.email'() {
+        if (this.errors.email) {
+          this.errors.email = null;
+        }
+      }
+    },
     created() {
       if (this.id) {
         this.getUser()
@@ -135,11 +145,15 @@
           },
           (error) => {
             this.loadingRequest = false
-            toast.error((error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                  error.message ||
-                  error.toString())
+            if (error.response?.status === 422) {
+              this.errors = error.response.data.errors;
+            } else {
+              toast.error((error.response &&
+                      error.response.data &&
+                      error.response.data.message) ||
+                    error.message ||
+                    error.toString())
+            }
           })
         } else {
           userService.saveUser(this.user).then(() => {
@@ -148,11 +162,15 @@
           },
           (error) => {
             this.loadingRequest = false
-            toast.error((error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                  error.message ||
-                  error.toString())
+            if (error.response?.status === 422) {
+              this.errors = error.response.data.errors;
+            } else {
+              toast.error((error.response &&
+                      error.response.data &&
+                      error.response.data.message) ||
+                    error.message ||
+                    error.toString())
+            }
           })
         }
       },

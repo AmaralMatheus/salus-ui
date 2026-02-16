@@ -138,7 +138,6 @@ export default {
     },
     loadAppointments() {
       appointmentService.getAllAppointments().then((response) => {
-        console.log('Appointments data:', response.data)
         this.appointments = response.data
         this.loading = false
       }).catch((error) => {

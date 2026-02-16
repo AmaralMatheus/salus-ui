@@ -1,105 +1,7 @@
 <template>
   <v-row :class="this.currentUser ? '' : 'mt-2'">
     <v-col cols="12" sm="6" md="7" lg="8">
-      <v-card v-if="!loading" title="Odontograma">
-        <v-card-text>
-          <v-tabs-window v-model="tab">
-            <v-tabs-window-item
-              :key="1"
-              :value="1"
-            >
-              <div class="d-flex flex-column ga-3">
-                <div class="d-flex justify-space-between align-baseline">
-                  <v-menu
-                    class="cursor-pointer"
-                    v-for="tooth in toothObjectUp" :key="tooth.id"
-                    :close-on-content-click="false"
-                    open-on-hover
-                  >
-                    <template v-slot:activator="{props}">
-                      <div class="d-flex flex-column" v-bind="props">
-                        <div class="text-disabled text-caption">{{ teethNumber[tooth.type] }}</div>
-                        <img class="cursor-pointer" :class="!tooth.status ? '' : 'tooth-extracted'" :src="require('../../assets/Vector-'+tooth.type+'.svg')"/>
-                      </div>
-                    </template>
-
-                    <v-list :class="this.currentUser ? '' : 'hidden'">
-                      <v-list-item>
-                        <div class="text-h6">Status do dente: {{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-select
-                          density="compact"
-                          label="Alterar estado do dente"
-                          :items="teethStatuses"
-                          item-title="name"
-                          return-object
-                          :loading="loadingTeeth"
-                          @update:modelValue="updateToothStatus($event, tooth)"
-                          item-value="id"
-                        ></v-select>
-                        <div class="text-h6">Evoluções relacionadas</div>
-                        <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between" :key="evolution.id">
-                          <div v-html="evolution.description"></div>
-                          <div class="ml-3">{{ getDateTime(evolution.created_at) }}</div>
-                        </div>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                </div>
-              </div>
-              <div class="d-flex flex-column ga-3">
-                <div class="d-flex justify-space-between align-baseline">
-                  <v-menu
-                    class="cursor-pointer"
-                    v-for="tooth in toothObjectDown" :key="tooth.id"
-                    :close-on-content-click="false"
-                    open-on-hover
-                  >
-                    <template v-slot:activator="{props}">
-                      <div class="d-flex flex-column" v-bind="props">
-                        <div class="text-disabled text-caption">{{ teethNumber[tooth.type] }}</div>
-                        <img class="cursor-pointer" :class="!tooth.status ? '' : 'tooth-extracted'" :src="require('../../assets/Vector-'+tooth.type+'.svg')"/>
-                      </div>
-                    </template>
-
-                    <v-list>
-                      <v-list-item>
-                        <div class="text-h6">Status do dente: {{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-select
-                          density="compact"
-                          label="Alterar estado do dente"
-                          :items="teethStatuses"
-                          item-title="name"
-                          return-object
-                          @update:modelValue="updateToothStatus($event, tooth)"
-                          item-value="id"
-                        ></v-select>
-                        <div class="text-h6">Evoluções relacionadas</div>
-                        <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between" :key="evolution.id">
-                          <div v-html="evolution.description"></div>
-                          <div class="ml-3">{{ getDateTime(evolution.created_at) }}</div>
-                        </div>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                </div>
-              </div>
-            </v-tabs-window-item>
-          </v-tabs-window>
-          <!-- <v-tabs
-            v-model="tab"
-            color="primary"
-            align-tabs="center"
-            class="mt-2"
-          >
-            <v-tab :value="1">Permanentes</v-tab>
-            <v-tab :value="2">Desiduos</v-tab>
-          </v-tabs> -->
-        </v-card-text>
-      </v-card>
+      <Odontogram :loading="loading" :client="client"/>
       <v-skeleton-loader
         v-if="loading"
         class="mx-auto border"
@@ -363,33 +265,6 @@
               }" :images="client.images.map((image) => image.path)">
               <img v-for="src in client.images.map((image) => image.path)" :key="src" :src="src" class="image-gallery">
             </viewer>
-            <!-- <v-carousel
-              class="rounded"
-              show-arrows="hover"
-              cycle
-              v-if="client.images.length > 0"
-              hide-delimiter-background
-            >
-              <v-carousel-item
-                v-for="image in client.images" :key="image"
-              >
-                <v-sheet class="h-100">
-                  <div class="d-flex h-100">
-                    <img :src="image.path" id="box" class="ma-auto" width="100%" height="100%" />
-                  </div>
-                  <v-btn
-                    v-if="this.currentUser"
-                    id="overlay"
-                    text="tESTE"
-                    icon="mdi-delete"
-                    density="confortable"
-                    color="primary"
-                    variant="text"
-                    @click="imageDeleteDialog = true; selectedImage = image.id"
-                  ></v-btn>
-                </v-sheet>
-              </v-carousel-item>
-            </v-carousel> -->
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -404,54 +279,7 @@
     </v-col>
 		<v-col cols="12" sm="6" md="5" lg="4">
       <v-card v-if="!loading" :loading="loading">
-        <v-card-title>
-          <div class="d-flex ga-2 align-center">
-            <h4 class="text-h6">{{ client.name }}</h4>
-            <div class="d-flex ga-2 ml-auto" v-if="this.currentUser">
-              <v-btn size="small" icon="mdi-calendar-outline" @click="schedulerDialog = true" color="info" variant="tonal" density="comfortable"/>
-              <v-btn size="small" icon="mdi-pencil" @click="update" color="warning" variant="tonal" density="comfortable"/>
-              <v-btn size="small" icon="mdi-delete" @click="dialog = true" color="error" variant="tonal" density="comfortable"/>
-            </div>
-          </div>
-        </v-card-title>
-        <v-card-subtitle v-if="client.status" class="text-medium-emphasis">
-          {{ client.status.name }}
-        </v-card-subtitle>
-        <v-card-text>
-          <div v-if="!loading" class="d-flex flex-column ga-6">
-            <v-avatar color="surface-variant ma-auto" size="57">
-              <v-img :src="client.avatar ?? 'https://ui-avatars.com/api/?name='+client.name.replaceAll(' ', '+') + '&background=random'" cover></v-img>
-            </v-avatar>
-            <div class="d-flex flex-column profile-card ga-2">
-              <div class="d-flex ga-2 align-center" v-if="expanded">
-                <v-icon>mdi-gender-male-female-variant</v-icon>
-                <div>{{ client.gender === 1 ? 'Homem' : client.gender === 2 ? 'Mulher' : 'Gênero alternativo' }}</div>
-              </div>
-              <div class="d-flex ga-2 align-center" v-if="expanded">
-                <v-icon>mdi-calendar-outline</v-icon>
-                <div>{{ client.birthday ? getBirthday(client.birthday) : 'Nenhum aniversário cadastrado' }} {{ client.birthday ? '(' + getAge() + ' Anos)' : '' }}</div>
-              </div>
-              <div class="d-flex ga-2 align-center">
-                <v-icon>mdi-phone-outline</v-icon>
-                <div>{{ client.phone ?? 'Nenhum telefone cadastrado' }}</div>
-              </div>
-              <div class="d-flex ga-2 align-center" v-if="expanded">
-                <v-icon>mdi-map-marker-outline</v-icon>
-                <div>{{ client.address ?? 'Nenhum endereço cadastrado' }}</div>
-              </div>
-              <div class="d-flex ga-2 align-center" v-if="expanded">
-                <v-icon>mdi-email-outline</v-icon>
-                <div>{{ client.email ?? 'Nenhum e-mail cadastrado' }}</div>
-              </div>
-              <div class="d-flex ga-2 align-center">
-                <v-icon>mdi-clock-outline</v-icon>
-                <div>{{ client.next_appointment.length > 0 ? 'Próxima consulta dia ' + getDateTime(client.next_appointment[0].date) : 'Sem consultas agendadas' }}</div>
-              </div>
-              <div @click="expanded = !expanded" class="cursor-pointer text-primary font-weight-bold">{{ !expanded ? 'Ver mais' : 'Ver menos' }}</div>
-            </div>
-          </div>
-        </v-card-text>
-        <v-alert v-if="client.comorbities" type="error" variant="tonal" density="comfortable" class="mx-4">{{ client.comorbities }}</v-alert>
+        <ClientProfile :client="client" @update="update" />
         <v-card-title>
           <div class="d-flex ga-2 align-center">
             <h4 class="text-h6">Receitas</h4>
@@ -506,38 +334,73 @@
         </v-card-text>
         <v-card-title>
           <div class="d-flex ga-2 align-center">
-            <h4 class="text-h6">Imagens</h4>
+            <h4 class="text-h6">{{ tab }}</h4>
             <div class="d-flex ga-2 ml-auto">
               <v-btn size="small" icon="mdi-plus" @click="addImageDialog = true" color="primary" variant="tonal" density="comfortable"/>
             </div>
           </div>
         </v-card-title>
-        <v-card-text class="d-flex flex-column ga-3">
-          <v-carousel
-            height="200"
-            class="rounded"
-            show-arrows="hover"
-            cycle
-            v-if="client.images.length > 0"
-            hide-delimiter-background
+        <v-tabs
+          v-model="tab"
+          color="primary"
+          align-tabs="center"
+          class="mt-2"
+        >
+          <v-tab value="Imagens">Imagens</v-tab>
+          <v-tab value="Documentos">Documentos</v-tab>
+        </v-tabs>
+        <v-tabs-window v-model="tab">
+          <v-tabs-window-item
+            key="Imagens"
+            value="Imagens"
           >
-            <v-carousel-item
-              v-for="image in client.images" :key="image"
-            >
-              <v-sheet
+            <v-card-text class="d-flex flex-column ga-3">
+              <v-carousel
+                height="200"
+                class="rounded"
+                show-arrows="hover"
+                cycle
+                v-if="client.images.length > 0"
+                hide-delimiter-background
               >
-                <div class="d-flex justify-center align-center">
-                  <img width="500" :src="image.path"  @click="imageDialog = true" />
+                <v-carousel-item
+                  v-for="image in client.images" :key="image"
+                >
+                  <v-sheet
+                  >
+                    <div class="d-flex justify-center align-center">
+                      <img width="500" :src="image.path"  @click="imageDialog = true" />
+                    </div>
+                  </v-sheet>
+                </v-carousel-item>
+              </v-carousel>
+              <div v-else>Não existem imagens cadastradas</div>
+              <div v-if="client.images.length > 0" @click="imageDialog = true" class="text-none text-primary cursor-pointer d-flex align-center">
+                Ver todas as imagens
+                <v-icon icon="mdi-chevron-right"></v-icon>
+              </div>
+            </v-card-text>
+          </v-tabs-window-item>
+          <v-tabs-window-item
+            key="Documentos"
+            value="Documentos"
+          >
+            <v-card-text class="d-flex flex-column ga-3">
+              <v-hover v-if="client.documents && client.documents.length > 0"><div v-for="document in client.documents" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-red-lighten-5 rounded-sm cursor-pointer" :key="document.id">
+                <div @click="documentView = true; currenDocument = document" class="d-flex justify-space-between align-center ga-3 w-100">
+                  <div class="text-error">{{ getDateTime(document.created_at) }}</div>
+                  <div class="ml-auto">{{document.path.split("/")[document.path.split("/").length -1]}}</div>
                 </div>
-              </v-sheet>
-            </v-carousel-item>
-          </v-carousel>
-          <div v-else>Não existem imagens cadastradas</div>
-          <div v-if="client.images.length > 0" @click="imageDialog = true" class="text-none text-primary cursor-pointer d-flex align-center">
-            Ver todas as imagens
-            <v-icon icon="mdi-chevron-right"></v-icon>
-          </div>
-        </v-card-text>
+                <v-btn size="small" density="comfortable" icon="mdi-delete" v-if="this.currentUser" @click="planDeleteDialog = true; selectedPlan = plan.id" color="error" variant="text"/>
+              </div></v-hover>
+              <div v-else>Não existem documentos cadastrados</div>
+              <div v-if="client.documents.length > 0" @click="documentDialog = true" class="text-none text-primary cursor-pointer d-flex align-center">
+                Ver todas os documetnos
+                <v-icon icon="mdi-chevron-right"></v-icon>
+              </div>
+            </v-card-text>
+          </v-tabs-window-item>
+        </v-tabs-window>
       </v-card>
       <v-skeleton-loader
         v-else
@@ -556,7 +419,7 @@
     v-model="planView"
     width="1200"
   >
-    <v-card width="1000">
+    <v-card width="1200">
       <div ref="pdfContent" class="d-flex flex-column">
         <div class="pb-10" style="border-left: solid 8px rgb(var(--v-theme-primary)); padding: 50px; padding-bottom: 0;">
           <div class="mb-10 d-flex justify-space-between">
@@ -573,6 +436,20 @@
         </div>
         <div style="border-color: red; padding: 50px; padding-top: 0;" class="border-s-xl">
           <div class="pb-5">
+            <div class="d-flex flex-column ga-3 mb-3">
+              <div class="d-flex justify-space-between align-baseline">
+                <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :value="tooth" :key="tooth">
+                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                  <img class="cursor-pointer" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+                </div>
+              </div>
+              <div class="d-flex justify-space-between">
+                <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :value="tooth" :key="tooth">
+                  <img class="cursor-pointer" height="25" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                </div>
+              </div>
+            </div>
             <div v-if="currentPlan.healthcare">
               Tabela de Preço: {{ currentPlan.healthcare?.name }}
             </div>
@@ -588,8 +465,8 @@
               </template>
             </v-data-table-virtual>
             <div class="ml-2">Total: R$ {{ Number(getTotal()).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}</div>
-            <div v-if="currentPlan.additional_info">
-              Observações: {{ currentPlan.additional_info }}
+            <div v-if="currentPlan.additional_info" class="mt-50">
+              <b>Observações: {{ currentPlan.additional_info }}</b>
             </div>
           </div>
           <div style="height: 150px;" class="ma-auto text-center">
@@ -736,21 +613,28 @@
   </v-dialog>
 </template>
 
+<style>
+.mt-50 {
+  margin-top: 250px;
+}
+</style>
+
 <script>
   import clientService from '../../services/client.service'
   import companyService from '../../services/company.service'
-  import statusService from '../../services/company.service'
   import planService from '../../services/plan.service'
   import { format, parseISO, differenceInYears } from 'date-fns'
   import Scheduler from '../../components/agenda/Scheduler.vue'
   import ClientInfoDialog from '../../components/client/ClientInfoDialog.vue'
   import ClientRegister from '../../components/client/ClientRegister.vue'
+  import Odontogram from '../../components/client/Odontogram.vue'
   import { toast } from 'vue3-toastify'
   import AWS from '../../services/aws.service'
   import html2pdf from 'html2pdf.js'
   import locationService from '../../services/location.service'
   import 'viewerjs/dist/viewer.css'
   import { component as Viewer } from "v-viewer"
+  import ClientProfile from '@/components/client/ClientProfile.vue'
 
   export default {
     computed: {
@@ -782,17 +666,18 @@
       Scheduler,
       ClientInfoDialog,
       ClientRegister,
+      Odontogram,
+      ClientProfile
     },
     data () {
       return {
         format,
         parseISO,
-        tab: 1,
+        tab: 'Imagens',
         approveMode: 'evolution',
         imageLoading: false,
         registeringDialog: false,
         procedures: [],
-        expanded: false,
         actionSuggestions: [],
         planForm: false,
         planView: false,
@@ -807,7 +692,6 @@
         currentPlan: null,
         currentPrescription: null,
         prescriptionView: false,
-        teethStatuses: [],
         approveDialog: false,
         newPlan: {
           actions: [],
@@ -859,20 +743,6 @@
             return 'Este campo não pode estar vazio.'
           },
         ],
-        colors: [
-          'indigo',
-          'warning',
-          'pink darken-2',
-          'red lighten-1',
-          'deep-purple accent-4',
-        ],
-        slides: [
-          'First',
-          'Second',
-          'Third',
-          'Fourth',
-          'Fifth',
-        ],
       }
     },
     created() {
@@ -893,6 +763,30 @@
             response.data.birthday = new Date(response.data.birthday)
           }
           this.client = response.data
+          this.client.documents = []
+          let images = []
+          this.client.images?.forEach((image) => {
+            if(image.path.split(".")[image.path.split(".").length -1] === "png") {
+              images.push(image)
+              this.client.documents.push(image)
+            }
+            if(image.path.split(".")[image.path.split(".").length -1] === "jpg") {
+              images.push(image)
+            }
+            if(image.path.split(".")[image.path.split(".").length -1] === "jpeg") {
+              images.push(image)
+            }
+            if(image.path.split(".")[image.path.split(".").length -1] === "pdf") {
+              this.client.documents.push(image)
+            }
+            if(image.path.split(".")[image.path.split(".").length -1] === "docx") {
+              this.client.documents.push(image)
+            }
+            if(image.path.split(".")[image.path.split(".").length -1] === "xlsx") {
+              this.client.documents.push(image)
+            }
+          })
+          this.client.images = images
           this.$store.dispatch('auth/updateEntityName', this.client.name)
         })
         this.company = await companyService.getCompany(this.currentUser ? this.currentUser.company_id : this.client.company_id)
@@ -907,12 +801,10 @@
         if (this.company.state) {
           locationService.getStates().then((response) => {
             this.company.state = response.data.filter((state) => state.id == this.company.state)[0].nome
+            this.loading = false
           })
         }
-        statusService.getAllTeethStatus(this.currentUser ? this.currentUser.company_id : this.client.company_id).then((response) => {
-          this.teethStatuses = response.data
-          this.loading = false
-        })
+
       },
       remove () {
         this.loading = true
@@ -988,42 +880,8 @@
             return 'Extraído'
         }
       },
-      updateToothStatus(status, tooth) {
-        this.loadingTeeth = true
-        const createTooth = {
-          status: status,
-          type: tooth.type,
-          id: tooth.id,
-          client_id: this.client.id
-        }
-        if (this.client.teeth.filter((t) => t.type === tooth.type).length  === 0) {
-          this.client.teeth.push(createTooth)
-        } else {
-          this.client.teeth.map((t) => {
-            if (t.type === tooth.type) {
-              t.status = status
-            }
-          })
-        }
-        clientService.updateToothStatus(createTooth).then((response) => {
-          toast.success(response.data.message)
-        },
-        (error) => {
-          this.loading = false
-          toast.error((error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                  error.message ||
-                  error.toString())
-        }).finally(() => {
-          this.loadingTeeth = false
-        })
-      },
       getDateTime(date) {
         return format(parseISO(date), 'dd/MM/yyyy kk:mm')
-      },
-      getBirthday(date) {
-        return format(date, 'dd/MM/yyyy')
       },
       viewRow (event, row) {
         this.planView = true
@@ -1064,7 +922,6 @@
   
         const data = await AWS.upload(params).promise()
         this.image = data.Location
-        console.log(this.image)
         this.imageLoading = false
       },
       generatePDF() {
@@ -1195,5 +1052,14 @@
 
 .custom-height {
   height: 1000px !important;
+}
+
+.tooth {
+  height: 60px;
+  width: 25px;
+}
+
+.cross {
+  z-index: 1;
 }
 </style>
