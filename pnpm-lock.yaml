@@ -8,6 +8,9 @@ dependencies:
   '@coleqiu/vue-drag-select':
     specifier: ^2.0.6-beta.1
     version: 2.0.6-beta.1(vue@3.2.13)
+  '@schedule-x/calendar':
+    specifier: ^4.1.0
+    version: 4.1.0(@preact/signals@1.3.2)(preact@10.28.2)(temporal-polyfill@0.3.0)
   '@schedule-x/event-modal':
     specifier: ^2.5.0
     version: 2.5.0(@preact/signals@1.3.2)(preact@10.28.2)
@@ -19,7 +22,7 @@ dependencies:
     version: 2.4.0
   '@schedule-x/vue':
     specifier: ^2.3.0
-    version: 2.3.0(@schedule-x/calendar@2.4.0)(@schedule-x/date-picker@2.4.0)(vue@3.2.13)
+    version: 2.3.0(@schedule-x/calendar@4.1.0)(@schedule-x/date-picker@2.4.0)(vue@3.2.13)
   '@vueup/vue-quill':
     specifier: ^1.2.0
     version: 1.2.0(vue@3.2.13)
@@ -1511,14 +1514,16 @@ packages:
       - supports-color
     dev: true
 
-  /@schedule-x/calendar@2.4.0(@preact/signals@1.3.2)(preact@10.28.2):
-    resolution: {integrity: sha512-GBMrpwf2Bi619NNAvp4GNm+v83SANh10Ux++0fDhLfioHmsDj54NFfNPXoD+6DBHHfA6qiYaQLI+NNFDbbQlfA==}
+  /@schedule-x/calendar@4.1.0(@preact/signals@1.3.2)(preact@10.28.2)(temporal-polyfill@0.3.0):
+    resolution: {integrity: sha512-l3ropgjbCH/Me9pny9Iwb8rMDbxBQOymC1ORB4GLkoyAr6FJH/ZAzUra+4G+T38kjV9hwvs963VCj58ypsx5GA==}
     peerDependencies:
-      '@preact/signals': ^1.1.5
+      '@preact/signals': ^2.0.2
       preact: ^10.19.2
+      temporal-polyfill: 0.3.0
     dependencies:
       '@preact/signals': 1.3.2(preact@10.28.2)
       preact: 10.28.2
+      temporal-polyfill: 0.3.0
     dev: false
 
   /@schedule-x/date-picker@2.4.0(@preact/signals@1.3.2)(preact@10.28.2):
@@ -1549,14 +1554,14 @@ packages:
     resolution: {integrity: sha512-grXX+ofzc3vjVdKVJJY8pebra/+C96cEboIeog7GG9MVq2ysKEBMc22OIoZPVvQYgqATIDssaNBbsQ+cBkuQAw==}
     dev: false
 
-  /@schedule-x/vue@2.3.0(@schedule-x/calendar@2.4.0)(@schedule-x/date-picker@2.4.0)(vue@3.2.13):
+  /@schedule-x/vue@2.3.0(@schedule-x/calendar@4.1.0)(@schedule-x/date-picker@2.4.0)(vue@3.2.13):
     resolution: {integrity: sha512-7X/4FE0XR4i7E5muPsINkKnNLIBJeaSVBhF67xZM4ewekinFyYyl5HuMF8S1qoR981z/ya0eCmEZ7opJ3zFhfA==}
     peerDependencies:
       '@schedule-x/calendar': 2.4.0
       '@schedule-x/date-picker': 2.4.0
       vue: ^3
     dependencies:
-      '@schedule-x/calendar': 2.4.0(@preact/signals@1.3.2)(preact@10.28.2)
+      '@schedule-x/calendar': 4.1.0(@preact/signals@1.3.2)(preact@10.28.2)(temporal-polyfill@0.3.0)
       '@schedule-x/date-picker': 2.4.0(@preact/signals@1.3.2)(preact@10.28.2)
       vue: 3.2.13
     dev: false
@@ -8436,6 +8441,16 @@ packages:
       mkdirp: 1.0.4
       yallist: 4.0.0
     dev: true
+
+  /temporal-polyfill@0.3.0:
+    resolution: {integrity: sha512-qNsTkX9K8hi+FHDfHmf22e/OGuXmfBm9RqNismxBrnSmZVJKegQ+HYYXT+R7Ha8F/YSm2Y34vmzD4cxMu2u95g==}
+    dependencies:
+      temporal-spec: 0.3.0
+    dev: false
+
+  /temporal-spec@0.3.0:
+    resolution: {integrity: sha512-n+noVpIqz4hYgFSMOSiINNOUOMFtV5cZQNCmmszA6GiVFVRt3G7AqVyhXjhCSmowvQn+NsGn+jMDMKJYHd3bSQ==}
+    dev: false
 
   /terser-webpack-plugin@5.3.16(webpack@5.104.1):
     resolution: {integrity: sha512-h9oBFCWrq78NyWWVcSwZarJkZ01c2AyGrzs1crmHZO3QUg9D61Wu4NPjBy69n7JqylFF5y+CsUZYmYEIZ3mR+Q==}
