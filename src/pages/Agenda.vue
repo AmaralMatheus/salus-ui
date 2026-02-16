@@ -2,7 +2,7 @@
 import Calendar from '../components/agenda/Calendar.vue'
 import Scheduler from '../components/agenda/Scheduler.vue'
 import appointmentService from '../services/appointment.service'
-import { format, parseISO, startOfWeek, addDays, isSameDay, isToday, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns'
+import { format, parseISO, startOfWeek, addDays, isSameDay, isToday, startOfMonth, endOfMonth, eachDayOfInterval, getDay, differenceInMinutes } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'vue3-toastify'
 
@@ -139,6 +139,20 @@ export default {
     loadAppointments() {
       appointmentService.getAllAppointments().then((response) => {
         this.appointments = response.data
+        appointmentService.getGoogleCalendarEvents(this.currentUser.calendar).then((response) => {
+          response.data.items.forEach((event) => {
+            if (event.start && event.end) {
+              this.appointments.push({
+                title: 'Agendamento Google',
+                people: event.attendees ? event.attendees.map((people) => people.email) : ['Sem pacientes vinculados'],
+                date: parseISO(event.start.dateTime).toISOString().replace('.000Z', '.000000Z'),
+                duration: differenceInMinutes(parseISO(event.end.dateTime), parseISO(event.start.dateTime)),
+                id: event.id,
+                calendarId: "google"
+              })
+            }
+          })
+        })
         this.loading = false
       }).catch((error) => {
         console.error('Error loading appointments:', error)

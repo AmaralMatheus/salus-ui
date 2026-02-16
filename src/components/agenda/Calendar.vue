@@ -164,6 +164,7 @@ function load() {
     })
   })
 
+  console.log(auth.state.user.calendar)
   if (auth.state.user.calendar) {
     appointmentService.getGoogleCalendarEvents(auth.state.user.calendar).then((response) => {
       response.data.items.forEach((event) => {

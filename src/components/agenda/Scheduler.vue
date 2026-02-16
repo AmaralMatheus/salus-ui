@@ -167,6 +167,7 @@
       }
     },
     created() {
+      this.loading = true
       this.clear()
       if (this.preselectedDate) {
         this.scheduleDate = parseISO(this.preselectedDate)
@@ -188,6 +189,9 @@
       })
       procedureService.getAllProcedures().then((response) => {
         this.allProcedures = response.data
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
       })
     },
     methods: {
