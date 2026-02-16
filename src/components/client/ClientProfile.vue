@@ -79,6 +79,9 @@
       getBirthday(date) {
         return format(date, 'dd/MM/yyyy')
       },
+      getAge() {
+        return differenceInYears(new Date(), this.client.birthday)
+      },
     }
   }
 </script>

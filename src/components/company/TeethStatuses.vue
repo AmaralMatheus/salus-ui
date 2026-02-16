@@ -38,6 +38,10 @@
                   @update:options="loadItems"
                   @click:row="viewRow"
                 >
+                  <template v-slot:[`item.name`]="{ item }">
+                   {{ item.name }}
+                   <v-chip density="compact" v-if="item.default" color="info">Status Primário</v-chip>
+                  </template>
                   <template v-slot:[`item.actions`]="{ item }">
                     <v-menu>
                       <template v-slot:activator="{ props }">
@@ -168,8 +172,10 @@
       }),
       methods: {
         viewRow (event, row) {
-          this.statusDialog = true
-          this.status = row.item
+          if (!row.item.default) {
+            this.statusDialog = true
+            this.status = row.item
+          }
         },
         loadItems ({ page, itemsPerPage, sortBy }) {
           this.loading = true

@@ -354,8 +354,9 @@
       ],
       dateRule: [
         value => {
+          console.log(value)
           if (!value) return true
-          if (!isNaN(value)) {
+          if (isNaN(value)) {
             return 'Informe uma data válida.'
           } else {
             return true

@@ -30,6 +30,7 @@
                   </v-list-item>
                   <v-list-item>
                     <v-select
+                      :disabled="currentUser.type === 2"
                       density="compact"
                       label="Alterar estado do dente"
                       :items="teethStatuses"
@@ -74,6 +75,7 @@
                   </v-list-item>
                   <v-list-item>
                     <v-select
+                      :disabled="currentUser.type === 2"
                       density="compact"
                       label="Alterar estado do dente"
                       :items="teethStatuses"

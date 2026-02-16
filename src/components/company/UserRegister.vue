@@ -31,7 +31,7 @@
                   label="E-mail">
                 </v-text-field>
               </v-col>
-              <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4" v-if="user.type === 1">
+              <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4" v-if="user.type !== 2">
                 <v-text-field
                   v-model="user.cro"
                   :loading="loadingInfo"
@@ -46,7 +46,7 @@
               <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
                 <v-select
                 :items="[
-                    {label: 'Dentista', id: 0},
+                    {label: 'Dentista', id: 3},
                     {label: 'Administrador', id: 1},
                     {label: 'Secretaria', id: 2},
                   ]"
@@ -61,6 +61,32 @@
                   hide-details="auto"
                   label="Tipo de acesso">
                 </v-select>
+              </v-col>
+              <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
+                <v-text-field
+                  v-model="user.password"
+                  :loading="loadingInfo"
+                  :disabled="loadingInfo"
+                  :rules="passwordRules"
+                  variant="outlined"
+                  type="password"
+                  density="compact"
+                  hide-details="auto"
+                  label="Senha">
+                </v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" :md="user.type === 1 ? 3 : 4">
+                <v-text-field
+                  v-model="user.passwordConfirm"
+                  :loading="loadingInfo"
+                  :disabled="loadingInfo"
+                  :rules="passwordConfirmRules"
+                  variant="outlined"
+                  type="password"
+                  density="compact"
+                  hide-details="auto"
+                  label="Confirmação de Senha">
+                </v-text-field>
               </v-col>
             </v-row>
             <div>
@@ -85,6 +111,12 @@
       id() {
         return this.$route.params.id
       },
+      passwordConfirmRules() {
+        return [
+          v => !!v || 'Confirmação é obrigatória',
+          v => v === this.user.password || 'As senhas não coincidem'
+        ]
+      }
     },
     data: () => ({
       valid: true,
@@ -92,6 +124,7 @@
         name: '',
         email: '',
         type: 1,
+        password: '',
       },
       errors: {},
       loadingRequest: false,
@@ -99,19 +132,27 @@
       rules: [
         value => {
           if (value) return true
-          return 'Este campo não pode estar vazio.'
+          return 'Este campo não pode estar vazio'
         },
       ],
       phoneRule: [
         value => {
-          if (value.length < 15) return 'Informe o telefone completo.'
+          if (value.length < 15) return 'Informe o telefone completo'
         },
       ],
       dateRule: [
         value => {
-          if (!isNaN(value)) return 'Informe uma data válida.'
+          if (!isNaN(value)) return 'Informe uma data válida'
         },
       ],
+      passwordRules: [
+        v => !!v || 'Senha é obrigatória',
+        v => v.length >= 8 || 'Mínimo de 8 caracteres',
+        v => /[A-Z]/.test(v) || 'Precisa de uma letra maiúscula',
+        v => /[a-z]/.test(v) || 'Precisa de uma letra minúscula',
+        v => /[0-9]/.test(v) || 'Precisa de um número',
+        // v => /[!@#$%^&*(),.?":{}|<>]/.test(v) || 'Precisa de um caractere especial',
+      ]
     }),
     watch: {
       'user.email'() {
