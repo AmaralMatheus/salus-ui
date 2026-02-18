@@ -1,5 +1,5 @@
 <script>
-import Calendar from '../components/agenda/Calendar.vue'
+// import Calendar from '../components/agenda/Calendar.vue'
 import Scheduler from '../components/agenda/Scheduler.vue'
 import appointmentService from '../services/appointment.service'
 import { format, parseISO, startOfWeek, addDays, isSameDay, isToday, startOfMonth, endOfMonth, eachDayOfInterval, getDay, differenceInMinutes } from 'date-fns'
@@ -9,7 +9,6 @@ import { toast } from 'vue3-toastify'
 export default {
   name: "DefaultAgenda",
 	components: {
-      Calendar,
       Scheduler
 	},
   data: () => ({

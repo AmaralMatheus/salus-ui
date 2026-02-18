@@ -164,7 +164,7 @@
   import transactionService from '../services/transaction.service'
   import appointmentService from '../services/appointment.service'
   import { format, parseISO } from 'date-fns'
-  import Calendar from '../components/agenda/Calendar.vue'
+  // import Calendar from '../components/agenda/Calendar.vue'
   import Scheduler from '../components/agenda/Scheduler.vue'
   import Transaction from '../components/Transaction.vue'
   import ClientRegister from '../components/client/ClientRegister.vue'
@@ -196,7 +196,7 @@
     name: "HomePage",
     components: {
       Line,
-      Calendar,
+      // Calendar,
       Scheduler,
       Transaction,
       ClientRegister
