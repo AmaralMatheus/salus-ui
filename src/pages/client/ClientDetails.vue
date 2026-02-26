@@ -441,12 +441,12 @@
               <div class="d-flex justify-space-between align-baseline">
                 <div v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :value="tooth" :key="tooth">
                   <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                  <img class="cursor-pointer" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+                  <img class="cursor-pointer" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/'+teethNumber[tooth]+'.svg')"/>
                 </div>
               </div>
               <div class="d-flex justify-space-between">
                 <div v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :value="tooth" :key="tooth">
-                  <img class="cursor-pointer" height="25" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
+                  <img class="cursor-pointer" height="25" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/'+teethNumber[tooth]+'.svg')"/>
                   <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
                 </div>
               </div>

@@ -56,12 +56,12 @@
                 <div>Agenda</div>
               </div>
             </v-list-item>
-            <!-- <v-list-item active-class="text-white bg-theme" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')">
+            <v-list-item active-class="text-white bg-theme" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')">
               <div class="d-flex ga-4 align-center">
                 <img class="cursor-pointer" :class="path ==='financeiro' ? 'active' : ''" :src="require('./assets/coins-line.svg')"/>
                 <div>Financeiro</div>
               </div>
-            </v-list-item> -->
+            </v-list-item>
             <v-list-item v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
               <div class="d-flex ga-4 align-center">
                 <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>

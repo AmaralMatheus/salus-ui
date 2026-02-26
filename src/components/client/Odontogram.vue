@@ -18,7 +18,7 @@
                   <div class="d-flex flex-column" v-bind="props">
                     <div class="text-disabled text-caption">{{ teethNumber[tooth.type] }}</div>
                     <div class="tooth d-flex">
-                      <img style="position: absolute" class="tooth mx-auto cursor-pointer" :class="!tooth.status ? '' : 'tooth-extracted'" :src="require('../../assets/Vector-'+tooth.type+'.svg')"/>
+                      <img style="position: absolute" class="tooth mx-auto cursor-pointer" :class="!tooth.status ? '' : 'tooth-extracted'" :src="require('../../assets/'+teethNumber[tooth.type]+'.svg')"/>
                       <img v-if="tooth.status?.name === 'Extraído'" class="my-auto mx-auto cross" src="../../assets/cross.svg"/>
                     </div>
                   </div>
@@ -62,7 +62,7 @@
                 <template v-slot:activator="{props}">
                   <div class="d-flex flex-column" v-bind="props">
                     <div class="tooth d-flex">
-                      <img style="position: absolute" class="tooth mx-auto cursor-pointer" :class="!tooth.status ? '' : 'tooth-extracted'" :src="require('../../assets/Vector-'+tooth.type+'.svg')"/>
+                      <img style="position: absolute" class="tooth mx-auto cursor-pointer" :class="!tooth.status ? '' : 'tooth-extracted'" :src="require('../../assets/'+teethNumber[tooth.type]+'.svg')"/>
                       <img v-if="tooth.status?.name === 'Extraído'" class="mx-auto cross" src="../../assets/cross.svg"/>
                     </div>
                     <div class="text-disabled text-caption">{{ teethNumber[tooth.type] }}</div>

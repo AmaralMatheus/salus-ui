@@ -1,7 +1,7 @@
 <template>
   <v-form @submit.prevent="schedule" v-model="valid" >
     <v-card
-      width="1100"
+      max-width="1300"
       prepend-icon="mdi-calendar-edit-outline"
       :subtitle="client ?  ' para ' + client.name : customClient ? ' para ' + clients.filter((client) => customClient === client.id)[0].name : ''"
       :title="event ? 'Alterar agendamento' : 'Novo agendamento'"
@@ -80,7 +80,7 @@
             </div>
           </v-col>
           <v-col cols="12" md="8">
-            <div class="d-sm-flex justify-space-around border rounded">
+            <div class="d-sm-flex ga-10 justify-space-around border rounded">
               <v-date-picker
                 v-model="scheduleDate"
                 :rules="rules"
@@ -258,9 +258,6 @@
 </script>
 
 <style>
-.v-time-picker {
-  padding-top:16px !important;
-}
 
 .v-picker {
   background: transparent;
