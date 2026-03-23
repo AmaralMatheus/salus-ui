@@ -798,7 +798,7 @@ export default {
               <v-icon size="16" color="grey">mdi-account</v-icon>
               <span>Paciente:</span>
             </div>
-            <div class="detail-value">{{ selectedAppointment.client?.name || 'Cliente não informado' }}</div>
+            <div class="detail-value" @click="$router.push('/pacientes/'+selectedAppointment.client?.id)">{{ selectedAppointment.client?.name || 'Cliente não informado' }}</div>
           </div>
           
           <div class="detail-row">

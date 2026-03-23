@@ -211,12 +211,22 @@
   height: 1000px !important;
 }
 
-.tooth {
-  height: 60px;
-  width: 25px;
-}
-
 .cross {
   z-index: 1;
+}
+
+.tooth {
+    height: 60px;
+}
+
+@media (max-width: 917px) {
+  .tooth {
+    width: 18px;
+  }
+}
+@media (min-width: 918px) {
+  .tooth {
+    width: 25px;
+  }
 }
 </style>

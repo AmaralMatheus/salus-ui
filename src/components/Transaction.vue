@@ -29,7 +29,7 @@
                 label="Tipo de transação"
               ></v-select>
             </v-col>
-            <v-col cols="12" sm="6" md="4">
+            <v-col cols="12" sm="6" :md="method === 2 ? '2' : '4'">
               <v-select
                 :items="[
                   {label: 'Dinheiro', id: 1},
@@ -47,6 +47,9 @@
                 density="compact"
                 label="Método de execução"
               ></v-select>
+            </v-col>
+            <v-col v-if="method === 2" cols="12" sm="6" md="2">
+              <CurrencyInput label="Taxa do Cartão" v-model="tax" :loading="loading"></CurrencyInput>
             </v-col>
             <v-col cols="12" sm="6" md="4">
               <CurrencyInput v-model="amount" :loading="loading"></CurrencyInput>

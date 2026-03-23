@@ -80,6 +80,9 @@
             <template v-slot:[`item.date`]="{ item }">
               {{ getDateTime(item.date) }}
             </template>
+            <template v-slot:[`item.client`]="{ item }">
+              {{ item.client?.name }}
+            </template>
             <template v-slot:[`item.amount`]="{ item }">
               <div :class="item.type === 1 ? 'text-success' : 'text-error'">
                 R$ {{ Number(item.amount).toFixed(2).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") }}
@@ -169,6 +172,7 @@
         { title: 'Data', key: 'date', align: 'start' },
         { title: 'Forma de Pagamento', key: 'method', align: 'start' },
         { title: 'Descrição', key: 'description', align: 'start' },
+        { title: 'Paciente', key: 'client', align: 'start' },
         { title: '', key: 'actions', align: 'start' },
       ],
       rules: [

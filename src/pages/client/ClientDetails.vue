@@ -1052,11 +1052,6 @@
   height: 1000px !important;
 }
 
-.tooth {
-  height: 60px;
-  width: 25px;
-}
-
 .cross {
   z-index: 1;
 }
