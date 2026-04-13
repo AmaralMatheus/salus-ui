@@ -131,8 +131,8 @@
         <v-card
           max-width="400"
           prepend-icon="mdi-alert"
-          text="Essa imagem não pode ser restaurada"
-          title="Deseja excluir essa imagem?"
+          text="Essa imagem/documento não pode ser restaurada"
+          title="Deseja excluir essa imagem/documento?"
         >
           <template v-slot:actions>
             <v-btn
@@ -223,10 +223,27 @@
       >
         <v-card
           prepend-icon="mdi-image-outline"
-          title="Adicionar Imagens"
+          title="Adicionar Imagens/Documentos"
         >
           <v-card-text>
-            <v-file-input prepend-icon="" prepend-inner-icon="mdi-attachment" label="Imagem" density="compact" @update:modelValue="convertToBase64" variant="outlined"></v-file-input>
+            <v-file-input prepend-icon="" prepend-inner-icon="mdi-attachment" label="Imagem/Documento" density="compact" @update:modelValue="convertToBase64" variant="outlined"></v-file-input>
+            <v-date-input
+              v-model="imageDate"
+              :rules="rules"
+              :loading="loading"
+              :disabled="loading"
+              hide-details="auto"
+              variant="outlined"
+              density="compact"
+              prepend-icon=""
+              v-maska="'##/##/####'"
+              append-inner-icon="$calendar"
+              label=" da imagem/documento"
+            >
+              <template slot="dateIcon">
+                <v-icon>mdi mdi-calendar-outline</v-icon>
+              </template>
+            </v-date-input>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -390,15 +407,11 @@
               <v-hover v-if="client.documents && client.documents.length > 0"><div v-for="document in client.documents" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-red-lighten-5 rounded-sm cursor-pointer" :key="document.id">
                 <div @click="documentView = true; currenDocument = document" class="d-flex justify-space-between align-center ga-3 w-100">
                   <div class="text-error">{{ getDateTime(document.created_at) }}</div>
-                  <div class="ml-auto">{{document.path.split("/")[document.path.split("/").length -1]}}</div>
+                  <div class="ml-auto filename">{{document.path.split("/")[document.path.split("/").length -1]}}</div>
                 </div>
-                <v-btn size="small" density="comfortable" icon="mdi-delete" v-if="this.currentUser" @click="planDeleteDialog = true; selectedPlan = plan.id" color="error" variant="text"/>
+                <v-btn size="small" density="comfortable" icon="mdi-delete" v-if="this.currentUser" @click="imageDeleteDialog = true; selectedImage = document" color="error" variant="text"/>
               </div></v-hover>
               <div v-else>Não existem documentos cadastrados</div>
-              <div v-if="client.documents.length > 0" @click="documentDialog = true" class="text-none text-primary cursor-pointer d-flex align-center">
-                Ver todas os documetnos
-                <v-icon icon="mdi-chevron-right"></v-icon>
-              </div>
             </v-card-text>
           </v-tabs-window-item>
         </v-tabs-window>
@@ -636,6 +649,8 @@
   import 'viewerjs/dist/viewer.css'
   import { component as Viewer } from "v-viewer"
   import ClientProfile from '@/components/client/ClientProfile.vue'
+  import { VDateInput } from 'vuetify/labs/VDateInput'
+  import { vMaska } from "maska/vue"
 
   export default {
     computed: {
@@ -668,14 +683,17 @@
       ClientInfoDialog,
       ClientRegister,
       Odontogram,
-      ClientProfile
+      ClientProfile,
+      VDateInput
     },
+    directives: { maska: vMaska },
     data () {
       return {
         format,
         parseISO,
         tab: 'Imagens',
         approveMode: 'evolution',
+        imageDate: null,
         imageLoading: false,
         registeringDialog: false,
         procedures: [],
@@ -969,6 +987,7 @@
       async saveImage() {
         this.imageLoading = true
         const data = {
+          date: this.imageDate,
           image: this.image,
           client: this.id
         }
@@ -976,6 +995,7 @@
           this.addImageDialog = false
           this.imageLoading = null
           this.image = null
+          this.imageDate = null
           this.getClient()
           this.$emit('save')
         },
@@ -1054,5 +1074,10 @@
 
 .cross {
   z-index: 1;
+}
+
+.filename {
+  text-overflow: ellipsis;
+  max-width: 200px;
 }
 </style>

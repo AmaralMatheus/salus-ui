@@ -23,7 +23,7 @@
               <v-col cols="12" md="3" lg="2" class="text-h6">Financeiro</v-col>
               <v-col cols="12" md="9" lg="10">
                 <v-row>
-                  <v-col cols="12" sm="2" md="3" lg="3">
+                  <v-col cols="12" sm="3" md="3" lg="3">
                     <v-text-field
                       v-model="search"
                       variant="outlined"
@@ -33,7 +33,7 @@
                       placeholder="Buscar Transação">
                     </v-text-field>
                   </v-col>
-                  <v-col cols="12" sm="2" md="3" lg="3">
+                  <v-col cols="12" sm="3" md="3" lg="3">
                     <v-date-input
                       v-model="dateFilter"
                       multiple="range"
@@ -51,10 +51,22 @@
                       </template>
                     </v-date-input>
                   </v-col>
-                  <v-col cols="12" sm="5" md="3" lg="4">
+                  <v-col cols="12" sm="2" md="2" lg="2">
+                    <v-select
+                      v-model="typeFilter"
+                      :items="typeFilterOptions"
+                      item-title="title"
+                      item-value="value"
+                      variant="outlined"
+                      density="compact"
+                      hide-details="auto"
+                      label="Tipo"
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="12" sm="2" md="2" lg="2">
                     <v-btn block append-icon="mdi-plus" @click="transactionDialog = true" class="py-1" color="primary">Adicionar Transação</v-btn>
                   </v-col>
-                  <v-col cols="12" sm="3" md="3" lg="2">
+                  <v-col cols="12" sm="2" md="2" lg="2">
                     <v-btn block append-icon="mdi-table" @click="download" class="py-1" color="primary">Exportar</v-btn>
                   </v-col>
                 </v-row>
@@ -81,7 +93,7 @@
               {{ getDateTime(item.date) }}
             </template>
             <template v-slot:[`item.client`]="{ item }">
-              {{ item.client?.name }}
+              <div class="cursor-pointer" @click="$router.push('/pacientes/'+item.client?.id)">{{ item.client?.name }}</div>
             </template>
             <template v-slot:[`item.amount`]="{ item }">
               <div :class="item.type === 1 ? 'text-success' : 'text-error'">
@@ -153,6 +165,12 @@
       format,
       parseISO,
       dateFilter: [],
+      typeFilter: null,
+      typeFilterOptions: [
+        { title: 'Todos', value: null },
+        { title: 'Entrada', value: 1 },
+        { title: 'Saída', value: 2 },
+      ],
       dialog: false,
       incoming: 0.00,
       outcoming: 0.00,
@@ -192,7 +210,10 @@
     },
     watch: {
       dateFilter() {
-        this.loadItems ({ page:1, itemsPerPage: 10, sortBy: []})
+        this.loadItems({ page:1, itemsPerPage: 10, sortBy: []})
+      },
+      typeFilter() {
+        this.loadItems({ page:1, itemsPerPage: 10, sortBy: []})
       }
     },
     methods: {
@@ -210,7 +231,8 @@
         }
 
         const dates = this.dateFilter.map((date) => date.toISOString())
-        transactionService.getTransactions(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}` + (this.dateFilter.length > 0 ? `&search=${this.search}&startDate=${dates[0]}&finishDate=${dates[dates.length-1]}` : '')).then((response) => {
+        const typeParam = this.typeFilter !== null ? `&type=${this.typeFilter}` : ''
+        transactionService.getTransactions(`page=${page}&itemsPerPage=${itemsPerPage}&sort=${sortBy[0].key}&order=${sortBy[0].order}` + (this.dateFilter.length > 0 ? `&search=${this.search}&startDate=${dates[0]}&finishDate=${dates[dates.length-1]}` : '') + typeParam).then((response) => {
           this.serverItems = response.data.list.data
           this.totalItems = response.data.list.total
           this.incoming = response.data.incoming
