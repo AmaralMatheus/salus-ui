@@ -38,6 +38,10 @@
                   @update:options="loadItems"
                   @click:row="viewRow"
                 >
+                  <template v-slot:[`item.name`]="{ item }">
+                   {{ item.name }}
+                   <v-chip density="compact" v-if="item.default" color="info">Status Primário</v-chip>
+                  </template>
                   <template v-slot:[`item.actions`]="{ item }">
                     <v-menu>
                       <template v-slot:activator="{ props }">
@@ -45,8 +49,8 @@
                       </template>
                 
                       <v-list>
-                        <v-list-item prepend-icon="mdi-pencil" density="comfortable" @click="viewRow(null, {item})" title="Editar"></v-list-item>
-                        <v-list-item prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
+                        <v-list-item :disabled="item.default" prepend-icon="mdi-pencil" density="comfortable" @click="viewRow(null, {item})" title="Editar"></v-list-item>
+                        <v-list-item :disabled="item.default" prepend-icon="mdi-delete" density="comfortable" @click="selectedItem = item; dialog = true" title="Excluir"></v-list-item>
                       </v-list>
                     </v-menu>
                   </template>
@@ -168,8 +172,10 @@
       }),
       methods: {
         viewRow (event, row) {
-          this.statusDialog = true
-          this.status = row.item
+          if (!row.item.default) {
+            this.statusDialog = true
+            this.status = row.item
+          }
         },
         loadItems ({ page, itemsPerPage, sortBy }) {
           this.loading = true

@@ -2,7 +2,7 @@
   <v-row>
     <v-col cols="12" md="8" class="d-flex flex-column ga-6">
       <div>
-        <v-row>agenda/
+        <v-row>
           <v-col cols="12" md="6" class="d-flex flex-column ga-6">
             <v-card @click="newClientDialog = true" class="action-card cursor-pointer" title="Ações Rápidas">
               <v-card-text class="d-flex h-100">
@@ -72,7 +72,7 @@
           </v-col>
         </v-row>
       </div>
-      <v-card class="h-100" :loading="loading" title="Últimos 30 dias">
+      <!-- <v-card class="h-100" :loading="loading" title="Últimos 30 dias">
         <v-card-text v-if="!loading && transactions.length > 0" class="d-flex flex-column ga-2">
           <div v-for="transaction in transactions.slice(0, 2)" :key="transaction.id" class="transaction-item">
             <div class="transaction-icon" :class="transaction.type === 1 ? 'income' : 'expense'">
@@ -110,7 +110,7 @@
             type="article"
           ></v-skeleton-loader>
         </v-card-text>
-      </v-card>
+      </v-card> -->
     </v-col>
     <v-col>
       <v-card :loading="loading" title="Agenda do dia">
@@ -146,7 +146,6 @@
   </v-row>
   <v-dialog
     v-model="schedulerDialog"
-    max-width="800"
     width="auto"
   >
     <scheduler @cancel="schedulerDialog = false" @reload="init"/>
@@ -154,7 +153,7 @@
 
   <v-dialog
     v-model="newClientDialog"
-    max-width="800"
+    max-width="1300"
   >
     <client-register :selectedClient="this.selectedItem" @cancel="newClientDialog = false" @reload="newClientDialog = false"/>
   </v-dialog>
@@ -165,7 +164,7 @@
   import transactionService from '../services/transaction.service'
   import appointmentService from '../services/appointment.service'
   import { format, parseISO } from 'date-fns'
-  import Calendar from '../components/agenda/Calendar.vue'
+  // import Calendar from '../components/agenda/Calendar.vue'
   import Scheduler from '../components/agenda/Scheduler.vue'
   import Transaction from '../components/Transaction.vue'
   import ClientRegister from '../components/client/ClientRegister.vue'
@@ -197,7 +196,7 @@
     name: "HomePage",
     components: {
       Line,
-      Calendar,
+      // Calendar,
       Scheduler,
       Transaction,
       ClientRegister
@@ -303,7 +302,6 @@
       getFinancialResume() {
         transactionService.getTransactions('page=1&itemsPerPage=30&sort=date&order=asc').then((response) => {
           this.transactions = response.data.list.data
-          console.log('Transactions data:', this.transactions) // Debug
           this.prepareChartData()
         })
       },

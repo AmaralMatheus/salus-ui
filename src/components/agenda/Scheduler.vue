@@ -1,74 +1,86 @@
 <template>
   <v-form @submit.prevent="schedule" v-model="valid" >
     <v-card
+      max-width="1300"
       prepend-icon="mdi-calendar-edit-outline"
       :subtitle="client ?  ' para ' + client.name : customClient ? ' para ' + clients.filter((client) => customClient === client.id)[0].name : ''"
       :title="event ? 'Alterar agendamento' : 'Novo agendamento'"
     >
     <v-card-text>
         <v-row>
-          <v-col cols="12" :md="currentUser.type === 1 && client ? '6' : currentUser.type === 1 && !client ? '4' : '3'">
-            <v-select
-              :items="allProcedures"
-              item-title="name"
-              item-value="id"
-              hide-details="auto"
-              multiple
-              v-model="procedures"
-              :loading="loading"
-              :disabled="loading"
-              :rules="rules"
-              variant="outlined"
-              density="compact"
-              label="Tipo de agendamento"
-            ></v-select>
+          <v-col cols="12" md="4">
+            <div class=" d-flex flex-column ga-6 mb-4">
+              <v-select
+                :items="allProcedures"
+                item-title="name"
+                item-value="id"
+                hide-details="auto"
+                multiple
+                v-model="procedures"
+                :loading="loading"
+                :disabled="loading"
+                :rules="rules"
+                variant="outlined"
+                density="compact"
+                label="Tipo de agendamento"
+              ></v-select>
+              <v-select 
+                v-if="currentUser.type !== 1"
+                :items="users"
+                item-title="name"
+                item-value="id"
+                hide-details="auto"
+                v-model="user"
+                :loading="loading"
+                :disabled="loading"
+                :rules="rules"
+                variant="outlined"
+                density="compact"
+                label="Doutor"
+              ></v-select>
+              <v-autocomplete
+                v-if="!client"
+                :items="clients"
+                item-title="name"
+                item-value="id"
+                hide-details="auto"
+                v-model="customClient"
+                :loading="loading"
+                :disabled="loading"
+                :rules="rules"
+                variant="outlined"
+                density="compact"
+                label="Paciente"
+              ></v-autocomplete>
+              <v-text-field
+                v-model="duration"
+                :rules="rules"
+                hide-details="auto"
+                :loading="loading"
+                :disabled="loading"
+                type="number"
+                variant="outlined"
+                density="compact"
+                hint="Em minutos"
+                label="Duração">
+              </v-text-field>
+              <v-textarea     
+                rows="10"
+                row-height="30"
+                class="h-fill"
+                v-model="description"
+                :loading="loading"
+                :disabled="loading"
+                hide-details="auto"
+                variant="outlined"
+                auto-grow
+                density="compact"
+                label="Observação">
+              </v-textarea>
+            </div>
           </v-col>
-          <v-col cols="12" :md="client  ? '6' : '3'" v-if="currentUser.type !== 1">
-            <v-select
-              :items="users"
-              item-title="name"
-              item-value="id"
-              hide-details="auto"
-              v-model="user"
-              :loading="loading"
-              :disabled="loading"
-              :rules="rules"
-              variant="outlined"
-              density="compact"
-              label="Doutor"
-            ></v-select>
-          </v-col>
-          <v-col cols="12" :md="currentUser.type === 1 && client ? '6' : currentUser.type === 1 && !client ? '4' : '3'" v-if="!client">
-            <v-autocomplete
-              :items="clients"
-              item-title="name"
-              item-value="id"
-              hide-details="auto"
-              v-model="customClient"
-              :loading="loading"
-              :disabled="loading"
-              :rules="rules"
-              variant="outlined"
-              density="compact"
-              label="Paciente"
-            ></v-autocomplete>
-          </v-col>
-          <v-col cols="12" :md="currentUser.type === 1 && client ? '6' : currentUser.type === 1 && !client ? '4' : '3'">
-            <v-text-field
-              v-model="duration"
-              :rules="rules"
-              hide-details="auto"
-              :loading="loading"
-              :disabled="loading"
-              type="number"
-              variant="outlined"
-              density="compact"
-              hint="Em minutos"
-              label="Duração">
-            </v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <div class="d-sm-flex justify-space-around border">
+          <v-col cols="12" md="8">
+            <div class="d-sm-flex ga-10 justify-space-around border rounded">
               <v-date-picker
                 v-model="scheduleDate"
                 :rules="rules"
@@ -87,17 +99,6 @@
               >
               </v-time-picker>
             </div>
-          </v-col>
-          <v-col cols="12">
-            <v-textarea
-              v-model="description"
-              :loading="loading"
-              :disabled="loading"
-              hide-details="auto"
-              variant="outlined"
-              density="compact"
-              label="Observação">
-            </v-textarea>
           </v-col>
         </v-row>
       </v-card-text>
@@ -127,13 +128,13 @@
   import userService from '../../services/user.service'
   import { vMaska } from "maska/vue"
   import { format, parseISO, setHours, setMinutes } from 'date-fns'
-  import { VTimePicker } from 'vuetify/labs/VTimePicker'
+  // import { VTimePicker } from 'vuetify/labs/VTimePicker'
   import { toast } from 'vue3-toastify'
 
   export default {
     name: 'ClientScheduler',
     components: {
-      VTimePicker
+      // VTimePicker
     },
     directives: { maska: vMaska },
     props: {client: Object, event: Object, preselectedDate: Date},
@@ -166,8 +167,8 @@
       }
     },
     created() {
+      this.loading = true
       this.clear()
-      console.log(this.preselectedDate)
       if (this.preselectedDate) {
         this.scheduleDate = parseISO(this.preselectedDate)
         this.scheduleTime = parseISO(this.preselectedDate)
@@ -188,6 +189,9 @@
       })
       procedureService.getAllProcedures().then((response) => {
         this.allProcedures = response.data
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
       })
     },
     methods: {
@@ -206,7 +210,6 @@
       schedule () {
         if (this.valid) {
           this.loading = true
-          console.log(typeof this.scheduleTime === 'string' || this.scheduleTime instanceof String)
           if (typeof this.scheduleTime === 'string' || this.scheduleTime instanceof String) {
             this.scheduleDate = setHours(this.scheduleDate,this.scheduleTime.split(':')[0])
             this.scheduleDate = setMinutes(this.scheduleDate,this.scheduleTime.split(':')[1])
@@ -255,8 +258,9 @@
 </script>
 
 <style>
-.v-time-picker {
-  padding-top:16px !important;
+
+.v-picker {
+  background: transparent;
 }
 
 .v-time-picker-controls__time__btn.v-btn--density-default.v-btn {

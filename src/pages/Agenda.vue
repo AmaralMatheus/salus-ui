@@ -1,18 +1,18 @@
 <script>
-import Calendar from '../components/agenda/Calendar.vue'
+// import Calendar from '../components/agenda/Calendar.vue'
 import Scheduler from '../components/agenda/Scheduler.vue'
 import appointmentService from '../services/appointment.service'
-import { format, parseISO, startOfWeek, addDays, isSameDay, isToday, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns'
+import { format, parseISO, startOfWeek, addDays, isSameDay, isToday, startOfMonth, endOfMonth, eachDayOfInterval, getDay, differenceInMinutes } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'vue3-toastify'
 
 export default {
   name: "DefaultAgenda",
 	components: {
-      Calendar,
       Scheduler
 	},
   data: () => ({
+    ptBR,
     format,
     parseISO,
     list: false,
@@ -138,8 +138,21 @@ export default {
     },
     loadAppointments() {
       appointmentService.getAllAppointments().then((response) => {
-        console.log('Appointments data:', response.data)
         this.appointments = response.data
+        // appointmentService.getGoogleCalendarEvents(this.currentUser.calendar).then((response) => {
+        //   response.data.items.forEach((event) => {
+        //     if (event.start && event.end) {
+        //       this.appointments.push({
+        //         title: 'Agendamento Google',
+        //         people: event.attendees ? event.attendees.map((people) => people.email) : ['Sem pacientes vinculados'],
+        //         date: parseISO(event.start.dateTime).toISOString().replace('.000Z', '.000000Z'),
+        //         duration: differenceInMinutes(parseISO(event.end.dateTime), parseISO(event.start.dateTime)),
+        //         id: event.id,
+        //         calendarId: "google"
+        //       })
+        //     }
+        //   })
+        // })
         this.loading = false
       }).catch((error) => {
         console.error('Error loading appointments:', error)
@@ -486,11 +499,12 @@ export default {
                 <div class="card-content">
                   <div class="procedure-info">
                     <v-chip 
-                      :color="getProcedureColor(appointment.procedures)"
+                      :color="getProcedureColor(procedure)"
                       size="small"
                       variant="outlined"
+                      v-for="procedure in appointment.procedures" :key="procedure"
                     >
-                      {{ getProcedureName(appointment.procedures) }}
+                      {{ getProcedureName(procedure) }}
                     </v-chip>
                   </div>
                   
@@ -544,7 +558,16 @@ export default {
                 >
                   <div class="appointment-time">{{ getTimeOnly(appointment.date) }}</div>
                   <div class="appointment-patient">{{ appointment.client?.name || 'Cliente não informado' }}</div>
-                  <div class="appointment-procedure">{{ getProcedureName(appointment.procedures) }}</div>
+                  <div class="appointment-procedure">
+                    <v-chip 
+                      :color="getProcedureColor(procedure)"
+                      size="small"
+                      variant="outlined"
+                      v-for="procedure in appointment.procedures" :key="procedure"
+                    >
+                      {{ getProcedureName(procedure) }}
+                    </v-chip>
+                  </div>
                   <div class="appointment-actions">
                     <v-btn 
                       icon="mdi-pencil" 
@@ -591,7 +614,33 @@ export default {
                 >
                   <div class="mini-time">{{ getTimeOnly(appointment.date) }}</div>
                   <div class="mini-patient">{{ appointment.client?.name || 'Cliente não informado' }}</div>
-                  <div class="mini-procedure">{{ getProcedureName(appointment.procedures) }}</div>
+                  <div class="mini-procedure">
+                    <v-chip 
+                      :color="getProcedureColor(procedure)"
+                      size="small"
+                      variant="outlined"
+                      v-for="procedure in appointment.procedures" :key="procedure"
+                    >
+                      {{ getProcedureName(procedure) }}
+                    </v-chip>
+                  </div>
+                  <div class="d-flex">
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      color="primary"
+                      icon="mdi-pencil"
+                      desnsity="compact"
+                      variant="text"
+                      @click="selectedAppointment = appointment;editAppointment()"
+                    ></v-btn>
+                    <v-btn
+                      color="error"
+                      icon="mdi-delete"
+                      desnsity="compact"
+                      variant="text"
+                      @click="selectedAppointment = appointment;deleteAppointmentFromDetails()"
+                    ></v-btn>
+                  </div>
                 </div>
               </div>
             </div>
@@ -721,7 +770,7 @@ export default {
   
   <v-dialog
     v-model="schedulerDialog"
-    max-width="800"
+    width="auto"
   >
     <scheduler 
       @cancel="schedulerDialog = false; selectedItem = null" 
@@ -749,7 +798,7 @@ export default {
               <v-icon size="16" color="grey">mdi-account</v-icon>
               <span>Paciente:</span>
             </div>
-            <div class="detail-value">{{ selectedAppointment.client?.name || 'Cliente não informado' }}</div>
+            <div class="detail-value cursor-pointer" @click="$router.push('/pacientes/'+selectedAppointment.client?.id)">{{ selectedAppointment.client?.name || 'Cliente não informado' }}</div>
           </div>
           
           <div class="detail-row">
@@ -767,11 +816,12 @@ export default {
             </div>
             <div class="detail-value">
               <v-chip 
-                :color="getProcedureColor(selectedAppointment.procedures)"
+                :color="getProcedureColor(procedure)"
                 size="small"
                 variant="outlined"
+                v-for="procedure in selectedAppointment.procedures" :key="procedure"
               >
-                {{ getProcedureName(selectedAppointment.procedures) }}
+                {{ getProcedureName(procedure) }}
               </v-chip>
             </div>
           </div>
@@ -888,8 +938,8 @@ export default {
 
 .week-tabs-container {
   border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .week-tabs {
@@ -959,6 +1009,7 @@ export default {
   display: grid;
   grid-template-columns: 1fr 300px;
   gap: 20px;
+  margin-top: 16px;
 }
 
 .agenda-content.monthly-layout {
@@ -967,7 +1018,6 @@ export default {
 
 .main-agenda-area {
   border-radius: 8px;
-  padding: 24px;
 }
 
 .date-header-content {

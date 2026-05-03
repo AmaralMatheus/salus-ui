@@ -131,6 +131,26 @@ class CompanyService {
   deleteTemplate(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'templates/' + id, { headers: authHeader() })
   }
+
+
+  getQuestion(params) {
+    return axios.get(process.env.VUE_APP_API_URL + 'questions?' + params, { headers: authHeader() })
+  }
+  saveQuestion(data) {
+    return axios.post(process.env.VUE_APP_API_URL + 'questions', data, { headers: authHeader() })
+  }
+  getQuestionById(id) {
+    return axios.get(process.env.VUE_APP_API_URL + 'questions/' + id, { headers: authHeader() })
+  }
+  updateQuestion(id, data) {
+    return axios.put(process.env.VUE_APP_API_URL + 'questions/' + id, data, { headers: authHeader() })
+  }
+  getAllQuestion() {
+    return axios.get(process.env.VUE_APP_API_URL + 'questions/all',  { headers: authHeader() })
+  }
+  deleteQuestion(id) {
+    return axios.delete(process.env.VUE_APP_API_URL + 'questions/' + id, { headers: authHeader() })
+  }
 }
 
 export default new CompanyService()

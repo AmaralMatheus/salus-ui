@@ -3,7 +3,6 @@ import authHeader from './auth-header'
 
 class AppointmentService {
   getGoogleCalendarEvents(calendarId) {
-    console.log(process.env)
     return axios.get(process.env.VUE_APP_G_CALENDAR_API_URL + calendarId + '/events?key=' + process.env.VUE_APP_G_CALENDAR_TOKEN)
   }
   schedule(data) {

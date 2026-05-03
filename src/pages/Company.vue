@@ -177,6 +177,7 @@
         <Statuses/>
         <HealthCare/>
         <TeethStatuses/>
+        <Questions/>
         <PrescriptionTemplate/>
         <v-dialog
           v-model="dialog"
@@ -221,6 +222,7 @@
     import { vMaska } from "maska/vue"
     import HealthCare from '@/components/company/HealthCare.vue'
     import PrescriptionTemplate from '@/components/company/PrescriptionTemplate.vue'
+    import Questions from '@/components/company/Questions.vue'
 
     export default {
       name: 'UserList',
@@ -229,6 +231,7 @@
         Statuses,
         TeethStatuses,
         HealthCare,
+        Questions,
         PrescriptionTemplate
       },
       directives: { maska: vMaska },
@@ -327,7 +330,6 @@
         await this.getStates()
         companyService.getCompany(this.currentUser.company_id).then((response) => {
           this.company = response.data
-          console.log(this.company)
           this.company.state = Number(this.company.state)
           if (this.company.state) {
             locationService.getCities(this.company.state).then((response) => {
@@ -400,7 +402,6 @@
           })
         },
         viewRow (event, row) {
-          console.log(row)
           this.$router.push({
             name: 'user-register',
             params: { id: row.item.id }

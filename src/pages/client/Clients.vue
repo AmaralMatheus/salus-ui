@@ -99,7 +99,6 @@
       </v-dialog>
       <v-dialog
         v-model="schedulerDialog"
-        max-width="800"
       >
         <scheduler :client="this.selectedItem" @cancel="schedulerDialog = false" @reload="loadItems({page:1,
           itemsPerPage: 10,
@@ -107,7 +106,7 @@
       </v-dialog>
       <v-dialog
         v-model="newClientDialog"
-        max-width="800"
+        max-width="auto"
       >
         <client-register :selectedClient="this.selectedItem" @cancel="newClientDialog = false" @reload="newClientDialog = false; loadItems({page:1,
           itemsPerPage: 10,
@@ -115,7 +114,7 @@
       </v-dialog>
       <v-dialog
         v-model="importDialog"
-        max-width="800"
+        max-width="auto"
       >
         <v-file-input @update:modelValue="onFileChange" />
       </v-dialog>

@@ -265,7 +265,6 @@
       },
 
       setProcedure(event, element) {
-        console.log(event)
         if(typeof event === 'object' && event?.price) {
           element.price = event.price
           element.procedure_id = event.id

@@ -80,7 +80,7 @@
               </v-col>
               <v-col cols="12" sm="4">
                 <v-select
-                :items="[{name: 'Sem especialidade', id: 0}, {name: 'Ortodontia', id: 1}]"
+                :items="categories"
                   item-title="name"
                   item-value="id"
                   v-model="procedure.category_id"
@@ -160,7 +160,19 @@
     data: () => ({
       format,
       parseISO,
-      categories: [],
+      categories: [
+        {id: 1, name: 'Ortodontia/Ortopedia Funcional dos Maxilares'},
+        {id: 2, name: 'Implantodontia'},
+        {id: 3, name: 'Dentística'},
+        {id: 4, name: 'Endodontia'},
+        {id: 5, name: 'Periodontia'},
+        {id: 6, name: 'Prótese Dentária'},
+        {id: 7, name: 'Odontopediatria'},
+        {id: 8, name: 'Bucomaxilofacial'},
+        {id: 9, name: 'Radiologia'},
+        {id: 10, name: 'Odontologia para Pacientes com Necessidades Especiais'},
+        {id: 11, name: 'Harmonização oro facial HOF'}
+      ],
       company: {
         name: ''
       },
