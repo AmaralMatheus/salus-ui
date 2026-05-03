@@ -1,36 +1,60 @@
 <template>
   <v-row :class="this.currentUser ? '' : 'mt-2'">
     <v-col cols="12" sm="6" md="7" lg="8">
-      <v-card v-if="!loading" title="Odontograma">
+      <v-card v-if="!loading">
         <v-card-text>
-          <v-tabs-window v-model="tab">
-            <v-tabs-window-item
-              :key="1"
-              :value="1"
-            >
-              <div class="d-flex flex-column ga-3">
-                <div class="d-flex justify-space-between align-baseline">
+          <!-- Tab headers (centered) -->
+          <div class="d-flex justify-center ga-8 mb-5">
+            <div
+              class="odonto-tab text-h6 cursor-pointer"
+              :class="activeTab === 'permanent' ? 'odonto-tab-active' : 'text-disabled'"
+              @click="activeTab = 'permanent'"
+            >Permanentes</div>
+            <div
+              class="odonto-tab text-h6 cursor-pointer"
+              :class="activeTab === 'deciduous' ? 'odonto-tab-active' : 'text-disabled'"
+              @click="activeTab = 'deciduous'"
+            >Decíduos</div>
+          </div>
+
+          <!-- Odontogram grid -->
+          <div class="odontogram-area rounded-lg pa-4">
+
+            <!-- ===== PERMANENTES ===== -->
+            <template v-if="activeTab === 'permanent'">
+              <!-- Upper row: numbers above, teeth below -->
+              <div class="d-flex justify-center align-end">
+                <div class="d-flex align-end">
                   <v-menu
-                    class="cursor-pointer"
-                    v-for="tooth in toothObjectUp" :key="tooth.id"
+                    v-for="tooth in toothObjectUp.slice(0, 8)"
+                    :key="tooth.type"
                     :close-on-content-click="false"
                     open-on-hover
                   >
                     <template v-slot:activator="{props}">
-                      <div class="d-flex flex-column" v-bind="props">
+                      <div
+                        class="d-flex flex-column align-center px-1 cursor-pointer tooth-item"
+                        :class="{ 'tooth-highlighted': highlightedGroup.includes(teethNumber[tooth.type]) }"
+                        v-bind="props"
+                      >
                         <div class="text-disabled text-caption">{{ teethNumber[tooth.type] }}</div>
-                        <img class="cursor-pointer" :class="!tooth.status ? '' : 'tooth-extracted'" :src="require('../../assets/Vector-'+tooth.type+'.svg')"/>
+                        <img
+                          class="tooth-img"
+                          :class="tooth.status ? 'tooth-extracted' : ''"
+                          :src="require('../../assets/teeth/'+teethNumber[tooth.type]+'.svg')"
+                        />
                       </div>
                     </template>
-
-                    <v-list :class="this.currentUser ? '' : 'hidden'">
-                      <v-list-item>
-                        <div class="text-h6">Status do dente: {{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
-                      </v-list-item>
-                      <v-list-item>
+                    <v-card rounded="lg" elevation="3" min-width="230" :class="currentUser ? '' : 'hidden'">
+                      <v-card-text class="d-flex flex-column ga-3 pa-4">
+                        <div>
+                          <div class="text-caption text-medium-emphasis">Dente {{ teethNumber[tooth.type] }}</div>
+                          <div class="text-subtitle-1 font-weight-medium">{{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
+                        </div>
                         <v-select
                           density="compact"
-                          label="Alterar estado do dente"
+                          variant="outlined"
+                          label="Alterar status"
                           :items="teethStatuses"
                           item-title="name"
                           return-object
@@ -38,66 +62,359 @@
                           @update:modelValue="updateToothStatus($event, tooth)"
                           item-value="id"
                         ></v-select>
-                        <div class="text-h6">Evoluções relacionadas</div>
-                        <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between" :key="evolution.id">
-                          <div v-html="evolution.description"></div>
-                          <div class="ml-3">{{ getDateTime(evolution.created_at) }}</div>
+                        <div v-if="tooth.evolutions && tooth.evolutions.length">
+                          <div class="text-caption text-medium-emphasis mb-1">Evoluções relacionadas</div>
+                          <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between text-body-2" :key="evolution.id">
+                            <div v-html="evolution.description"></div>
+                            <div class="ml-3 text-caption text-disabled">{{ getDateTime(evolution.created_at) }}</div>
+                          </div>
                         </div>
-                      </v-list-item>
-                    </v-list>
+                      </v-card-text>
+                    </v-card>
                   </v-menu>
                 </div>
-              </div>
-              <div class="d-flex flex-column ga-3">
-                <div class="d-flex justify-space-between align-baseline">
+
+                <div class="odonto-v-sep mx-2"></div>
+
+                <div class="d-flex align-end">
                   <v-menu
-                    class="cursor-pointer"
-                    v-for="tooth in toothObjectDown" :key="tooth.id"
+                    v-for="tooth in toothObjectUp.slice(8)"
+                    :key="tooth.type"
                     :close-on-content-click="false"
                     open-on-hover
                   >
                     <template v-slot:activator="{props}">
-                      <div class="d-flex flex-column" v-bind="props">
+                      <div
+                        class="d-flex flex-column align-center px-1 cursor-pointer tooth-item"
+                        :class="{ 'tooth-highlighted': highlightedGroup.includes(teethNumber[tooth.type]) }"
+                        v-bind="props"
+                      >
                         <div class="text-disabled text-caption">{{ teethNumber[tooth.type] }}</div>
-                        <img class="cursor-pointer" :class="!tooth.status ? '' : 'tooth-extracted'" :src="require('../../assets/Vector-'+tooth.type+'.svg')"/>
+                        <img
+                          class="tooth-img"
+                          :class="tooth.status ? 'tooth-extracted' : ''"
+                          :src="require('../../assets/teeth/'+teethNumber[tooth.type]+'.svg')"
+                        />
                       </div>
                     </template>
-
-                    <v-list>
-                      <v-list-item>
-                        <div class="text-h6">Status do dente: {{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
-                      </v-list-item>
-                      <v-list-item>
+                    <v-card rounded="lg" elevation="3" min-width="230" :class="currentUser ? '' : 'hidden'">
+                      <v-card-text class="d-flex flex-column ga-3 pa-4">
+                        <div>
+                          <div class="text-caption text-medium-emphasis">Dente {{ teethNumber[tooth.type] }}</div>
+                          <div class="text-subtitle-1 font-weight-medium">{{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
+                        </div>
                         <v-select
                           density="compact"
-                          label="Alterar estado do dente"
+                          variant="outlined"
+                          label="Alterar status"
                           :items="teethStatuses"
                           item-title="name"
                           return-object
+                          :loading="loadingTeeth"
                           @update:modelValue="updateToothStatus($event, tooth)"
                           item-value="id"
                         ></v-select>
-                        <div class="text-h6">Evoluções relacionadas</div>
-                        <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between" :key="evolution.id">
-                          <div v-html="evolution.description"></div>
-                          <div class="ml-3">{{ getDateTime(evolution.created_at) }}</div>
+                        <div v-if="tooth.evolutions && tooth.evolutions.length">
+                          <div class="text-caption text-medium-emphasis mb-1">Evoluções relacionadas</div>
+                          <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between text-body-2" :key="evolution.id">
+                            <div v-html="evolution.description"></div>
+                            <div class="ml-3 text-caption text-disabled">{{ getDateTime(evolution.created_at) }}</div>
+                          </div>
                         </div>
-                      </v-list-item>
-                    </v-list>
+                      </v-card-text>
+                    </v-card>
                   </v-menu>
                 </div>
               </div>
-            </v-tabs-window-item>
-          </v-tabs-window>
-          <!-- <v-tabs
-            v-model="tab"
-            color="primary"
-            align-tabs="center"
-            class="mt-2"
-          >
-            <v-tab :value="1">Permanentes</v-tab>
-            <v-tab :value="2">Desiduos</v-tab>
-          </v-tabs> -->
+
+              <div class="odonto-h-sep my-4"></div>
+
+              <!-- Lower row: teeth above, numbers below -->
+              <div class="d-flex justify-center align-start">
+                <div class="d-flex align-start">
+                  <v-menu
+                    v-for="tooth in toothObjectDown.slice(0, 8)"
+                    :key="tooth.type"
+                    :close-on-content-click="false"
+                    open-on-hover
+                  >
+                    <template v-slot:activator="{props}">
+                      <div
+                        class="d-flex flex-column align-center px-1 cursor-pointer tooth-item"
+                        :class="{ 'tooth-highlighted': highlightedGroup.includes(teethNumber[tooth.type]) }"
+                        v-bind="props"
+                      >
+                        <img
+                          class="tooth-img"
+                          :class="tooth.status ? 'tooth-extracted' : ''"
+                          :src="require('../../assets/teeth/'+teethNumber[tooth.type]+'.svg')"
+                        />
+                        <div class="text-disabled text-caption">{{ teethNumber[tooth.type] }}</div>
+                      </div>
+                    </template>
+                    <v-card rounded="lg" elevation="3" min-width="230">
+                      <v-card-text class="d-flex flex-column ga-3 pa-4">
+                        <div>
+                          <div class="text-caption text-medium-emphasis">Dente {{ teethNumber[tooth.type] }}</div>
+                          <div class="text-subtitle-1 font-weight-medium">{{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
+                        </div>
+                        <v-select
+                          density="compact"
+                          variant="outlined"
+                          label="Alterar status"
+                          :items="teethStatuses"
+                          item-title="name"
+                          return-object
+                          :loading="loadingTeeth"
+                          @update:modelValue="updateToothStatus($event, tooth)"
+                          item-value="id"
+                        ></v-select>
+                        <div v-if="tooth.evolutions && tooth.evolutions.length">
+                          <div class="text-caption text-medium-emphasis mb-1">Evoluções relacionadas</div>
+                          <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between text-body-2" :key="evolution.id">
+                            <div v-html="evolution.description"></div>
+                            <div class="ml-3 text-caption text-disabled">{{ getDateTime(evolution.created_at) }}</div>
+                          </div>
+                        </div>
+                      </v-card-text>
+                    </v-card>
+                  </v-menu>
+                </div>
+
+                <div class="odonto-v-sep mx-2"></div>
+
+                <div class="d-flex align-start">
+                  <v-menu
+                    v-for="tooth in toothObjectDown.slice(8)"
+                    :key="tooth.type"
+                    :close-on-content-click="false"
+                    open-on-hover
+                  >
+                    <template v-slot:activator="{props}">
+                      <div
+                        class="d-flex flex-column align-center px-1 cursor-pointer tooth-item"
+                        :class="{ 'tooth-highlighted': highlightedGroup.includes(teethNumber[tooth.type]) }"
+                        v-bind="props"
+                      >
+                        <img
+                          class="tooth-img"
+                          :class="tooth.status ? 'tooth-extracted' : ''"
+                          :src="require('../../assets/teeth/'+teethNumber[tooth.type]+'.svg')"
+                        />
+                        <div class="text-disabled text-caption">{{ teethNumber[tooth.type] }}</div>
+                      </div>
+                    </template>
+                    <v-card rounded="lg" elevation="3" min-width="230">
+                      <v-card-text class="d-flex flex-column ga-3 pa-4">
+                        <div>
+                          <div class="text-caption text-medium-emphasis">Dente {{ teethNumber[tooth.type] }}</div>
+                          <div class="text-subtitle-1 font-weight-medium">{{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
+                        </div>
+                        <v-select
+                          density="compact"
+                          variant="outlined"
+                          label="Alterar status"
+                          :items="teethStatuses"
+                          item-title="name"
+                          return-object
+                          :loading="loadingTeeth"
+                          @update:modelValue="updateToothStatus($event, tooth)"
+                          item-value="id"
+                        ></v-select>
+                        <div v-if="tooth.evolutions && tooth.evolutions.length">
+                          <div class="text-caption text-medium-emphasis mb-1">Evoluções relacionadas</div>
+                          <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between text-body-2" :key="evolution.id">
+                            <div v-html="evolution.description"></div>
+                            <div class="ml-3 text-caption text-disabled">{{ getDateTime(evolution.created_at) }}</div>
+                          </div>
+                        </div>
+                      </v-card-text>
+                    </v-card>
+                  </v-menu>
+                </div>
+              </div>
+            </template>
+
+            <!-- ===== DECÍDUOS ===== -->
+            <template v-else>
+              <!-- Upper row: numbers above, teeth below (55-51 | 61-65) -->
+              <div class="d-flex justify-center align-end">
+                <div class="d-flex align-end">
+                  <v-menu
+                    v-for="tooth in toothObjectDecidUp.slice(0, 5)"
+                    :key="tooth.type"
+                    :close-on-content-click="false"
+                    open-on-hover
+                  >
+                    <template v-slot:activator="{props}">
+                      <div class="d-flex flex-column align-center px-1 cursor-pointer tooth-item" v-bind="props">
+                        <div class="text-disabled text-caption">{{ deciduousTeethNumber[tooth.type - 32] }}</div>
+                        <img class="tooth-img" :class="tooth.status ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+deciduousTeethNumber[tooth.type - 32]+'.svg')"/>
+                      </div>
+                    </template>
+                    <v-card rounded="lg" elevation="3" min-width="230" :class="currentUser ? '' : 'hidden'">
+                      <v-card-text class="d-flex flex-column ga-3 pa-4">
+                        <div>
+                          <div class="text-caption text-medium-emphasis">Dente {{ deciduousTeethNumber[tooth.type - 32] }}</div>
+                          <div class="text-subtitle-1 font-weight-medium">{{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
+                        </div>
+                        <v-select
+                          density="compact"
+                          variant="outlined"
+                          label="Alterar status"
+                          :items="teethStatuses"
+                          item-title="name"
+                          return-object
+                          :loading="loadingTeeth"
+                          @update:modelValue="updateToothStatus($event, tooth)"
+                          item-value="id"
+                        ></v-select>
+                        <div v-if="tooth.evolutions && tooth.evolutions.length">
+                          <div class="text-caption text-medium-emphasis mb-1">Evoluções relacionadas</div>
+                          <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between text-body-2" :key="evolution.id">
+                            <div v-html="evolution.description"></div>
+                            <div class="ml-3 text-caption text-disabled">{{ getDateTime(evolution.created_at) }}</div>
+                          </div>
+                        </div>
+                      </v-card-text>
+                    </v-card>
+                  </v-menu>
+                </div>
+                <div class="odonto-v-sep mx-2"></div>
+                <div class="d-flex align-end">
+                  <v-menu
+                    v-for="tooth in toothObjectDecidUp.slice(5)"
+                    :key="tooth.type"
+                    :close-on-content-click="false"
+                    open-on-hover
+                  >
+                    <template v-slot:activator="{props}">
+                      <div class="d-flex flex-column align-center px-1 cursor-pointer tooth-item" v-bind="props">
+                        <div class="text-disabled text-caption">{{ deciduousTeethNumber[tooth.type - 32] }}</div>
+                        <img class="tooth-img" :class="tooth.status ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+deciduousTeethNumber[tooth.type - 32]+'.svg')"/>
+                      </div>
+                    </template>
+                    <v-card rounded="lg" elevation="3" min-width="230" :class="currentUser ? '' : 'hidden'">
+                      <v-card-text class="d-flex flex-column ga-3 pa-4">
+                        <div>
+                          <div class="text-caption text-medium-emphasis">Dente {{ deciduousTeethNumber[tooth.type - 32] }}</div>
+                          <div class="text-subtitle-1 font-weight-medium">{{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
+                        </div>
+                        <v-select
+                          density="compact"
+                          variant="outlined"
+                          label="Alterar status"
+                          :items="teethStatuses"
+                          item-title="name"
+                          return-object
+                          :loading="loadingTeeth"
+                          @update:modelValue="updateToothStatus($event, tooth)"
+                          item-value="id"
+                        ></v-select>
+                        <div v-if="tooth.evolutions && tooth.evolutions.length">
+                          <div class="text-caption text-medium-emphasis mb-1">Evoluções relacionadas</div>
+                          <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between text-body-2" :key="evolution.id">
+                            <div v-html="evolution.description"></div>
+                            <div class="ml-3 text-caption text-disabled">{{ getDateTime(evolution.created_at) }}</div>
+                          </div>
+                        </div>
+                      </v-card-text>
+                    </v-card>
+                  </v-menu>
+                </div>
+              </div>
+
+              <div class="odonto-h-sep my-4"></div>
+
+              <!-- Lower row: teeth above, numbers below (85-81 | 71-75) -->
+              <div class="d-flex justify-center align-start">
+                <div class="d-flex align-start">
+                  <v-menu
+                    v-for="tooth in toothObjectDecidDown.slice(0, 5)"
+                    :key="tooth.type"
+                    :close-on-content-click="false"
+                    open-on-hover
+                  >
+                    <template v-slot:activator="{props}">
+                      <div class="d-flex flex-column align-center px-1 cursor-pointer tooth-item" v-bind="props">
+                        <img class="tooth-img" :class="tooth.status ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+deciduousTeethNumber[tooth.type - 32]+'.svg')"/>
+                        <div class="text-disabled text-caption">{{ deciduousTeethNumber[tooth.type - 32] }}</div>
+                      </div>
+                    </template>
+                    <v-card rounded="lg" elevation="3" min-width="230" :class="currentUser ? '' : 'hidden'">
+                      <v-card-text class="d-flex flex-column ga-3 pa-4">
+                        <div>
+                          <div class="text-caption text-medium-emphasis">Dente {{ deciduousTeethNumber[tooth.type - 32] }}</div>
+                          <div class="text-subtitle-1 font-weight-medium">{{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
+                        </div>
+                        <v-select
+                          density="compact"
+                          variant="outlined"
+                          label="Alterar status"
+                          :items="teethStatuses"
+                          item-title="name"
+                          return-object
+                          :loading="loadingTeeth"
+                          @update:modelValue="updateToothStatus($event, tooth)"
+                          item-value="id"
+                        ></v-select>
+                        <div v-if="tooth.evolutions && tooth.evolutions.length">
+                          <div class="text-caption text-medium-emphasis mb-1">Evoluções relacionadas</div>
+                          <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between text-body-2" :key="evolution.id">
+                            <div v-html="evolution.description"></div>
+                            <div class="ml-3 text-caption text-disabled">{{ getDateTime(evolution.created_at) }}</div>
+                          </div>
+                        </div>
+                      </v-card-text>
+                    </v-card>
+                  </v-menu>
+                </div>
+                <div class="odonto-v-sep mx-2"></div>
+                <div class="d-flex align-start">
+                  <v-menu
+                    v-for="tooth in toothObjectDecidDown.slice(5)"
+                    :key="tooth.type"
+                    :close-on-content-click="false"
+                    open-on-hover
+                  >
+                    <template v-slot:activator="{props}">
+                      <div class="d-flex flex-column align-center px-1 cursor-pointer tooth-item" v-bind="props">
+                        <img class="tooth-img" :class="tooth.status ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+deciduousTeethNumber[tooth.type - 32]+'.svg')"/>
+                        <div class="text-disabled text-caption">{{ deciduousTeethNumber[tooth.type - 32] }}</div>
+                      </div>
+                    </template>
+                    <v-card rounded="lg" elevation="3" min-width="230" :class="currentUser ? '' : 'hidden'">
+                      <v-card-text class="d-flex flex-column ga-3 pa-4">
+                        <div>
+                          <div class="text-caption text-medium-emphasis">Dente {{ deciduousTeethNumber[tooth.type - 32] }}</div>
+                          <div class="text-subtitle-1 font-weight-medium">{{ tooth.status ? tooth.status.name : 'Saudável' }}</div>
+                        </div>
+                        <v-select
+                          density="compact"
+                          variant="outlined"
+                          label="Alterar status"
+                          :items="teethStatuses"
+                          item-title="name"
+                          return-object
+                          :loading="loadingTeeth"
+                          @update:modelValue="updateToothStatus($event, tooth)"
+                          item-value="id"
+                        ></v-select>
+                        <div v-if="tooth.evolutions && tooth.evolutions.length">
+                          <div class="text-caption text-medium-emphasis mb-1">Evoluções relacionadas</div>
+                          <div v-for="evolution in tooth.evolutions" class="d-flex justify-space-between text-body-2" :key="evolution.id">
+                            <div v-html="evolution.description"></div>
+                            <div class="ml-3 text-caption text-disabled">{{ getDateTime(evolution.created_at) }}</div>
+                          </div>
+                        </div>
+                      </v-card-text>
+                    </v-card>
+                  </v-menu>
+                </div>
+              </div>
+            </template>
+          </div>
+
         </v-card-text>
       </v-card>
       <v-skeleton-loader
@@ -764,16 +1081,28 @@
       toothObjectUp() {
         return [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map((toothType) => {
           return this.client.teeth.filter((tooth) => tooth.type === toothType)[0] || {
-            type: toothType,
-            status: null
+            type: toothType, status: null, evolutions: []
           }
         })
       },
       toothObjectDown() {
         return [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].map((toothType) => {
           return this.client.teeth.filter((tooth) => tooth.type === toothType)[0] || {
-            type: toothType,
-            status: null
+            type: toothType, status: null, evolutions: []
+          }
+        })
+      },
+      toothObjectDecidUp() {
+        return [32,33,34,35,36,37,38,39,40,41].map((toothType) => {
+          return this.client.teeth.filter((tooth) => tooth.type === toothType)[0] || {
+            type: toothType, status: null, evolutions: []
+          }
+        })
+      },
+      toothObjectDecidDown() {
+        return [42,43,44,45,46,47,48,49,50,51].map((toothType) => {
+          return this.client.teeth.filter((tooth) => tooth.type === toothType)[0] || {
+            type: toothType, status: null, evolutions: []
           }
         })
       }
@@ -789,6 +1118,13 @@
         format,
         parseISO,
         tab: 1,
+        activeTab: 'permanent',
+        highlightedGroup: [],
+        toothGroups: {
+          maxila:    [11,12,13,14,15,16,17,18,21,22,23,24,25,26,27,28],
+          mandibula: [31,32,33,34,35,36,37,38,41,42,43,44,45,46,47,48],
+          face:      [13,12,11,21,22,23,43,42,41,31,32,33],
+        },
         approveMode: 'evolution',
         imageLoading: false,
         registeringDialog: false,
@@ -815,6 +1151,7 @@
           name: ''
         },
         teethNumber: [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28,48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38],
+        deciduousTeethNumber: [55,54,53,52,51,61,62,63,64,65,85,84,83,82,81,71,72,73,74,75],
         schedulerDialog: false,
         addImageDialog: false,
         title: '',
@@ -1155,6 +1492,77 @@
 </script>
 
 <style>
+.odonto-tab {
+  position: relative;
+  padding-bottom: 6px;
+  transition: color 0.2s;
+}
+
+.odonto-tab-active {
+  font-weight: bold;
+}
+
+.odonto-tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: rgb(var(--v-theme-error));
+  border-radius: 2px;
+}
+
+.odontogram-area {
+  background-color: #F5F5F7;
+}
+
+.odonto-v-sep {
+  border-left: 2px dashed #DDDDDD;
+  align-self: stretch;
+  width: 0;
+}
+
+.odonto-h-sep {
+  border-top: 2px dashed #DDDDDD;
+}
+
+.tooth-img {
+  width: 26px;
+  height: auto;
+}
+
+.tooth-item {
+  border-radius: 4px;
+  transition: background-color 0.15s;
+}
+
+.tooth-highlighted {
+  background-color: rgba(var(--v-theme-primary), 0.12);
+  border-radius: 4px;
+}
+
+.odonto-group-btn {
+  font-size: 0.875rem;
+  color: rgba(0,0,0,0.5);
+  cursor: pointer;
+  padding: 2px 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.odonto-group-btn:hover {
+  color: rgb(var(--v-theme-primary));
+  border-color: rgb(var(--v-theme-primary));
+}
+
+.odonto-group-active {
+  color: rgb(var(--v-theme-primary));
+  border-color: rgb(var(--v-theme-primary));
+  background-color: rgba(var(--v-theme-primary), 0.08);
+}
+
 .tooth-healthy {
   filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(119%) contrast(119%);
 }

@@ -4,18 +4,58 @@
   >
     <v-card-text  v-if="descriptionAction === 'evolutions' || descriptionAction === 'prescriptions'">
       <div class="d-flex flex-column ga-3 mb-3" v-if="descriptionAction === 'evolutions'">
+        <!-- Group selectors -->
+        <div class="d-flex justify-center ga-4">
+          <span class="odonto-group-btn" :class="{ 'odonto-group-active': isGroupSelected('maxila') }" @click="toggleGroup('maxila')">Maxila</span>
+          <span class="odonto-group-btn" :class="{ 'odonto-group-active': isGroupSelected('mandibula') }" @click="toggleGroup('mandibula')">Mandíbula</span>
+          <span class="odonto-group-btn" :class="{ 'odonto-group-active': isGroupSelected('face') }" @click="toggleGroup('face')">Face</span>
+        </div>
+
         <drag-select v-model="teeth" :multiple="true" background="rgba(255,82,82,0.28)">
-          <div class="d-flex justify-space-between align-baseline">
-            <drag-select-option v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :value="tooth" :key="tooth">
-              <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-              <img class="cursor-pointer" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
-            </drag-select-option>
-          </div>
-          <div class="d-flex justify-space-between">
-            <drag-select-option v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :value="tooth" :key="tooth">
-              <img class="cursor-pointer" height="25" :class="teeth.includes(tooth) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
-              <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-            </drag-select-option>
+          <div class="odontogram-area rounded-lg pa-3">
+            <!-- Upper row -->
+            <div class="d-flex justify-center align-end">
+              <div class="d-flex align-end">
+                <drag-select-option v-for="tooth in [0,1,2,3,4,5,6,7]" :value="tooth" :key="tooth">
+                  <div class="d-flex flex-column align-center px-1">
+                    <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                    <img class="tooth-img cursor-pointer" :class="teeth.includes(tooth) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
+                  </div>
+                </drag-select-option>
+              </div>
+              <div class="odonto-v-sep mx-2"></div>
+              <div class="d-flex align-end">
+                <drag-select-option v-for="tooth in [8,9,10,11,12,13,14,15]" :value="tooth" :key="tooth">
+                  <div class="d-flex flex-column align-center px-1">
+                    <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                    <img class="tooth-img cursor-pointer" :class="teeth.includes(tooth) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
+                  </div>
+                </drag-select-option>
+              </div>
+            </div>
+
+            <div class="odonto-h-sep my-3"></div>
+
+            <!-- Lower row -->
+            <div class="d-flex justify-center align-start">
+              <div class="d-flex align-start">
+                <drag-select-option v-for="tooth in [16,17,18,19,20,21,22,23]" :value="tooth" :key="tooth">
+                  <div class="d-flex flex-column align-center px-1">
+                    <img class="tooth-img cursor-pointer" :class="teeth.includes(tooth) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
+                    <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                  </div>
+                </drag-select-option>
+              </div>
+              <div class="odonto-v-sep mx-2"></div>
+              <div class="d-flex align-start">
+                <drag-select-option v-for="tooth in [24,25,26,27,28,29,30,31]" :value="tooth" :key="tooth">
+                  <div class="d-flex flex-column align-center px-1">
+                    <img class="tooth-img cursor-pointer" :class="teeth.includes(tooth) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
+                    <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                  </div>
+                </drag-select-option>
+              </div>
+            </div>
           </div>
         </drag-select>
       </div>
@@ -152,18 +192,55 @@
 
                   <v-list>
                     <v-list-item class="no-select">
+                      <!-- Group selectors for plan -->
+                      <div class="d-flex justify-center ga-3 mb-2">
+                        <span class="odonto-group-btn" :class="{ 'odonto-group-active': isPlanGroupSelected(element, 'maxila') }" @click="togglePlanGroup(element, 'maxila')">Maxila</span>
+                        <span class="odonto-group-btn" :class="{ 'odonto-group-active': isPlanGroupSelected(element, 'mandibula') }" @click="togglePlanGroup(element, 'mandibula')">Mandíbula</span>
+                        <span class="odonto-group-btn" :class="{ 'odonto-group-active': isPlanGroupSelected(element, 'face') }" @click="togglePlanGroup(element, 'face')">Face</span>
+                      </div>
                       <drag-select v-model="element.quantity" :multiple="true" background="rgba(255,82,82,0.28)">
-                        <div class="d-flex justify-space-between align-baseline">
-                          <drag-select-option v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
-                            <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                            <img class="cursor-pointer" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
-                          </drag-select-option>
-                        </div>
-                        <div class="d-flex justify-space-between">
-                          <drag-select-option v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
-                            <img class="cursor-pointer" height="25" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted': ''" :src="require('../../assets/Vector-'+tooth+'.svg')"/>
-                            <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                          </drag-select-option>
+                        <div class="odontogram-area rounded-lg pa-3">
+                          <!-- Upper row -->
+                          <div class="d-flex justify-center align-end">
+                            <div class="d-flex align-end">
+                              <drag-select-option v-for="tooth in [0,1,2,3,4,5,6,7]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
+                                <div class="d-flex flex-column align-center px-1">
+                                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                                  <img class="tooth-img cursor-pointer" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
+                                </div>
+                              </drag-select-option>
+                            </div>
+                            <div class="odonto-v-sep mx-2"></div>
+                            <div class="d-flex align-end">
+                              <drag-select-option v-for="tooth in [8,9,10,11,12,13,14,15]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
+                                <div class="d-flex flex-column align-center px-1">
+                                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                                  <img class="tooth-img cursor-pointer" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
+                                </div>
+                              </drag-select-option>
+                            </div>
+                          </div>
+                          <div class="odonto-h-sep my-3"></div>
+                          <!-- Lower row -->
+                          <div class="d-flex justify-center align-start">
+                            <div class="d-flex align-start">
+                              <drag-select-option v-for="tooth in [16,17,18,19,20,21,22,23]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
+                                <div class="d-flex flex-column align-center px-1">
+                                  <img class="tooth-img cursor-pointer" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
+                                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                                </div>
+                              </drag-select-option>
+                            </div>
+                            <div class="odonto-v-sep mx-2"></div>
+                            <div class="d-flex align-start">
+                              <drag-select-option v-for="tooth in [24,25,26,27,28,29,30,31]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
+                                <div class="d-flex flex-column align-center px-1">
+                                  <img class="tooth-img cursor-pointer" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
+                                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
+                                </div>
+                              </drag-select-option>
+                            </div>
+                          </div>
                         </div>
                       </drag-select>
                     </v-list-item>
@@ -258,6 +335,16 @@
         teeth: [],
         categories: [{id: 1, name: 'Ortodontia'}],
         teethNumber: [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28,48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38],
+        toothGroups: {
+          maxila:    [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+          mandibula: [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+          face:      [5,6,7,8,9,10,21,22,23,24,25,26],
+        },
+        toothGroupsFdi: {
+          maxila:    [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28],
+          mandibula: [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38],
+          face:      [13,12,11,21,22,23,43,42,41,31,32,33],
+        },
         description: '',
         saving: false,
         loading: false,
@@ -332,6 +419,32 @@
             return procedure
           })
         })
+      },
+      isGroupSelected(group) {
+        return this.toothGroups[group].every(i => this.teeth.includes(i))
+      },
+      toggleGroup(group) {
+        const indices = this.toothGroups[group]
+        if (this.isGroupSelected(group)) {
+          this.teeth = this.teeth.filter(i => !indices.includes(i))
+        } else {
+          const next = [...this.teeth]
+          indices.forEach(i => { if (!next.includes(i)) next.push(i) })
+          this.teeth = next
+        }
+      },
+      isPlanGroupSelected(element, group) {
+        return this.toothGroupsFdi[group].every(n => element.quantity.includes(n))
+      },
+      togglePlanGroup(element, group) {
+        const nums = this.toothGroupsFdi[group]
+        if (this.isPlanGroupSelected(element, group)) {
+          element.quantity = element.quantity.filter(n => !nums.includes(n))
+        } else {
+          const next = [...element.quantity]
+          nums.forEach(n => { if (!next.includes(n)) next.push(n) })
+          element.quantity = next
+        }
       },
       setProcedure(event, element) {
         if(typeof event === 'object' && event?.price) {
