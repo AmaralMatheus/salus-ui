@@ -422,9 +422,16 @@
         class="mx-auto border"
         type="article"
       ></v-skeleton-loader>
-      <div class="d-flex mt-6">
-        <v-btn v-if="!loading && currentUser && currentUser.type !== 2" @click="descriptionDialog = true; description = ''; descriptionAction = 'evolutions'" class="ma-auto mb-6">Adicionar Evolução</v-btn>
-      </div>
+      <v-btn
+        v-if="!loading && currentUser && currentUser.type !== 2"
+        @click="descriptionDialog = true; description = ''; descriptionAction = 'evolutions'"
+        prepend-icon="mdi-plus"
+        block
+        variant="outlined"
+        color="default"
+        class="mt-6 mb-4 bg-white"
+        style="border-color: #E0E0E0"
+      >Adicionar Evolução</v-btn>
       <div v-if="client.evolutions && client.evolutions.length < 1" class="d-flex ma-auto" style="width: max-content">
         Não há evoluções cadastradas!
       </div>
@@ -711,37 +718,36 @@
     </v-col>
 		<v-col cols="12" sm="6" md="5" lg="4">
       <v-card v-if="!loading" :loading="loading">
-        <ClientProfile :client="client" @update="update" />
+        <ClientProfile :client="client" @update="update" @delete="dialog = true" @schedule="schedulerDialog = true" />
         <v-card-title>
-          <div class="d-flex ga-2 align-center">
-            <h4 class="text-h6">Receitas</h4>
-            
-            <div class="d-flex ga-2 ml-auto">
-              <v-btn v-if="currentUser && currentUser.type !== 2" size="small" icon="mdi-plus" @click="descriptionDialog = true;  title = ''; description = ''; descriptionAction = 'prescriptions'" color="primary" variant="tonal" density="comfortable"/>
-            </div>
+          <div class="d-flex align-center">
+            <span style="font-size: 16px; font-weight: 600">Receitas</span>
+            <v-btn v-if="currentUser && currentUser.type !== 2" class="ml-auto" size="small" icon="mdi-plus" @click="descriptionDialog = true; title = ''; description = ''; descriptionAction = 'prescriptions'" color="primary" variant="tonal" density="comfortable" rounded="lg"/>
           </div>
         </v-card-title>
-        <v-card-text v-if="client.prescriptions && client.prescriptions.length > 0" class="d-flex flex-column ga-3">
-          <div v-for="prescription in client.prescriptions" class="px-3 py-2 d-flex ga-3 justify-space-between align-center text-none cursor-pointer bg-red-lighten-5 rounded-sm" :key="prescription.id">
-            <div @click="prescriptionView = true; currentPrescription = prescription" class="d-flex justify-space-between w-100">
-              <div class="text-error">{{ getDateTime(prescription.created_at) }}</div>
-            </div>
-            <v-btn v-if="this.currentUser" size="small" density="comfortable" icon="mdi-delete" @click="prescriptionDeleteDialog = true; selectedPrescription = prescription.id" color="error" variant="text"/>
+        <v-card-text v-if="client.prescriptions && client.prescriptions.length > 0" class="d-flex flex-column ga-2 pt-0">
+          <div
+            v-for="prescription in client.prescriptions.slice(0, 3)"
+            :key="prescription.id"
+            class="px-3 py-2 d-flex ga-3 align-center rounded-sm cursor-pointer"
+            style="background: #F5F5F7; font-size: 12px"
+            @click="prescriptionView = true; currentPrescription = prescription"
+          >
+            <span class="text-medium-emphasis">{{ getDateTime(prescription.created_at) }}</span>
+            <span class="text-disabled ml-1">{{ prescription.title ?? stripHtml(prescription.description) }}</span>
           </div>
-          <div @click="prescriptionDialog = true" class="text-none text-primary cursor-pointer d-flex align-center" >
-            Ver todas as receitas
-            <v-icon icon="mdi-chevron-right"></v-icon>
+          <div @click="prescriptionDialog = true" class="text-primary cursor-pointer d-flex align-center mt-1" style="font-size: 12px">
+            ver todas as receitas
+            <v-icon icon="mdi-chevron-right" size="16"></v-icon>
           </div>
         </v-card-text>
-        <v-card-text v-else class="d-flex flex-column ga-3">
+        <v-card-text v-else class="pt-0" style="font-size: 12px; color: rgba(0,0,0,0.4)">
           Não existem receitas cadastradas!
         </v-card-text>
         <v-card-title>
-          <div class="d-flex ga-2 align-center">
-            <h4 class="text-h6">Planos de Tratamento</h4>
-            <div class="d-flex ga-2 ml-auto">
-              <v-btn v-if="currentUser && currentUser.type !== 2" size="small" icon="mdi-plus" @click="descriptionDialog = true; title = ''; newPlan = { name: '', actions: []};  descriptionAction = 'plans'; getProcedures()" color="primary" variant="tonal" density="comfortable"/>
-            </div>
+          <div class="d-flex align-center">
+            <span style="font-size: 16px; font-weight: 600">Planos de Tratamento</span>
+            <v-btn v-if="currentUser && currentUser.type !== 2" class="ml-auto" size="small" icon="mdi-plus" @click="descriptionDialog = true; title = ''; newPlan = { name: '', actions: []}; descriptionAction = 'plans'; getProcedures()" color="primary" variant="tonal" density="comfortable" rounded="lg"/>
           </div>
         </v-card-title>
         <v-card-text v-if="client.plans && client.plans.length > 0" class="d-flex flex-column ga-3">
@@ -766,17 +772,15 @@
           Não existem planos cadastrados!
         </v-card-text>
         <v-card-title>
-          <div class="d-flex ga-2 align-center">
-            <h4 class="text-h6">{{ tab }}</h4>
-            <div class="d-flex ga-2 ml-auto">
-              <v-btn v-if="currentUser && currentUser.type !== 2" size="small" icon="mdi-plus" @click="addImageDialog = true" color="primary" variant="tonal" density="comfortable"/>
-            </div>
+          <div class="d-flex align-center">
+            <span style="font-size: 16px; font-weight: 600">Anexos</span>
+            <v-btn v-if="currentUser && currentUser.type !== 2" class="ml-auto" size="small" icon="mdi-plus" @click="addImageDialog = true" color="primary" variant="tonal" density="comfortable" rounded="lg"/>
           </div>
         </v-card-title>
         <v-tabs
           v-model="tab"
           color="primary"
-          align-tabs="center"
+          align-tabs="start"
           class="mt-2"
         >
           <v-tab value="Imagens">Imagens</v-tab>
@@ -819,13 +823,15 @@
             value="Documentos"
           >
             <v-card-text class="d-flex flex-column ga-3">
-              <v-hover v-if="client.documents && client.documents.length > 0"><div v-for="document in client.documents" variant="tonal" density="comfortable" color="disabled" class="px-3 py-2 d-flex ga-3 justify-space-between text-none align-center bg-red-lighten-5 rounded-sm cursor-pointer" :key="document.id">
-                <div @click="documentView = true; currenDocument = document" class="d-flex justify-space-between align-center ga-3 w-100">
-                  <div class="text-error">{{ getDateTime(document.created_at) }}</div>
-                  <div class="ml-auto filename">{{document.path.split("/")[document.path.split("/").length -1]}}</div>
+              <div v-if="client.documents && client.documents.length > 0">
+                <div v-for="document in client.documents" :key="document.id" class="px-3 py-2 d-flex justify-space-between align-center bg-red-lighten-5 rounded-sm cursor-pointer mb-2">
+                  <div @click="documentView = true; currenDocument = document" class="d-flex flex-column">
+                    <span class="filename" style="font-size: 12px">{{ document.path.split("/")[document.path.split("/").length - 1] }}</span>
+                    <span class="text-medium-emphasis" style="font-size: 11px">{{ getDateTime(document.created_at) }}</span>
+                  </div>
+                  <v-btn size="small" density="comfortable" icon="mdi-delete" v-if="currentUser" @click="imageDeleteDialog = true; selectedImage = document" color="error" variant="text"/>
                 </div>
-                <v-btn size="small" density="comfortable" icon="mdi-delete" v-if="this.currentUser" @click="imageDeleteDialog = true; selectedImage = document" color="error" variant="text"/>
-              </div></v-hover>
+              </div>
               <div v-else>Não existem documentos cadastrados</div>
             </v-card-text>
           </v-tabs-window-item>
@@ -1118,7 +1124,7 @@
       return {
         format,
         parseISO,
-        tab: 1,
+        tab: 'Imagens',
         activeTab: 'permanent',
         highlightedGroup: [],
         toothGroups: {
@@ -1336,6 +1342,10 @@
       },
       getDateTime(date) {
         return format(parseISO(date), 'dd/MM/yyyy kk:mm')
+      },
+      stripHtml(html) {
+        if (!html) return ''
+        return html.replace(/<[^>]*>/g, '').slice(0, 40)
       },
       viewRow (event, row) {
         this.planView = true
