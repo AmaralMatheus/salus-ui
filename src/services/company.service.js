@@ -145,8 +145,9 @@ class CompanyService {
   updateQuestion(id, data) {
     return axios.put(process.env.VUE_APP_API_URL + 'questions/' + id, data, { headers: authHeader() })
   }
-  getAllQuestion() {
-    return axios.get(process.env.VUE_APP_API_URL + 'questions/all',  { headers: authHeader() })
+  getAllQuestion(companyId) {
+    const params = companyId ? '?company_id=' + companyId : ''
+    return axios.get(process.env.VUE_APP_API_URL + 'questions/all' + params, { headers: authHeader() })
   }
   deleteQuestion(id) {
     return axios.delete(process.env.VUE_APP_API_URL + 'questions/' + id, { headers: authHeader() })

@@ -585,8 +585,8 @@
             <v-data-table-virtual
               v-model:items-per-page="itemsPerPage"
               :headers="headers"
-              :items="client.prescriptions"
-              :items-length="client.prescriptions.length"
+              :items="sortedPrescriptions"
+              :items-length="sortedPrescriptions.length"
               item-value="id"
               @click:row="viewPrescription"
             >
@@ -725,9 +725,9 @@
             <v-btn v-if="currentUser && currentUser.type !== 2" class="ml-auto" size="small" icon="mdi-plus" @click="descriptionDialog = true; title = ''; description = ''; descriptionAction = 'prescriptions'" color="primary" variant="tonal" density="comfortable" rounded="lg"/>
           </div>
         </v-card-title>
-        <v-card-text v-if="client.prescriptions && client.prescriptions.length > 0" class="d-flex flex-column ga-2 pt-0">
+        <v-card-text v-if="sortedPrescriptions.length > 0" class="d-flex flex-column ga-2 pt-0">
           <div
-            v-for="prescription in client.prescriptions.slice(0, 3)"
+            v-for="prescription in sortedPrescriptions.slice(0, 3)"
             :key="prescription.id"
             class="px-3 py-2 d-flex ga-3 align-center rounded-sm cursor-pointer"
             style="background: #F5F5F7; font-size: 12px"
@@ -1008,6 +1008,7 @@
   <v-dialog
     v-model="registeringDialog"
     max-width="1200"
+    scrollable
   >
     <client-register :selectedClient="this.client.id" @cancel="registeringDialog = false" @reload="registeringDialog = false; getClient()"/>
   </v-dialog>
@@ -1080,6 +1081,9 @@
       },
       currentUser() {
         return this.$store.state.auth.user
+      },
+      sortedPrescriptions() {
+        return [...(this.client.prescriptions || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       },
       toothObjectUp() {
         return [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map((toothType) => {

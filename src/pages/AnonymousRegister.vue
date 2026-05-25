@@ -4,7 +4,7 @@
       <img width="20" src="/favicon.svg" />
       <v-toolbar-title class="d-md-block">Dental Salus</v-toolbar-title>
     </div>
-    <client-register :external="true"></client-register>
+    <client-register :external="true" :company-id="$route.params.company"></client-register>
   </div>
 </template>
 <script>

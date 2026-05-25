@@ -1,6 +1,6 @@
 <template>
-  <div >
-    <v-card width="1200" :class="!this.currentUser ? 'mt-5' : ''" :loading="loadingInfo" :title="!id ? 'Cadastrar paciente' : 'Editar Paciente'" :subtitle="client.name">
+  <div style="max-height: 90vh; overflow-y: auto;">
+    <v-card style="width: min(1200px, 95vw);" :class="!this.currentUser ? 'mt-5' : ''" :loading="loadingInfo" :title="!id ? 'Cadastrar paciente' : 'Editar Paciente'" :subtitle="client.name">
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
           <v-row>
@@ -248,7 +248,7 @@
             </v-col>
           </v-row>
           <div class="d-flex">
-            <v-btn @click="$emit('cancel')" v-if="this.currentUser" variant="plain">Mande para o CLiente Responder</v-btn>
+            <v-btn @click="$emit('cancel')" v-if="this.currentUser" variant="plain">Mande para o Cliente Responder</v-btn>
             <v-btn class="ml-auto" v-if="this.currentUser" @click="$emit('cancel')" variant="plain">Cancelar</v-btn>
             <v-btn @click="save" :class="!this.currentUser ? 'ml-auto' : ''" variant="plain" color="primary" :disabled="loadingInfo || loadingRequest || !valid" :loading="loadingRequest">SALVAR</v-btn>
           </div>
@@ -265,7 +265,6 @@
   import { VDateInput } from 'vuetify/labs/VDateInput'
   import { vMaska } from "maska/vue"
   import { toast } from 'vue3-toastify'
-  import { useRoute } from 'vue-router'
 
   export default {
     components: {
@@ -283,7 +282,7 @@
         return this.$store.state.auth.user
       },
     },
-    props: ['selectedClient', 'external'],
+    props: ['selectedClient', 'external', 'companyId'],
     data: () => ({
       valid: true,
       client: {
@@ -378,8 +377,7 @@
           this.loading = false
         })
       } else {
-        const route = useRoute() 
-        statusService.getAllStatus(route.query.company_id).then((response) => {
+        statusService.getAllStatus(this.companyId).then((response) => {
           this.statuses = response.data
           this.loading = false
         })
@@ -457,7 +455,7 @@
         })
       },
       getQuestions() {
-        statusService.getAllQuestion().then((response) => {
+        statusService.getAllQuestion(this.companyId).then((response) => {
           this.questions = response.data
         })
       },

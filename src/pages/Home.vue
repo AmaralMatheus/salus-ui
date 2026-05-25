@@ -21,14 +21,6 @@
                 </span>
               </v-card-text>
               </v-card>
-              <v-card @click="transactionDialog = true" class="w-100 action-card cursor-pointer">
-                <v-card-text class="d-flex h-100">
-                <span class="ma-auto d-flex flex-column">
-                  <img width="48" class="cursor-pointer ma-auto" :src="require('../assets/currency-fill.svg')"/>
-                  Adicionar Transação
-                </span>
-              </v-card-text>
-              </v-card>
             </div>
           </v-col>
           <v-col cols="12" md="6">
@@ -157,16 +149,13 @@
   >
     <client-register :selectedClient="this.selectedItem" @cancel="newClientDialog = false" @reload="newClientDialog = false"/>
   </v-dialog>
-  <Transaction :transactionDialog="transactionDialog" @reload="init" @close="transactionDialog = false"></Transaction>
 </template>
 
 <script>
-  import transactionService from '../services/transaction.service'
   import appointmentService from '../services/appointment.service'
   import { format, parseISO } from 'date-fns'
   // import Calendar from '../components/agenda/Calendar.vue'
   import Scheduler from '../components/agenda/Scheduler.vue'
-  import Transaction from '../components/Transaction.vue'
   import ClientRegister from '../components/client/ClientRegister.vue'
   import {
     Chart as ChartJS,
@@ -198,17 +187,14 @@
       Line,
       // Calendar,
       Scheduler,
-      Transaction,
       ClientRegister
     },
     data() {
       return {
         loading: true,
         schedulerDialog: false,
-        transactionDialog: false,
         newClientDialog: false,
         appointment: {},
-        transactions: [],
         todayAppointments: [],
         chartData: {
           labels: [],
@@ -295,39 +281,8 @@
     },
     methods: {
       init() {
-        this.getFinancialResume()
         this.getNextAppointment()
         this.getTodayAppointments()
-      },
-      getFinancialResume() {
-        transactionService.getTransactions('page=1&itemsPerPage=30&sort=date&order=asc').then((response) => {
-          this.transactions = response.data.list.data
-          this.prepareChartData()
-        })
-      },
-      prepareChartData() {
-        // Agrupar transações por data e calcular entradas e saídas
-        const transactionsByDate = {}
-        
-        this.transactions.forEach(transaction => {
-          const date = this.getDate(transaction.date)
-          if (!transactionsByDate[date]) {
-            transactionsByDate[date] = { income: 0, expense: 0 }
-          }
-          
-          if (transaction.type === 1) {
-            transactionsByDate[date].income += transaction.amount
-          } else {
-            transactionsByDate[date].expense += transaction.amount
-          }
-        })
-        
-        // Ordenar por data
-        const sortedDates = Object.keys(transactionsByDate).sort()
-        
-        this.chartData.labels = sortedDates
-        this.chartData.datasets[0].data = sortedDates.map(date => transactionsByDate[date].income)
-        this.chartData.datasets[1].data = sortedDates.map(date => transactionsByDate[date].expense)
       },
       getTodayAppointments() {
         appointmentService.getAllAppointments().then((response) => {
@@ -350,9 +305,6 @@
       },
       getDateTime(date) {
         return format(parseISO(date), 'dd/MM/yyyy kk:mm')
-      },
-      getDate(date) {
-        return format(parseISO(date), 'dd/MM/yyyy')
       },
       getTimeOnly(date) {
         return format(parseISO(date), 'HH:mm')

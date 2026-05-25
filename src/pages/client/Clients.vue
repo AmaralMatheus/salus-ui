@@ -106,7 +106,8 @@
       </v-dialog>
       <v-dialog
         v-model="newClientDialog"
-        max-width="auto"
+        max-width="1200"
+        scrollable
       >
         <client-register :selectedClient="this.selectedItem" @cancel="newClientDialog = false" @reload="newClientDialog = false; loadItems({page:1,
           itemsPerPage: 10,

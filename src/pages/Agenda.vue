@@ -98,6 +98,14 @@ export default {
         }).sort((a, b) => new Date(a.date) - new Date(b.date))
       }))
     },
+    monthStartOffset() {
+      const firstDay = getDay(startOfMonth(this.currentMonth))
+      return (firstDay + 6) % 7 // Mon=0, Tue=1, ..., Sun=6
+    },
+    sidebarMonthStartOffset() {
+      if (!this.monthDays.length) return 0
+      return getDay(this.monthDays[0]) // Sun=0, Mon=1, ..., Sat=6
+    },
     viewModeOptions() {
       return [
         { value: 'daily', label: 'Diário', icon: 'mdi-calendar-day' },
@@ -288,12 +296,7 @@ export default {
     },
     getProcedureColor(procedure) {
       const colors = {
-        'Extração': '#FFD700', // Amarelo
-        'Consulta': '#2196F3', // Azul
-        'Limpeza': '#4CAF50', // Verde
-        'Clareamento': '#FF9800', // Laranja
-        'Ortodontia': '#9C27B0', // Roxo
-        'default': '#E91E63' // Rosa
+        'default': 'rgb(var(--v-theme-primary))'
       }
       
       // Se procedure for um array, pegar o primeiro item
@@ -451,8 +454,10 @@ export default {
     <div class="agenda-content" :class="{ 'monthly-layout': viewMode === 'monthly' }">
       <!-- Área principal da agenda -->
       <div class="main-agenda-area">
+        <v-skeleton-loader v-if="loading" type="card, article" class="w-100"/>
+
         <!-- Visualização Diária -->
-        <div v-if="viewMode === 'daily'" class="daily-view">
+        <div v-else-if="viewMode === 'daily'" class="daily-view">
           <div class="daily-view-toggle-container">
             <div class="daily-view-toggle">
               <v-switch
@@ -488,7 +493,10 @@ export default {
                 <div class="card-header">
                   <div class="patient-info">
                     <v-icon size="20" color="primary">mdi-account</v-icon>
-                    <span class="patient-name">{{ appointment.client?.name || 'Cliente não informado' }}</span>
+                    <span
+                      class="patient-name cursor-pointer"
+                      @click.stop="$router.push('/pacientes/' + appointment.client?.id)"
+                    >{{ appointment.client?.name || 'Cliente não informado' }}</span>
                   </div>
                   <div class="time-info">
                     <v-icon size="16" color="grey">mdi-clock</v-icon>
@@ -557,7 +565,10 @@ export default {
                   :style="{ borderLeftColor: getProcedureColor(appointment.procedures) }"
                 >
                   <div class="appointment-time">{{ getTimeOnly(appointment.date) }}</div>
-                  <div class="appointment-patient">{{ appointment.client?.name || 'Cliente não informado' }}</div>
+                  <div
+                    class="appointment-patient cursor-pointer"
+                    @click.stop="$router.push('/pacientes/' + appointment.client?.id)"
+                  >{{ appointment.client?.name || 'Cliente não informado' }}</div>
                   <div class="appointment-procedure">
                     <v-chip 
                       :color="getProcedureColor(procedure)"
@@ -613,7 +624,10 @@ export default {
                   @click="selectDate(dayData.date)"
                 >
                   <div class="mini-time">{{ getTimeOnly(appointment.date) }}</div>
-                  <div class="mini-patient">{{ appointment.client?.name || 'Cliente não informado' }}</div>
+                  <div
+                    class="mini-patient cursor-pointer"
+                    @click.stop="$router.push('/pacientes/' + appointment.client?.id)"
+                  >{{ appointment.client?.name || 'Cliente não informado' }}</div>
                   <div class="mini-procedure">
                     <v-chip 
                       :color="getProcedureColor(procedure)"
@@ -658,8 +672,14 @@ export default {
             </div>
             
             <div class="month-grid">
-              <div 
-                v-for="dayData in appointmentsForMonth" 
+              <div
+                v-for="n in monthStartOffset"
+                :key="'offset-' + n"
+                class="month-day"
+                style="cursor: default; pointer-events: none;"
+              ></div>
+              <div
+                v-for="dayData in appointmentsForMonth"
                 :key="dayData.date"
                 class="month-day"
                 :class="{
@@ -672,14 +692,18 @@ export default {
               >
                                <div class="day-number">{{ getDayNumber(dayData.date) }}</div>
                <div v-if="dayData.appointments.length > 0" class="month-appointments">
-                 <div 
-                   v-for="appointment in dayData.appointments.slice(0, 2)" 
+                 <div
+                   v-for="appointment in dayData.appointments.slice(0, 2)"
                    :key="appointment.id"
                    class="month-appointment-item"
+                   :style="{ borderLeftColor: getProcedureColor(appointment.procedures) }"
                    @click.stop="showAppointmentDetails(appointment)"
                  >
                    <div class="appointment-time-small">{{ getTimeOnly(appointment.date) }}</div>
-                   <div class="appointment-patient-small">{{ appointment.client?.name || 'Cliente não informado' }}</div>
+                   <div
+                     class="appointment-patient-small cursor-pointer"
+                     @click.stop="$router.push('/pacientes/' + appointment.client?.id)"
+                   >{{ appointment.client?.name || 'Cliente não informado' }}</div>
                  </div>
                  <div v-if="dayData.appointments.length > 2" class="more-appointments" @click.stop="showDayAppointments(dayData.date)">
                    +{{ dayData.appointments.length - 2 }}
@@ -693,48 +717,56 @@ export default {
 
       <!-- Mini calendário lateral (apenas nos modos diário e semanal) -->
       <div v-if="viewMode !== 'monthly'" class="sidebar-calendar">
-        <div class="calendar-header">
-          <v-btn 
-            icon="mdi-chevron-left" 
-            size="small" 
-            variant="text"
-            @click="previousMonth"
-          ></v-btn>
-          <h3>{{ format(currentMonth, 'MMMM yyyy', { locale: ptBR }) }}</h3>
-          <v-btn 
-            icon="mdi-chevron-right" 
-            size="small" 
-            variant="text"
-            @click="nextMonth"
-          ></v-btn>
-        </div>
-        
-        <div class="calendar-grid">
-          <div class="weekdays-header">
-            <div v-for="day in ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']" :key="day" class="weekday">
-              {{ day }}
+        <v-skeleton-loader v-if="loading" type="list-item-three-line, list-item-three-line" />
+        <template v-else>
+          <div class="calendar-header">
+            <v-btn
+              icon="mdi-chevron-left"
+              size="small"
+              variant="text"
+              @click="previousMonth"
+            ></v-btn>
+            <h3>{{ format(currentMonth, 'MMMM yyyy', { locale: ptBR }) }}</h3>
+            <v-btn
+              icon="mdi-chevron-right"
+              size="small"
+              variant="text"
+              @click="nextMonth"
+            ></v-btn>
+          </div>
+
+          <div class="calendar-grid">
+            <div class="weekdays-header">
+              <div v-for="day in ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']" :key="day" class="weekday">
+                {{ day }}
+              </div>
+            </div>
+
+            <div class="calendar-days">
+              <div
+                v-for="n in sidebarMonthStartOffset"
+                :key="'offset-' + n"
+                class="calendar-day"
+              ></div>
+              <div
+                v-for="day in monthDays"
+                :key="day"
+                class="calendar-day"
+                :class="{
+                  'other-month': day.getMonth() !== currentMonth.getMonth(),
+                  'current-day': isCurrentDay(day),
+                  'selected-day': isSelectedDay(day),
+                  'past-day': isPastDay(day),
+                  'has-appointments': getAppointmentsForDate(day).length > 0
+                }"
+                @click="selectDate(day)"
+              >
+                <span class="day-number">{{ getDayNumber(day) }}</span>
+                <div v-if="getAppointmentsForDate(day).length > 0" class="appointment-dot"></div>
+              </div>
             </div>
           </div>
-          
-          <div class="calendar-days">
-            <div 
-              v-for="day in monthDays" 
-              :key="day"
-              class="calendar-day"
-              :class="{
-                'other-month': day.getMonth() !== currentMonth.getMonth(),
-                'current-day': isCurrentDay(day),
-                'selected-day': isSelectedDay(day),
-                'past-day': isPastDay(day),
-                'has-appointments': getAppointmentsForDate(day).length > 0
-              }"
-              @click="selectDate(day)"
-            >
-              <span class="day-number">{{ getDayNumber(day) }}</span>
-              <div v-if="getAppointmentsForDate(day).length > 0" class="appointment-dot"></div>
-            </div>
-          </div>
-        </div>
+        </template>
       </div>
     </div>
   </div>
@@ -1114,7 +1146,7 @@ export default {
 .appointment-time {
   font-size: 12px;
   font-weight: 600;
-  color: #C62424;
+  color: rgb(var(--v-theme-primary));
   min-width: 50px;
 }
 
@@ -1212,7 +1244,7 @@ export default {
 
 .time {
   font-weight: 600;
-  color: #2196f3;
+  color: rgb(var(--v-theme-primary));
 }
 
 .card-content {
@@ -1339,7 +1371,7 @@ export default {
 .mini-time {
   font-size: 12px;
   font-weight: 600;
-  color: #C62424;
+  color: rgb(var(--v-theme-primary));
   margin-bottom: 4px;
 }
 
@@ -1460,7 +1492,7 @@ export default {
 .appointment-time-small {
   font-size: 12px;
   font-weight: 600;
-  color: #2196f3;
+  color: rgb(var(--v-theme-primary));
   line-height: 1;
 }
 
@@ -1564,7 +1596,7 @@ export default {
   bottom: 4px;
   width: 4px;
   height: 4px;
-  background: #2196f3;
+  background: rgb(var(--v-theme-primary));
   border-radius: 100px;
 }
 
