@@ -56,12 +56,6 @@
                 <div>Agenda</div>
               </div>
             </v-list-item>
-            <v-list-item active-class="text-white bg-theme" value="financeiro" :active="path ==='financeiro'" @click="$router.push('/financeiro')">
-              <div class="d-flex ga-4 align-center">
-                <img class="cursor-pointer" :class="path ==='financeiro' ? 'active' : ''" :src="require('./assets/coins-line.svg')"/>
-                <div>Financeiro</div>
-              </div>
-            </v-list-item>
             <v-list-item v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
               <div class="d-flex ga-4 align-center">
                 <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
@@ -148,6 +142,26 @@ export default {
   -webkit-box-shadow: 0px 0px 0px -0px rgba(128, 128, 128, 0.575) !important;
   -moz-box-shadow: 0px 0px 0px -0px rgba(128, 128, 128, 0.486) !important;
   box-shadow:0px 0px 0px 0px rgba(128, 128, 128, 0.473) !important;
+}
+
+.v-btn {
+  display: flex;
+  padding: 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  box-shadow: none;
+  height: 48px !important;
+  width: min-content;
+  text-transform: none;
+  letter-spacing: 0px;
+  line-height: 16px;
+  border-radius: 8px;
+  width: auto;
+}
+
+.v-btn:hover {
+  box-shadow: none;
 }
 
 .v-expansion-panel-title {

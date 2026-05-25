@@ -6,8 +6,8 @@
           <v-row class="mt-0">
             <v-col cols="12" sm="3" class="text-h6">Pacientes</v-col>
             <v-col cols="12" sm="9">
-              <v-row>
-                <v-col cols="12" sm="5" md="7" lg="4">
+              <div class=" d-flex flex-column flex-sm-row ga-8">
+                
                   <v-text-field
                     v-model="search"
                     variant="outlined"
@@ -16,14 +16,14 @@
                     append-inner-icon="mdi-magnify"
                     placeholder="Buscar Paciente">
                   </v-text-field>
-                </v-col>
-                <v-col cols="12" sm="7" md="5" lg="4">
-                  <v-btn block append-icon="mdi-plus" @click="create()" color="primary">Adicionar Paciente</v-btn>
-                </v-col>
-                <v-col cols="12" sm="7" md="5" lg="4">
-                  <v-btn block append-icon="mdi-plus" @click="importFromFile()" color="primary">Importar Pacientes</v-btn>
-                </v-col>
-              </v-row>
+                
+                
+                  <v-btn variant="outline" append-icon="mdi-plus" @click="importFromFile()" color="primary">Importar Pacientes</v-btn>
+                
+               
+                  <v-btn append-icon="mdi-plus" @click="create()" color="primary">Adicionar Paciente</v-btn>
+                
+                </div>
             </v-col>
           </v-row>
         </v-card-title>
@@ -106,7 +106,8 @@
       </v-dialog>
       <v-dialog
         v-model="newClientDialog"
-        max-width="auto"
+        max-width="1200"
+        scrollable
       >
         <client-register :selectedClient="this.selectedItem" @cancel="newClientDialog = false" @reload="newClientDialog = false; loadItems({page:1,
           itemsPerPage: 10,
