@@ -1,6 +1,6 @@
 <script>
-// import Calendar from '../components/agenda/Calendar.vue'
 import Scheduler from '../components/agenda/Scheduler.vue'
+import MiniCalendar from '../components/agenda/MiniCalendar.vue'
 import appointmentService from '../services/appointment.service'
 import { format, parseISO, startOfWeek, addDays, isSameDay, isToday, startOfMonth, endOfMonth, eachDayOfInterval, getDay, differenceInMinutes } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -8,9 +8,10 @@ import { toast } from 'vue3-toastify'
 
 export default {
   name: "DefaultAgenda",
-	components: {
-      Scheduler
-	},
+  components: {
+    Scheduler,
+    MiniCalendar,
+  },
   data: () => ({
     ptBR,
     format,
@@ -98,13 +99,15 @@ export default {
         }).sort((a, b) => new Date(a.date) - new Date(b.date))
       }))
     },
-    monthStartOffset() {
-      const firstDay = getDay(startOfMonth(this.currentMonth))
-      return (firstDay + 6) % 7 // Mon=0, Tue=1, ..., Sun=6
+    monthCalendarDays() {
+      const firstDay = startOfMonth(this.currentMonth)
+      const padding = (getDay(firstDay) + 6) % 7
+      return [...Array(padding).fill(null), ...this.appointmentsForMonth]
     },
-    sidebarMonthStartOffset() {
-      if (!this.monthDays.length) return 0
-      return getDay(this.monthDays[0]) // Sun=0, Mon=1, ..., Sat=6
+    sidebarCalendarDays() {
+      const firstDay = startOfMonth(this.currentMonth)
+      const padding = (getDay(firstDay) + 6) % 7
+      return [...Array(padding).fill(null), ...this.monthDays]
     },
     viewModeOptions() {
       return [
@@ -296,7 +299,12 @@ export default {
     },
     getProcedureColor(procedure) {
       const colors = {
-        'default': 'rgb(var(--v-theme-primary))'
+        'Extração': '#FFD700', // Amarelo
+        'Consulta': '#2196F3', // Azul
+        'Limpeza': '#4CAF50', // Verde
+        'Clareamento': '#FF9800', // Laranja
+        'Ortodontia': '#9C27B0', // Roxo
+        'default': '#E91E63' // Rosa
       }
       
       // Se procedure for um array, pegar o primeiro item
@@ -353,6 +361,26 @@ export default {
         this.currentMonth = new Date(this.selectedDate)
         this.generateMonthDays()
       }
+    },
+    previousWeek() {
+      this.selectedDate = addDays(this.selectedDate, -7)
+      this.currentMonth = new Date(this.selectedDate)
+      this.generateMonthDays()
+    },
+    nextWeek() {
+      this.selectedDate = addDays(this.selectedDate, 7)
+      this.currentMonth = new Date(this.selectedDate)
+      this.generateMonthDays()
+    },
+    previousDay() {
+      this.selectedDate = addDays(this.selectedDate, -1)
+      this.currentMonth = new Date(this.selectedDate)
+      this.generateMonthDays()
+    },
+    nextDay() {
+      this.selectedDate = addDays(this.selectedDate, 1)
+      this.currentMonth = new Date(this.selectedDate)
+      this.generateMonthDays()
     }
   },
   watch: {
@@ -389,12 +417,16 @@ export default {
           
           <!-- Título do dia (apenas no modo diário) -->
           <div v-else-if="viewMode === 'daily'" class="day-title">
+            <v-btn icon="mdi-chevron-left" size="small" variant="text" @click="previousDay"></v-btn>
             <h2>{{ format(selectedDate, 'EEEE, dd \'de\' MMMM', { locale: ptBR }) }}</h2>
+            <v-btn icon="mdi-chevron-right" size="small" variant="text" @click="nextDay"></v-btn>
           </div>
-          
+
           <!-- Título da semana (apenas no modo semanal) -->
           <div v-else-if="viewMode === 'weekly'" class="week-title">
+            <v-btn icon="mdi-chevron-left" size="small" variant="text" @click="previousWeek"></v-btn>
             <h2>{{ format(currentWeekDays[0], 'dd \'de\' MMMM', { locale: ptBR }) }} - {{ format(currentWeekDays[6], 'dd \'de\' MMMM', { locale: ptBR }) }}</h2>
+            <v-btn icon="mdi-chevron-right" size="small" variant="text" @click="nextWeek"></v-btn>
           </div>
         </div>
         
@@ -454,10 +486,8 @@ export default {
     <div class="agenda-content" :class="{ 'monthly-layout': viewMode === 'monthly' }">
       <!-- Área principal da agenda -->
       <div class="main-agenda-area">
-        <v-skeleton-loader v-if="loading" type="card, article" class="w-100"/>
-
         <!-- Visualização Diária -->
-        <div v-else-if="viewMode === 'daily'" class="daily-view">
+        <div v-if="viewMode === 'daily'" class="daily-view">
           <div class="daily-view-toggle-container">
             <div class="daily-view-toggle">
               <v-switch
@@ -493,10 +523,7 @@ export default {
                 <div class="card-header">
                   <div class="patient-info">
                     <v-icon size="20" color="primary">mdi-account</v-icon>
-                    <span
-                      class="patient-name cursor-pointer"
-                      @click.stop="$router.push('/pacientes/' + appointment.client?.id)"
-                    >{{ appointment.client?.name || 'Cliente não informado' }}</span>
+                    <span class="patient-name">{{ appointment.client?.name || 'Cliente não informado' }}</span>
                   </div>
                   <div class="time-info">
                     <v-icon size="16" color="grey">mdi-clock</v-icon>
@@ -565,10 +592,7 @@ export default {
                   :style="{ borderLeftColor: getProcedureColor(appointment.procedures) }"
                 >
                   <div class="appointment-time">{{ getTimeOnly(appointment.date) }}</div>
-                  <div
-                    class="appointment-patient cursor-pointer"
-                    @click.stop="$router.push('/pacientes/' + appointment.client?.id)"
-                  >{{ appointment.client?.name || 'Cliente não informado' }}</div>
+                  <div class="appointment-patient">{{ appointment.client?.name || 'Cliente não informado' }}</div>
                   <div class="appointment-procedure">
                     <v-chip 
                       :color="getProcedureColor(procedure)"
@@ -604,15 +628,21 @@ export default {
         <!-- Visualização Semanal -->
         <div v-else-if="viewMode === 'weekly'" class="weekly-view">
           <div class="week-grid">
-            <div 
-              v-for="dayData in appointmentsForWeek" 
+            <div
+              v-for="dayData in appointmentsForWeek"
               :key="dayData.date"
               class="day-column"
-              :class="{ 'current-day': isCurrentDay(dayData.date) }"
+              :class="{
+                'current-day': isCurrentDay(dayData.date),
+                'selected-day': isSelectedDay(dayData.date)
+              }"
             >
-              <div class="day-header">
+              <div class="day-header" @click="selectDate(dayData.date)">
                 <div class="day-name">{{ getDayName(dayData.date) }}</div>
                 <div class="day-number">{{ getDayNumber(dayData.date) }}</div>
+                <div v-if="getAppointmentsForDate(dayData.date).length > 0" class="week-appt-count">
+                  {{ getAppointmentsForDate(dayData.date).length }}
+                </div>
               </div>
               
               <div class="day-appointments">
@@ -624,10 +654,7 @@ export default {
                   @click="selectDate(dayData.date)"
                 >
                   <div class="mini-time">{{ getTimeOnly(appointment.date) }}</div>
-                  <div
-                    class="mini-patient cursor-pointer"
-                    @click.stop="$router.push('/pacientes/' + appointment.client?.id)"
-                  >{{ appointment.client?.name || 'Cliente não informado' }}</div>
+                  <div class="mini-patient">{{ appointment.client?.name || 'Cliente não informado' }}</div>
                   <div class="mini-procedure">
                     <v-chip 
                       :color="getProcedureColor(procedure)"
@@ -672,44 +699,36 @@ export default {
             </div>
             
             <div class="month-grid">
-              <div
-                v-for="n in monthStartOffset"
-                :key="'offset-' + n"
-                class="month-day"
-                style="cursor: default; pointer-events: none;"
-              ></div>
-              <div
-                v-for="dayData in appointmentsForMonth"
-                :key="dayData.date"
-                class="month-day"
-                :class="{
-                  'other-month': dayData.date.getMonth() !== currentMonth.getMonth(),
-                  'current-day': isCurrentDay(dayData.date),
-                  'selected-day': isSelectedDay(dayData.date),
-                  'has-appointments': dayData.appointments.length > 0
-                }"
-                @click="handleDayClick(dayData.date)"
-              >
-                               <div class="day-number">{{ getDayNumber(dayData.date) }}</div>
-               <div v-if="dayData.appointments.length > 0" class="month-appointments">
-                 <div
-                   v-for="appointment in dayData.appointments.slice(0, 2)"
-                   :key="appointment.id"
-                   class="month-appointment-item"
-                   :style="{ borderLeftColor: getProcedureColor(appointment.procedures) }"
-                   @click.stop="showAppointmentDetails(appointment)"
-                 >
-                   <div class="appointment-time-small">{{ getTimeOnly(appointment.date) }}</div>
-                   <div
-                     class="appointment-patient-small cursor-pointer"
-                     @click.stop="$router.push('/pacientes/' + appointment.client?.id)"
-                   >{{ appointment.client?.name || 'Cliente não informado' }}</div>
-                 </div>
-                 <div v-if="dayData.appointments.length > 2" class="more-appointments" @click.stop="showDayAppointments(dayData.date)">
-                   +{{ dayData.appointments.length - 2 }}
-                 </div>
-               </div>
-              </div>
+              <template v-for="(dayData, index) in monthCalendarDays" :key="dayData ? dayData.date : 'pad-' + index">
+                <div v-if="dayData === null" class="month-day empty-day" />
+                <div
+                  v-else
+                  class="month-day"
+                  :class="{
+                    'current-day': isCurrentDay(dayData.date),
+                    'selected-day': isSelectedDay(dayData.date),
+                    'has-appointments': dayData.appointments.length > 0
+                  }"
+                  @click="handleDayClick(dayData.date)"
+                >
+                  <div class="day-number">{{ getDayNumber(dayData.date) }}</div>
+                  <div v-if="dayData.appointments.length > 0" class="month-appointments">
+                    <div
+                      v-for="appointment in dayData.appointments.slice(0, 2)"
+                      :key="appointment.id"
+                      class="month-appointment-item"
+                      :style="{ borderLeftColor: getProcedureColor(appointment.procedures) }"
+                      @click.stop="showAppointmentDetails(appointment)"
+                    >
+                      <div class="appointment-time-small">{{ getTimeOnly(appointment.date) }}</div>
+                      <div class="appointment-patient-small">{{ appointment.client?.name || 'Cliente não informado' }}</div>
+                    </div>
+                    <div v-if="dayData.appointments.length > 2" class="more-appointments" @click.stop="showDayAppointments(dayData.date)">
+                      +{{ dayData.appointments.length - 2 }}
+                    </div>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -717,56 +736,10 @@ export default {
 
       <!-- Mini calendário lateral (apenas nos modos diário e semanal) -->
       <div v-if="viewMode !== 'monthly'" class="sidebar-calendar">
-        <v-skeleton-loader v-if="loading" type="list-item-three-line, list-item-three-line" />
-        <template v-else>
-          <div class="calendar-header">
-            <v-btn
-              icon="mdi-chevron-left"
-              size="small"
-              variant="text"
-              @click="previousMonth"
-            ></v-btn>
-            <h3>{{ format(currentMonth, 'MMMM yyyy', { locale: ptBR }) }}</h3>
-            <v-btn
-              icon="mdi-chevron-right"
-              size="small"
-              variant="text"
-              @click="nextMonth"
-            ></v-btn>
-          </div>
-
-          <div class="calendar-grid">
-            <div class="weekdays-header">
-              <div v-for="day in ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']" :key="day" class="weekday">
-                {{ day }}
-              </div>
-            </div>
-
-            <div class="calendar-days">
-              <div
-                v-for="n in sidebarMonthStartOffset"
-                :key="'offset-' + n"
-                class="calendar-day"
-              ></div>
-              <div
-                v-for="day in monthDays"
-                :key="day"
-                class="calendar-day"
-                :class="{
-                  'other-month': day.getMonth() !== currentMonth.getMonth(),
-                  'current-day': isCurrentDay(day),
-                  'selected-day': isSelectedDay(day),
-                  'past-day': isPastDay(day),
-                  'has-appointments': getAppointmentsForDate(day).length > 0
-                }"
-                @click="selectDate(day)"
-              >
-                <span class="day-number">{{ getDayNumber(day) }}</span>
-                <div v-if="getAppointmentsForDate(day).length > 0" class="appointment-dot"></div>
-              </div>
-            </div>
-          </div>
-        </template>
+        <mini-calendar
+          v-model="selectedDate"
+          :appointments="appointments"
+        />
       </div>
     </div>
   </div>
@@ -804,10 +777,11 @@ export default {
     v-model="schedulerDialog"
     width="auto"
   >
-    <scheduler 
-      @cancel="schedulerDialog = false; selectedItem = null" 
-      :event="selectedItem" 
-      :client="selectedItem ? selectedItem.client : null" 
+    <scheduler
+      @cancel="schedulerDialog = false; selectedItem = null; preselectedDate = null"
+      :event="selectedItem"
+      :client="selectedItem ? selectedItem.client : null"
+      :preselectedDate="preselectedDate ? preselectedDate.toISOString() : null"
       @reload="onAppointmentReload"
     />
   </v-dialog>
@@ -922,6 +896,13 @@ export default {
   flex: 1;
 }
 
+.day-title,
+.week-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .day-title h2,
 .week-title h2 {
   font-size: 20px;
@@ -1027,7 +1008,7 @@ export default {
   right: 8px;
   background: #C62424;
   color: white;
-  border-radius: 8%;
+  border-radius: 50%;
   width: 20px;
   height: 20px;
   font-size: 12px;
@@ -1146,7 +1127,7 @@ export default {
 .appointment-time {
   font-size: 12px;
   font-weight: 600;
-  color: rgb(var(--v-theme-primary));
+  color: #C62424;
   min-width: 50px;
 }
 
@@ -1244,7 +1225,7 @@ export default {
 
 .time {
   font-weight: 600;
-  color: rgb(var(--v-theme-primary));
+  color: #C62424;
 }
 
 .card-content {
@@ -1315,76 +1296,136 @@ export default {
 .week-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 12px;
+  gap: 8px;
 }
 
 .day-column {
   border-radius: 8px;
-  padding: 16px;
-  min-height: 400px;
+  min-height: 420px;
+  background: white;
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.day-column.current-day {
-  border: 2px solid #C62424;
+.day-column.current-day .day-header {
+  background: #C62424;
+}
+
+.day-column.current-day .day-header .day-name,
+.day-column.current-day .day-header .day-number {
+  color: white;
+}
+
+.day-column.selected-day .day-header {
+  background: #FDF2F2;
+  border-bottom-color: #C62424;
+}
+
+.day-column.selected-day .day-header .day-name,
+.day-column.selected-day .day-header .day-number {
+  color: #C62424;
 }
 
 .day-header {
   text-align: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 14px 8px 12px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #efefef;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  position: relative;
+}
+
+.day-header:hover {
+  background: #FDF2F2;
+}
+
+.day-column.current-day .day-header:hover,
+.day-column.selected-day .day-header:hover {
+  filter: brightness(0.97);
 }
 
 .day-header .day-name {
-  font-size: 12px;
-  color: #666;
+  font-size: 11px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
   margin-bottom: 4px;
 }
 
 .day-header .day-number {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #1a1a1a;
+  line-height: 1;
+}
+
+.week-appt-count {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #C62424;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.day-column.current-day .week-appt-count {
+  background: white;
+  color: #C62424;
 }
 
 .day-appointments {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  padding: 10px 8px;
+  flex: 1;
 }
 
 .mini-appointment-card {
-  background: white;
-  border-radius: 8px;
-  padding: 12px;
+  background: #fafafa;
+  border-radius: 6px;
+  padding: 8px 10px;
   border-left: 3px solid;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.15s ease;
 }
 
 .mini-appointment-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #FFF0F0;
+  transform: translateX(2px);
 }
 
 .mini-time {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgb(var(--v-theme-primary));
-  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #C62424;
+  margin-bottom: 3px;
 }
 
 .mini-patient {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #1a1a1a;
   margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .mini-procedure {
   font-size: 11px;
-  color: #666;
+  color: #888;
 }
 
 /* Visualização Mensal */
@@ -1392,216 +1433,161 @@ export default {
   padding: 0;
 }
 
-
-
 .month-calendar {
   background: white;
-  border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8e8e8;
 }
 
 .weekdays-header {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 4px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e8e8e8;
 }
 
 .weekday {
   text-align: center;
   font-size: 11px;
-  font-weight: 600;
-  color: #666;
-  padding: 4px 0;
+  font-weight: 700;
+  color: #aaa;
+  padding: 10px 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .month-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  gap: 1px;
+  background: #e8e8e8;
 }
 
 .month-day {
-  aspect-ratio: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
-  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease;
   position: relative;
-  padding: 2px 1px;
-  min-height: 40px;
-  max-height: 120px;
-  width:100%
+  padding: 6px 8px;
+  min-height: 90px;
+  overflow: hidden;
+  width: 100%;
+  background: #ffffff;
 }
 
-.month-day:hover {
-  background: #FAE5E5;
+.month-day.empty-day {
+  pointer-events: none;
+  background: #f9f9f9;
 }
 
-.month-day.other-month {
-  color: #ccc;
+.month-day:not(.empty-day):not(.selected-day):hover {
+  background: #f5f5f5;
 }
 
 .month-day.current-day {
-  background: #ffebee;
-  color: #f44336;
+  background: #FFF5F5;
+}
+
+.month-day.current-day .day-number {
+  color: #C62424;
   font-weight: 700;
 }
 
 .month-day.selected-day {
   background: #C62424;
+}
+
+.month-day.selected-day .day-number {
   color: white;
   font-weight: 700;
 }
 
-.month-day.has-appointments {
-  font-weight: 600;
-}
-
 .month-day .day-number {
-  font-size: 11px;
-  font-weight: 500;
-  margin-bottom: 1px;
+  font-size: 13px;
+  font-weight: 400;
+  margin-bottom: 4px;
+  align-self: flex-end;
+  color: #444;
+  line-height: 1;
 }
 
 .month-appointments {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
   width: 100%;
 }
 
 .month-appointment-item {
-  background: #f8f9fa;
-  border-radius: 4px;
-  padding: 4px 8px;
-  margin-bottom: 1px;
+  background: white;
+  border-radius: 3px;
+  padding: 3px 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-left: 2px solid;
+  transition: background 0.15s ease;
+  border-left: 3px solid;
+  overflow: hidden;
 }
 
 .month-appointment-item:hover {
-  background: #e9ecef;
-  transform: translateX(1px);
+  background: #FFF0F0;
+}
+
+.month-day.selected-day .month-appointment-item {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.month-day.selected-day .month-appointment-item:hover {
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .appointment-time-small {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgb(var(--v-theme-primary));
-  line-height: 1;
+  font-size: 10px;
+  font-weight: 700;
+  color: #C62424;
+  line-height: 1.2;
+}
+
+.month-day.selected-day .appointment-time-small {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .appointment-patient-small {
-  font-size: 12px;
-  color: #1a1a1a;
-  line-height: 1;
+  font-size: 11px;
+  color: #333;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-weight: 400;
+  font-weight: 500;
+}
+
+.month-day.selected-day .appointment-patient-small {
+  color: white;
 }
 
 .more-appointments {
-  font-size: 12px;
-  color: #666;
-  text-align: center;
+  font-size: 10px;
+  color: #888;
   font-weight: 600;
+  padding: 2px 0 0 2px;
+}
+
+.month-day.selected-day .more-appointments {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .sidebar-calendar {
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8e8e8;
   height: fit-content;
-}
-
-.calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.calendar-header h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0;
-  text-transform: capitalize;
-}
-
-.calendar-grid {
-  width: 100%;
-}
-
-.calendar-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-}
-
-.calendar-day {
-  aspect-ratio: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  font-weight: 500 !important;
-}
-
-.calendar-day:hover {
-  background: #e3f2fd;
-}
-
-.calendar-day.other-month {
-  color: #A6A6A6 !important;
-}
-
-.calendar-day.past-day {
-  color: #A6A6A6 !important;
-}
-
-.calendar-day:not(.current-day):not(.other-month):not(.past-day) {
-  color: #0D0C0D !important;
-}
-
-.calendar-day.current-day {
-  background: #C62424 !important;
-  color: white !important;
-  font-weight: 700 !important;
-}
-
-.calendar-day.selected-day {
-  border: #C62424 1px solid;
-  color: white;
-  font-weight: 700;
-}
-
-.calendar-day.has-appointments {
-  font-weight: 600;
-}
-
-.appointment-dot {
-  position: absolute;
-  bottom: 4px;
-  width: 4px;
-  height: 4px;
-  background: rgb(var(--v-theme-primary));
-  border-radius: 100px;
-}
-
-.calendar-day.selected-day .appointment-dot {
-  background: white;
 }
 
 /* Responsividade */
@@ -1676,10 +1662,6 @@ export default {
   
   .month-day .day-number {
     font-size: 10px;
-  }
-  
-  .month-appointment-dot {
-    height: 1px;
   }
   
   .more-appointments {
