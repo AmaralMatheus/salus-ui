@@ -32,38 +32,53 @@
       </v-bottom-navigation>
       <v-main class="d-flex ga-5">
         <div class="custom-navbar" v-if="currentUser">
-          <v-breadcrumbs style="color: transparent" :items="['s']">
-            <template v-slot:divider>
-              <v-icon icon="mdi-chevron-right"></v-icon>
-            </template>
-          </v-breadcrumbs>
-          <v-list class="bg-transparent d-flex ga-4 flex-column" density="compact" nav v-if="currentUser">
-            <v-list-item active-class="text-white bg-theme" value="home" :active="path === undefined" @click="$router.push('/home')">
-              <div class="d-flex ga-4 align-center">
-                <img class="cursor-pointer" :class="path === undefined ? 'active' : ''" :src="require('./assets/home-6-line.svg')"/>
-                <div>Home</div>
-              </div>
-            </v-list-item>
-            <v-list-item active-class="text-white bg-theme" value="pacientes" :active="path && path.toString().includes('client')" @click="$router.push('/pacientes')">
-              <div class="d-flex ga-4 align-center">
-                <img class="cursor-pointer" :class="path && path.toString().includes('client') ? 'active' : ''" :src="require('./assets/clientes.svg')"/>
-                <div>Pacientes</div>
-              </div>
-            </v-list-item>
-            <v-list-item active-class="text-white bg-theme" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')">
-              <div class="d-flex ga-4 align-center">
-                <img class="cursor-pointer" :class="path ==='agenda' ? 'active' : ''" :src="require('./assets/calendar-event-fill.svg')"/>
-                <div>Agenda</div>
-              </div>
-            </v-list-item>
-            <v-list-item v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
-              <div class="d-flex ga-4 align-center">
-                <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
-                <div>Configurações</div>
-              </div>
-            </v-list-item>
-          </v-list>
+          <div class="nav-top">
+            <v-breadcrumbs style="color: transparent" :items="['s']">
+              <template v-slot:divider>
+                <v-icon icon="mdi-chevron-right"></v-icon>
+              </template>
+            </v-breadcrumbs>
+            <v-list class="bg-transparent d-flex ga-4 flex-column" density="compact" nav v-if="currentUser">
+              <v-list-item active-class="text-white bg-theme" value="home" :active="path === undefined" @click="$router.push('/home')">
+                <div class="d-flex ga-4 align-center">
+                  <img class="cursor-pointer" :class="path === undefined ? 'active' : ''" :src="require('./assets/home-6-line.svg')"/>
+                  <div>Home</div>
+                </div>
+              </v-list-item>
+              <v-list-item active-class="text-white bg-theme" value="pacientes" :active="path && path.toString().includes('client')" @click="$router.push('/pacientes')">
+                <div class="d-flex ga-4 align-center">
+                  <img class="cursor-pointer" :class="path && path.toString().includes('client') ? 'active' : ''" :src="require('./assets/clientes.svg')"/>
+                  <div>Pacientes</div>
+                </div>
+              </v-list-item>
+              <v-list-item active-class="text-white bg-theme" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')">
+                <div class="d-flex ga-4 align-center">
+                  <img class="cursor-pointer" :class="path ==='agenda' ? 'active' : ''" :src="require('./assets/calendar-event-fill.svg')"/>
+                  <div>Agenda</div>
+                </div>
+              </v-list-item>
+              <v-list-item v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
+                <div class="d-flex ga-4 align-center">
+                  <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
+                  <div>Configurações</div>
+                </div>
+              </v-list-item>
+            </v-list>
+          </div>
+
+          <div class="nav-bottom">
+            <v-list class="bg-transparent" density="compact" nav>
+              <v-list-item class="feedback-nav-item" @click="feedbackDialog = true">
+                <div class="d-flex ga-4 align-center">
+                  <img :src="require('./assets/feedback-line.svg')" class="feedback-nav-icon" />
+                  <div>Feedback</div>
+                </div>
+              </v-list-item>
+            </v-list>
+          </div>
         </div>
+
+        <feedback-dialog v-model="feedbackDialog" />
         <div class="w-100">
           <v-breadcrumbs v-if="currentUser" :items="route.fullPath.split('/').map((link) => {
             if (link !== '') {
@@ -84,10 +99,14 @@
 </template>
 
 <script>
+import FeedbackDialog from './components/FeedbackDialog.vue'
+
 export default {
+  components: { FeedbackDialog },
   data() {
     return {
-      expanded: false
+      expanded: false,
+      feedbackDialog: false,
     }
   },
   created() {
@@ -233,6 +252,32 @@ td {
   top: 0;
   position: sticky;
   transition: ease-in-out .2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.nav-top {
+  flex: 1;
+}
+
+.nav-bottom {
+  padding-bottom: 8px;
+}
+
+.feedback-nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.feedback-nav-item {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.feedback-nav-item:hover {
+  opacity: 1;
 }
 
 @media (max-width: 959px) {
