@@ -12,6 +12,7 @@ const ClientDetails = () => import("./pages/client/ClientDetails.vue")
 const ClientRegister = () => import("./components/client/ClientRegister.vue")
 const AnonymousRegister = () => import("./pages/AnonymousRegister.vue")
 const AnonymousOnboarding = () => import("./pages/AnonymousOnboarding.vue")
+const Dashboard = () => import("./pages/Dashboard.vue")
 const Finance = () => import("./pages/Finance.vue")
 const Agenda = () => import("./pages/Agenda.vue")
 
@@ -54,8 +55,12 @@ const routes = [
   {
     path: "/cadastro",
     name: "external-onboarding",
-    // lazy-loaded
     component: AnonymousOnboarding,
+  },
+  {
+    path: "/metricas",
+    name: "dashboard",
+    component: Dashboard,
   },
   {
     path: "/pacientes/:id",
@@ -107,7 +112,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-const publicPages = ['/login', '/cadastro', '/home'];
+const publicPages = ['/login', '/cadastro', '/home', '/metricas'];
 const authRequired = !publicPages.includes(to.path) && !to.path.includes('pacientes/') && !to.path.startsWith('/autocadastro/');
 const loggedIn = localStorage.getItem('user');
 
