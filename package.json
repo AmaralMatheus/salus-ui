@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@coleqiu/vue-drag-select": "^2.0.6-beta.1",
+    "@lottiefiles/dotlottie-vue": "^0.11.16",
+    "@svg-maps/brazil": "^2.0.0",
     "@vueup/vue-quill": "^1.2.0",
     "aws-sdk": "^2.1692.0",
     "chart.js": "^4.4.6",

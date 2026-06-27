@@ -1,6 +1,12 @@
 const { defineConfig } = require('@vue/cli-service')
 const Dotenv = require('dotenv-webpack')
 module.exports = defineConfig({
+  chainWebpack: config => {
+    config.module
+      .rule('lottie')
+      .test(/\.lottie$/)
+      .set('type', 'asset/resource')
+  },
   configureWebpack: {
     plugins: [
       new Dotenv(
