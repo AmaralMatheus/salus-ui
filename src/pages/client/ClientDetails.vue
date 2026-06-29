@@ -1518,6 +1518,12 @@
   height: auto;
 }
 
+@media (max-width: 600px) {
+  .tooth-img {
+    width: 12px;
+  }
+}
+
 .tooth-item {
   border-radius: 4px;
   transition: background-color 0.15s;

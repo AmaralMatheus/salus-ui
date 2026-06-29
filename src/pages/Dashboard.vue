@@ -213,6 +213,7 @@
 <script>
 import { Line, Bar } from 'vue-chartjs'
 import dashboardService from '../services/dashboard.service'
+import { toast } from 'vue3-toastify'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -545,15 +546,19 @@ export default {
         const { data } = await dashboardService.getClients()
         this.allClients = data.map(c => ({
           id:        c.id,
-          name:      c.name,
-          email:     c.email,
-          state:     c.state,
-          city:      c.city,
-          entryDate: c.entry_date,
-          patients:  c.patients_count,
+          name:      c.name      || '',
+          email:     c.email     || '',
+          state:     c.state     || '',
+          city:      c.city      || '',
+          entryDate: c.entry_date || '',
+          patients:  c.patients_count || 0,
         }))
-      } catch {
-        // API indisponível — mantém mock data
+      } catch (err) {
+        const msg = err?.response?.data?.message || err?.message || 'Erro desconhecido'
+        const status = err?.response?.status
+        console.error('[Dashboard] fetchData error:', status, err?.response?.data || err)
+        toast.error(`Erro ao carregar dados${status ? ' (' + status + ')' : ''}: ${msg}`)
+
       } finally {
         this.loading = false
       }
@@ -597,6 +602,7 @@ export default {
     },
 
     formatDate(dateStr) {
+      if (!dateStr) return '—'
       return format(parseISO(dateStr), 'dd/MM/yyyy')
     },
   },

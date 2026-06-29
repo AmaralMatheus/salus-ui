@@ -7,7 +7,7 @@
       :disabled="loading"
       hide-details="auto"
       :variant="variant ?? 'outlined'"
-      density="compact"
+      :density="props.density ?? 'compact'"
       :label="props.label || 'Valor'"
       :model-value="value"
       :readonly="readonly">
@@ -26,7 +26,7 @@
       :disabled="loading"
       hide-details="auto"
       :variant="variant ?? 'outlined'"
-      density="compact"
+      :density="props.density ?? 'compact'"
       :label="props.label || 'Valor'">
     </v-text-field>
     <div class="text-caption text-disabled">{{ hint }}</div>
@@ -37,7 +37,7 @@
   import { useCurrencyInput } from 'vue-currency-input'
   import { watchEffect, defineProps, watch } from 'vue'
 
-  const props = defineProps({ readonly: Boolean, modelValue: Number, loading: Boolean, variant: String, label: String, hint: String, value: Number })
+  const props = defineProps({ readonly: Boolean, modelValue: Number, loading: Boolean, variant: String, density: String, label: String, hint: String, value: Number })
 
   const { inputRef, formattedValue, setValue } = useCurrencyInput({
     currency: 'BRL',
