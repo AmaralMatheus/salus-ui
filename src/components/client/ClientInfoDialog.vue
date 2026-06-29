@@ -1,19 +1,22 @@
 <template>
   <v-card
-    :title="'Adicionar ' +  (descriptionAction === 'evolutions' ? 'Evolução' : descriptionAction === 'plans' ? 'Plano' : 'Receita')"
+    :title="'Adicionar ' + (descriptionAction === 'evolutions' ? 'Evolução' : descriptionAction === 'plans' ? 'Plano de Tratamento' : 'Receita')"
+    class="has-mobile-header"
   >
-    <v-card-text  v-if="descriptionAction === 'evolutions' || descriptionAction === 'prescriptions'">
+    <div class="mobile-modal-header d-flex d-md-none">
+      <span class="mobile-modal-title">{{ 'Adicionar ' + (descriptionAction === 'evolutions' ? 'Evolução' : descriptionAction === 'plans' ? 'Plano de Tratamento' : 'Receita') }}</span>
+      <v-btn icon="mdi-close" variant="text" size="small" density="compact" @click="$emit('cancel')" />
+    </div>
+    <!-- Evolutions / Prescriptions — unchanged -->
+    <v-card-text v-if="descriptionAction === 'evolutions' || descriptionAction === 'prescriptions'">
       <div class="d-flex flex-column ga-3 mb-3" v-if="descriptionAction === 'evolutions'">
-        <!-- Group selectors -->
         <div class="d-flex justify-center ga-4">
           <span class="odonto-group-btn" :class="{ 'odonto-group-active': isGroupSelected('maxila') }" @click="toggleGroup('maxila')">Maxila</span>
           <span class="odonto-group-btn" :class="{ 'odonto-group-active': isGroupSelected('mandibula') }" @click="toggleGroup('mandibula')">Mandíbula</span>
           <span class="odonto-group-btn" :class="{ 'odonto-group-active': isGroupSelected('face') }" @click="toggleGroup('face')">Face</span>
         </div>
-
         <drag-select v-model="teeth" :multiple="true" background="rgba(255,82,82,0.28)">
           <div class="odontogram-area rounded-lg pa-3">
-            <!-- Upper row -->
             <div class="d-flex justify-center align-end">
               <div class="d-flex align-end">
                 <drag-select-option v-for="tooth in [0,1,2,3,4,5,6,7]" :value="tooth" :key="tooth">
@@ -33,10 +36,7 @@
                 </drag-select-option>
               </div>
             </div>
-
             <div class="odonto-h-sep my-3"></div>
-
-            <!-- Lower row -->
             <div class="d-flex justify-center align-start">
               <div class="d-flex align-start">
                 <drag-select-option v-for="tooth in [16,17,18,19,20,21,22,23]" :value="tooth" :key="tooth">
@@ -59,7 +59,7 @@
           </div>
         </drag-select>
       </div>
-      <v-row dense >
+      <v-row dense>
         <v-col cols="12">
           <v-text-field
             v-if="descriptionAction !== 'evolutions' && descriptionAction !== 'prescriptions'"
@@ -79,17 +79,20 @@
         </div>
       </v-row>
     </v-card-text>
+
+    <!-- Plans — redesigned -->
     <v-card-text v-else class="pb-0">
-      <v-form v-model="planForm" class="d-flex flex-column ga-4">
-        <v-row>
+      <v-form v-model="planForm" class="d-flex flex-column ga-3">
+        <v-row dense>
           <v-col cols="8">
             <v-text-field
-              label="Título"
+              label="Título do plano"
               :disabled="loading"
               variant="outlined"
               density="compact"
               hide-details
               v-model="title"
+              placeholder="Título"
             ></v-text-field>
           </v-col>
           <v-col cols="4">
@@ -107,139 +110,30 @@
               label="Tabela de preço"
             ></v-select>
           </v-col>
-          <v-col>
-            <div class="text-center" v-if="newPlan.actions?.length === 0">Cadastre os procedimentos para este plano de tratamento!</div>
-            <draggable 
-              v-model="newPlan.actions"
-              v-if="!loading && newPlan.actions?.length > 0"
-              @start="drag=true" 
-              @end="drag=false" 
-              item-key="order">
-              <!-- the row will go here -->
-                
-              <template #item="{element}">
-                <v-row dense>
-                  <v-col class="d-flex mx-auto align-center ga-2 mt-1" cols="1">
-                    <v-btn size="comfortable" icon="mdi-reorder-horizontal" disabled variant="plain"/>
-                    <v-btn size="comfortable" icon="mdi-delete" @click="newPlan.actions = newPlan.actions.filter((action) => action !== element)" color="error" variant="plain"/>
-                  </v-col>
-                  <v-col cols="11" sm="3" md="2">
-                    <v-combobox
-                      :items="categories"
-                      item-title="name"
-                      item-value="id"
-                      :rules="rules"
-                      :loading="loading"
-                      :disabled="loading"
-                      variant="underlined"
-                      density="compact"
-                      hide-details="auto"
-                      @update:modelValue="getProcedures"
-                      label="Especialidade">
-                    </v-combobox>
-                  </v-col>
-                  <v-col cols="11" sm="3" md="2">
-                    <v-combobox
-                      :items="procedures"
-                      item-title="name"
-                      item-value="name"
-                      :rules="rules"
-                      v-model="element.description"
-                      :loading="loading"
-                      :disabled="loading"
-                      variant="underlined"
-                      density="compact"
-                      hide-details="auto"
-                      @update:modelValue="setProcedure($event, element)"
-                      label="Procedimento">
-                    </v-combobox>
-                  </v-col>
-                  <v-col cols="11" sm="5" md="3">
-                    <v-menu :close-on-content-click="false" @v-model="element.quantity">
-                      <template v-slot:activator="{ props }">
-                        <v-combobox
-                          readonly
-                          clearable
-                          :single-line="true"
-                          :items="teethNumber"
-                          v-bind="props"
-                          item-title="name"
-                          item-value="name"
-                          multiple
-                          @click:clear="element.quantity = []"
-                          v-model="element.quantity"
-                          :loading="loading"
-                          :disabled="loading"
-                          variant="underlined"
-                          density="compact"
-                          hide-details="auto"
-                          label="Dentes">
-                        </v-combobox>
-                      </template>
-    
-                      <v-list>
-                        <v-list-item class="no-select">
-                          <drag-select v-model="element.quantity" :multiple="true" background="rgba(255,82,82,0.28)">
-                            <div class="d-flex justify-space-between align-baseline">
-                              <drag-select-option v-for="tooth in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
-                                <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                                <img class="cursor-pointer" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted': ''" :src="require('../../assets/'+teethNumber[tooth]+'.svg')"/>
-                              </drag-select-option>
-                            </div>
-                            <div class="d-flex justify-space-between">
-                              <drag-select-option v-for="tooth in [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
-                                <img class="cursor-pointer" height="25" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted': ''" :src="require('../../assets/'+teethNumber[tooth]+'.svg')"/>
-                                <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                              </drag-select-option>
-                            </div>
-                          </drag-select>
-                          <div class="mt-2 d-flex ga-2">
-                            <v-btn color="primary" @click="element.quantity = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28]">Arcada Superior</v-btn>
-                            <v-btn color="primary" @click="element.quantity = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]">Arcada Inferior</v-btn>
-                            <v-btn color="primary" @click="element.quantity = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28,48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]">Geral</v-btn>
-                          </div>
-                        </v-list-item>
-                      </v-list>
-                    </v-menu>
-                  </v-col>
-                  <v-col cols="11" sm="4" class="d-flex ga-2 align-center">
-                    <CurrencyInput :hint="element.priceSource ? 'Preço para o plano '+healthcare.filter((hc) => hc.id === newPlan.healthcare_id)[0].name : ''" variant="underlined" label="Valor Unitário" v-model="element.price"></CurrencyInput>
-                    <CurrencyInput label="Valor Total" readonly :value="'R$ '+(element.price * element.quantity.length).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')" variant="underlined"></CurrencyInput>
-                  </v-col>
-                </v-row>
-              </template>
-            </draggable>
-          </v-col>
-          <v-col cols="12">
-            <v-textarea
-              v-model="newPlan.additional_info"
-              :loading="loading"
-              :disabled="loading"
-              class="h-auto"
-              :rows="3"
-              variant="outlined"
-              density="compact"
-              hide-details
-              label="Observações">
-            </v-textarea>
-          </v-col>
         </v-row>
-        <div class="text-center" v-if="newPlan.actions?.length === 0">Cadastre os procedimentos para este plano de tratamento!</div>
-        <draggable 
+
+        <div v-if="newPlan.actions?.length === 0" class="text-center text-caption text-disabled py-2">
+          Cadastre os procedimentos para este plano de tratamento!
+        </div>
+
+        <draggable
           v-model="newPlan.actions"
-          v-if="!loading && newPlan.actions?.length > 0"
-          @start="drag=true" 
-          @end="drag=false" 
-          item-key="order">
-          <!-- the row will go here -->
-            
+          v-if="!loading"
+          @start="drag=true"
+          @end="drag=false"
+          item-key="order"
+          handle=".plan-drag-handle"
+        >
           <template #item="{element}">
-            <v-row dense>
-              <v-col class="d-flex mx-auto align-center ga-2 mt-1" cols="1">
-                <v-btn size="comfortable" icon="mdi-reorder-horizontal" disabled variant="plain"/>
-                <v-btn size="comfortable" icon="mdi-delete" @click="newPlan.actions = newPlan.actions.filter((action) => action !== element)" color="error" variant="plain"/>
-              </v-col>
-              <v-col cols="11" sm="3" md="2">
+            <div class="plan-item">
+
+              <!-- Drag handle -->
+              <div class="plan-drag-handle">
+                <v-icon icon="mdi-reorder-horizontal" size="18" color="#ccc" />
+              </div>
+
+              <!-- Fields 2x2 grid -->
+              <div class="plan-fields-wrap">
                 <v-combobox
                   :items="categories"
                   item-title="name"
@@ -247,14 +141,12 @@
                   :rules="rules"
                   :loading="loading"
                   :disabled="loading"
-                  variant="underlined"
-                  density="compact"
+                  variant="outlined"
+                  density="comfortable"
                   hide-details="auto"
                   @update:modelValue="getProcedures"
-                  label="Procedimento">
-                </v-combobox>
-              </v-col>
-              <v-col cols="11" sm="3" md="2">
+                  label="Especialidade"
+                ></v-combobox>
                 <v-combobox
                   :items="procedures"
                   item-title="name"
@@ -263,110 +155,189 @@
                   v-model="element.description"
                   :loading="loading"
                   :disabled="loading"
-                  variant="underlined"
-                  density="compact"
+                  variant="outlined"
+                  density="comfortable"
                   hide-details="auto"
                   @update:modelValue="setProcedure($event, element)"
-                  label="Procedimento">
-                </v-combobox>
-              </v-col>
-              <v-col cols="11" sm="5" md="3">
-                <v-menu :close-on-content-click="false" @v-model="element.quantity">
-                  <template v-slot:activator="{ props }">
-                    <v-combobox
-                      readonly
-                      clearable
-                      :single-line="true"
-                      :items="teethNumber"
-                      v-bind="props"
-                      item-title="name"
-                      item-value="name"
-                      multiple
-                      @click:clear="element.quantity = []"
-                      v-model="element.quantity"
-                      :loading="loading"
-                      :disabled="loading"
-                      variant="underlined"
-                      density="compact"
-                      hide-details="auto"
-                      label="Dentes">
-                    </v-combobox>
-                  </template>
+                  label="Procedimento"
+                ></v-combobox>
+                <CurrencyInput
+                  :hint="element.priceSource ? 'Preço para o plano ' + (healthcare.find(hc => hc.id === newPlan.healthcare_id)?.name || '') : ''"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+                  label="Valor unitário"
+                  v-model="element.price"
+                ></CurrencyInput>
+                <CurrencyInput
+                  label="Valor total"
+                  readonly
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details="auto"
+                  :value="'R$ ' + (element.price * element.quantity.length).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')"
+                ></CurrencyInput>
+              </div>
 
-                  <v-list>
-                    <v-list-item class="no-select">
-                      <!-- Group selectors for plan -->
-                      <div class="d-flex justify-center ga-3 mb-2">
-                        <span class="odonto-group-btn" :class="{ 'odonto-group-active': isPlanGroupSelected(element, 'maxila') }" @click="togglePlanGroup(element, 'maxila')">Maxila</span>
-                        <span class="odonto-group-btn" :class="{ 'odonto-group-active': isPlanGroupSelected(element, 'mandibula') }" @click="togglePlanGroup(element, 'mandibula')">Mandíbula</span>
-                        <span class="odonto-group-btn" :class="{ 'odonto-group-active': isPlanGroupSelected(element, 'face') }" @click="togglePlanGroup(element, 'face')">Face</span>
+              <!-- Odontogram with tabs -->
+              <div class="plan-teeth">
+                <div class="plan-teeth-tabs">
+                  <button
+                    type="button"
+                    class="plan-teeth-tab"
+                    :class="{ 'plan-teeth-tab-active': element.tab !== 'deciduos' }"
+                    @click="element.tab = 'permanentes'"
+                  >Permanentes</button>
+                  <button
+                    type="button"
+                    class="plan-teeth-tab"
+                    :class="{ 'plan-teeth-tab-active': element.tab === 'deciduos' }"
+                    @click="element.tab = 'deciduos'"
+                  >Decíduos</button>
+                </div>
+                <div v-if="element.tab !== 'deciduos'" class="d-flex justify-center ga-2 mb-2">
+                  <span class="odonto-group-btn" :class="{ 'odonto-group-active': isPlanGroupSelected(element, 'maxila') }" @click="togglePlanGroup(element, 'maxila')">Maxila</span>
+                  <span class="odonto-group-btn" :class="{ 'odonto-group-active': isPlanGroupSelected(element, 'mandibula') }" @click="togglePlanGroup(element, 'mandibula')">Mandíbula</span>
+                  <span class="odonto-group-btn" :class="{ 'odonto-group-active': isPlanGroupSelected(element, 'face') }" @click="togglePlanGroup(element, 'face')">Face</span>
+                </div>
+
+                <!-- Permanent -->
+                <drag-select
+                  v-if="element.tab !== 'deciduos'"
+                  v-model="element.quantity"
+                  :multiple="true"
+                  background="rgba(255,82,82,0.28)"
+                >
+                  <div class="plan-odonto-grid">
+                    <div class="d-flex justify-center align-end">
+                      <div class="d-flex align-end">
+                        <drag-select-option v-for="i in [0,1,2,3,4,5,6,7]" :value="teethNumber[i]" :key="teethNumber[i]">
+                          <div class="d-flex flex-column align-center plan-tooth-cell">
+                            <div class="plan-tooth-num">{{ teethNumber[i] }}</div>
+                            <img class="plan-tooth-img" :class="element.quantity.includes(teethNumber[i]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[i]+'.svg')"/>
+                          </div>
+                        </drag-select-option>
                       </div>
-                      <drag-select v-model="element.quantity" :multiple="true" background="rgba(255,82,82,0.28)">
-                        <div class="odontogram-area rounded-lg pa-3">
-                          <!-- Upper row -->
-                          <div class="d-flex justify-center align-end">
-                            <div class="d-flex align-end">
-                              <drag-select-option v-for="tooth in [0,1,2,3,4,5,6,7]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
-                                <div class="d-flex flex-column align-center px-1">
-                                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                                  <img class="tooth-img cursor-pointer" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
-                                </div>
-                              </drag-select-option>
-                            </div>
-                            <div class="odonto-v-sep mx-2"></div>
-                            <div class="d-flex align-end">
-                              <drag-select-option v-for="tooth in [8,9,10,11,12,13,14,15]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
-                                <div class="d-flex flex-column align-center px-1">
-                                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                                  <img class="tooth-img cursor-pointer" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
-                                </div>
-                              </drag-select-option>
-                            </div>
+                      <div class="odonto-v-sep mx-2"></div>
+                      <div class="d-flex align-end">
+                        <drag-select-option v-for="i in [8,9,10,11,12,13,14,15]" :value="teethNumber[i]" :key="teethNumber[i]">
+                          <div class="d-flex flex-column align-center plan-tooth-cell">
+                            <div class="plan-tooth-num">{{ teethNumber[i] }}</div>
+                            <img class="plan-tooth-img" :class="element.quantity.includes(teethNumber[i]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[i]+'.svg')"/>
                           </div>
-                          <div class="odonto-h-sep my-3"></div>
-                          <!-- Lower row -->
-                          <div class="d-flex justify-center align-start">
-                            <div class="d-flex align-start">
-                              <drag-select-option v-for="tooth in [16,17,18,19,20,21,22,23]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
-                                <div class="d-flex flex-column align-center px-1">
-                                  <img class="tooth-img cursor-pointer" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
-                                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                                </div>
-                              </drag-select-option>
-                            </div>
-                            <div class="odonto-v-sep mx-2"></div>
-                            <div class="d-flex align-start">
-                              <drag-select-option v-for="tooth in [24,25,26,27,28,29,30,31]" :value="teethNumber[tooth]" :key="teethNumber[tooth]">
-                                <div class="d-flex flex-column align-center px-1">
-                                  <img class="tooth-img cursor-pointer" :class="element.quantity.includes(teethNumber[tooth]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[tooth]+'.svg')"/>
-                                  <div class="text-disabled text-caption">{{ teethNumber[tooth] }}</div>
-                                </div>
-                              </drag-select-option>
-                            </div>
+                        </drag-select-option>
+                      </div>
+                    </div>
+                    <div class="odonto-h-sep my-2"></div>
+                    <div class="d-flex justify-center align-start">
+                      <div class="d-flex align-start">
+                        <drag-select-option v-for="i in [16,17,18,19,20,21,22,23]" :value="teethNumber[i]" :key="teethNumber[i]">
+                          <div class="d-flex flex-column align-center plan-tooth-cell">
+                            <img class="plan-tooth-img" :class="element.quantity.includes(teethNumber[i]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[i]+'.svg')"/>
+                            <div class="plan-tooth-num">{{ teethNumber[i] }}</div>
                           </div>
-                        </div>
-                      </drag-select>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </v-col>
-              <v-col cols="11" sm="4" class="d-flex ga-2 align-center">
-                <CurrencyInput :hint="element.priceSource ? 'Preço para o plano '+healthcare.filter((hc) => hc.id === newPlan.healthcare_id)[0].name : ''" variant="underlined" label="Valor Unitário" v-model="element.price"></CurrencyInput>
-                <CurrencyInput label="Valor Total" readonly :value="'R$ '+(element.price * element.quantity.length).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')" variant="underlined"></CurrencyInput>
-              </v-col>
-            </v-row>
+                        </drag-select-option>
+                      </div>
+                      <div class="odonto-v-sep mx-2"></div>
+                      <div class="d-flex align-start">
+                        <drag-select-option v-for="i in [24,25,26,27,28,29,30,31]" :value="teethNumber[i]" :key="teethNumber[i]">
+                          <div class="d-flex flex-column align-center plan-tooth-cell">
+                            <img class="plan-tooth-img" :class="element.quantity.includes(teethNumber[i]) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+teethNumber[i]+'.svg')"/>
+                            <div class="plan-tooth-num">{{ teethNumber[i] }}</div>
+                          </div>
+                        </drag-select-option>
+                      </div>
+                    </div>
+                  </div>
+                </drag-select>
+
+                <!-- Deciduous -->
+                <drag-select
+                  v-else
+                  v-model="element.quantity"
+                  :multiple="true"
+                  background="rgba(255,82,82,0.28)"
+                >
+                  <div class="plan-odonto-grid">
+                    <div class="d-flex justify-center align-end">
+                      <div class="d-flex align-end">
+                        <drag-select-option v-for="n in [55,54,53,52,51]" :value="n" :key="n">
+                          <div class="d-flex flex-column align-center plan-tooth-cell">
+                            <div class="plan-tooth-num">{{ n }}</div>
+                            <img class="plan-tooth-img" :class="element.quantity.includes(n) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+n+'.svg')"/>
+                          </div>
+                        </drag-select-option>
+                      </div>
+                      <div class="odonto-v-sep mx-2"></div>
+                      <div class="d-flex align-end">
+                        <drag-select-option v-for="n in [61,62,63,64,65]" :value="n" :key="n">
+                          <div class="d-flex flex-column align-center plan-tooth-cell">
+                            <div class="plan-tooth-num">{{ n }}</div>
+                            <img class="plan-tooth-img" :class="element.quantity.includes(n) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+n+'.svg')"/>
+                          </div>
+                        </drag-select-option>
+                      </div>
+                    </div>
+                    <div class="odonto-h-sep my-2"></div>
+                    <div class="d-flex justify-center align-start">
+                      <div class="d-flex align-start">
+                        <drag-select-option v-for="n in [85,84,83,82,81]" :value="n" :key="n">
+                          <div class="d-flex flex-column align-center plan-tooth-cell">
+                            <img class="plan-tooth-img" :class="element.quantity.includes(n) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+n+'.svg')"/>
+                            <div class="plan-tooth-num">{{ n }}</div>
+                          </div>
+                        </drag-select-option>
+                      </div>
+                      <div class="odonto-v-sep mx-2"></div>
+                      <div class="d-flex align-start">
+                        <drag-select-option v-for="n in [71,72,73,74,75]" :value="n" :key="n">
+                          <div class="d-flex flex-column align-center plan-tooth-cell">
+                            <img class="plan-tooth-img" :class="element.quantity.includes(n) ? 'tooth-extracted' : ''" :src="require('../../assets/teeth/'+n+'.svg')"/>
+                            <div class="plan-tooth-num">{{ n }}</div>
+                          </div>
+                        </drag-select-option>
+                      </div>
+                    </div>
+                  </div>
+                </drag-select>
+              </div>
+
+              <!-- Delete -->
+              <v-btn
+                v-if="newPlan.actions.length > 1"
+                icon="mdi-close"
+                size="x-small"
+                variant="plain"
+                color="grey"
+                class="plan-delete-btn"
+                @click="newPlan.actions = newPlan.actions.filter(a => a !== element)"
+              />
+            </div>
           </template>
         </draggable>
-        <v-btn
-          text="Adicionar Procedimento"
-          v-if="descriptionAction === 'plans'"
+
+        <v-textarea
+          v-model="newPlan.additional_info"
+          :loading="loading"
+          :disabled="loading"
+          class="h-auto"
+          :rows="3"
           variant="outlined"
-          class="mx-auto"
+          density="compact"
+          hide-details
+          label="Observações"
+        ></v-textarea>
+
+        <v-btn
+          text="Adicionar procedimento"
+          variant="outlined"
           color="primary"
-          @click="newPlan.actions.push({price: 0, description: null, quantity: [], order: newPlan.actions.length})"
+          block
+          @click="newPlan.actions.push({price: 0, description: null, quantity: [], order: newPlan.actions.length, tab: 'permanentes'})"
         ></v-btn>
       </v-form>
     </v-card-text>
+
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn
@@ -374,7 +345,6 @@
         variant="plain"
         @click="$emit('cancel')"
       ></v-btn>
-
       <v-btn
         color="primary"
         text="Salvar"
@@ -431,7 +401,7 @@
         currentPlan: null,
         newPlan: {
           actions: [
-            {price: 0, description: null, quantity: [], order: 0}
+            {price: 0, description: null, quantity: [], order: 0, tab: 'permanentes'}
           ],
           name: ''
         },
@@ -607,8 +577,157 @@
 .v-field__input{
   overflow: hidden;
   max-height: 32px;
-  white-space: nowrap; /* Prevents text from wrapping to the next line */
-  overflow: hidden; /* Hides any text that overflows the container */
-  text-overflow: ellipsis; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Plan item card ── */
+.plan-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  background: #f5f5f7;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  position: relative;
+  font-size: 16px;
+}
+
+.plan-drag-handle {
+  display: flex;
+  align-items: center;
+  padding-top: 10px;
+  cursor: grab;
+  flex-shrink: 0;
+}
+
+.plan-drag-handle:active {
+  cursor: grabbing;
+}
+
+.plan-fields-wrap {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.plan-fields-wrap .v-label {
+  font-size: 16px;
+}
+
+.plan-fields-wrap .v-field__input {
+  font-size: 16px;
+  max-height: none;
+}
+
+/* ── Teeth section ── */
+.plan-teeth {
+  flex: 0 0 auto;
+  width: fit-content;
+  
+}
+
+.plan-teeth-tabs {
+  display: flex;
+  border-bottom: 1.5px solid #e0e0e0;
+  margin-bottom: 8px;
+  justify-content: center;
+}
+
+.plan-teeth-tab {
+  background: none;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  color: #aaa;
+  padding: 4px 12px 6px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1.5px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.plan-teeth-tab-active {
+  color: #C62424;
+  border-bottom-color: #C62424;
+  font-weight: 600;
+}
+
+.plan-odonto-grid {
+  padding: 2px 0;
+}
+
+.plan-tooth-cell {
+  padding: 0 5px;
+}
+
+.plan-tooth-num {
+  font-size: 12px;
+  color: #bbb;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.plan-tooth-img {
+  height: 48px;
+  width: auto;
+  display: block;
+}
+
+.plan-delete-btn {
+  position: absolute !important;
+  top: 8px;
+  right: 8px;
+}
+
+@media (min-width: 960px) {
+  .plan-teeth {
+    min-width: 540px;
+  }
+}
+
+@media (max-width: 600px) {
+  .plan-item {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .plan-fields-wrap {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .plan-teeth {
+    width: 100%;
+  }
+
+  .plan-tooth-img {
+    height: 22px;
+  }
+
+  .plan-tooth-cell {
+    padding: 0 1px;
+  }
+
+  .plan-tooth-num {
+    font-size: 12px;
+  }
+}
+
+.odonto-v-sep {
+  border-left: 2px dashed #DDDDDD;
+  align-self: stretch;
+  width: 0;
+}
+
+.odonto-h-sep {
+  border-top: 2px dashed #DDDDDD;
 }
 </style>

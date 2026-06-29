@@ -5,7 +5,12 @@
       prepend-icon="mdi-calendar-edit-outline"
       :subtitle="client ? ' para ' + client.name : customClient ? ' para ' + clients.filter((c) => customClient === c.id)[0]?.name : ''"
       :title="event ? 'Alterar agendamento' : 'Novo agendamento'"
+      class="has-mobile-header"
     >
+      <div class="mobile-modal-header d-flex d-md-none">
+        <span class="mobile-modal-title">{{ event ? 'Alterar agendamento' : 'Novo agendamento' }}</span>
+        <v-btn icon="mdi-close" variant="text" size="small" density="compact" @click="$emit('cancel'); clear()" />
+      </div>
       <v-card-text>
         <v-row dense class="ga-1">
 

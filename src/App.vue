@@ -319,4 +319,65 @@ td {
 .v-expansion-panel__shadow{
   box-shadow: none;
 }
+
+/* ── Mobile: dialogs fill screen ── */
+@media (max-width: 600px) {
+  .v-overlay.v-dialog > .v-overlay__content {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    overflow: hidden;
+  }
+
+  /* Card or form>card inside dialog fills the screen */
+  .v-overlay.v-dialog > .v-overlay__content > .v-card,
+  .v-overlay.v-dialog > .v-overlay__content > .v-form > .v-card,
+  .v-overlay.v-dialog > .v-overlay__content > div > .v-card {
+    border-radius: 0 !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Wrapper divs also need to fill the height */
+  .v-overlay.v-dialog > .v-overlay__content > div {
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Hide Vuetify card header when our custom mobile header is shown */
+@media (max-width: 960px) {
+  .has-mobile-header > .v-card-item {
+    display: none !important;
+  }
+}
+
+/* ── Mobile modal navigation header ── */
+.mobile-modal-header {
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.mobile-modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  font-family: 'Montserrat', sans-serif;
+}
 </style>

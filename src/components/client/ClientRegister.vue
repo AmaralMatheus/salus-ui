@@ -1,6 +1,10 @@
 <template>
   <div style="max-height: 90vh; overflow-y: auto;">
-    <v-card style="width: min(1200px, 95vw);" :class="!this.currentUser ? 'mt-5' : ''" :loading="loadingInfo" :title="!id ? 'Cadastrar paciente' : 'Editar Paciente'" :subtitle="client.name">
+    <v-card style="width: min(1200px, 95vw);" :class="!this.currentUser ? 'mt-5' : ''" :loading="loadingInfo" :title="!id ? 'Cadastrar paciente' : 'Editar Paciente'" :subtitle="client.name" class="has-mobile-header">
+      <div class="mobile-modal-header d-flex d-md-none">
+        <span class="mobile-modal-title">{{ !id ? 'Cadastrar paciente' : 'Editar paciente' }}</span>
+        <v-btn icon="mdi-close" variant="text" size="small" density="compact" @click="$emit('cancel')" />
+      </div>
       <v-card-text>
         <v-form class="d-flex flex-column ga-6" @submit.prevent="save" v-model="valid" >
           <v-row>
