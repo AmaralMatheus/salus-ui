@@ -378,7 +378,11 @@ export default {
         users: this.users,
       }
       companyService.createCompany(payload)
-        .then(() => { this.step = 3 })
+        .then(() => {
+          this.step = 3
+          window.dataLayer = window.dataLayer || []
+          window.dataLayer.push({ event: 'cadastro_concluido' })
+        })
         .catch((err) => toast.error(
           (err.response?.data?.message) || err.message || err.toString()
         ))
