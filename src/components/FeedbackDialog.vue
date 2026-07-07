@@ -24,9 +24,10 @@
         <div v-else key="form">
           <div class="fb-header">
             <div class="fb-icon-wrap">
-              <img :src="require('../assets/feedback-line.svg')" class="fb-icon" />
+              <v-icon v-if="module" icon="mdi-creation" size="20" color="#C62424" />
+              <img v-else :src="require('../assets/feedback-line.svg')" class="fb-icon" />
             </div>
-            <span class="fb-title">Feedback</span>
+            <span class="fb-title">{{ module ? 'Módulo em breve' : 'Feedback' }}</span>
             <v-spacer />
             <v-btn
               icon="mdi-close"
@@ -38,54 +39,56 @@
           </div>
 
           <div class="fb-body">
-            <p class="fb-question">Como você avalia o Dental Salus?</p>
+            <p class="fb-question">{{ module ? 'Você tem interesse nesse módulo?' : 'Como você avalia o Dental Salus?' }}</p>
 
-            <!-- Estrelas -->
-            <div class="stars-row">
-              <button
-                v-for="n in 5"
-                :key="n"
-                type="button"
-                class="star-btn"
-                :class="{ filled: n <= (hoverRating || rating) }"
-                @mouseenter="hoverRating = n"
-                @mouseleave="hoverRating = 0"
-                @click="rating = n"
-              >
-                <v-icon
-                  :icon="n <= (hoverRating || rating) ? 'mdi-star' : 'mdi-star-outline'"
-                  size="40"
-                />
-              </button>
-            </div>
-
-            <transition name="label-fade">
-              <div v-if="rating || hoverRating" class="star-label">
-                {{ ratingLabel }}
-              </div>
-              <div v-else class="star-label placeholder">Selecione uma avaliação</div>
-            </transition>
-
-            <!-- Tipo -->
-            <div class="fb-section">
-              <span class="fb-label">
-                Tipo
-                <span class="optional">— opcional</span>
-              </span>
-              <div class="chips-row">
+            <!-- Estrelas (apenas no feedback normal) -->
+            <template v-if="!module">
+              <div class="stars-row">
                 <button
-                  v-for="cat in categories"
-                  :key="cat.value"
+                  v-for="n in 5"
+                  :key="n"
                   type="button"
-                  class="fb-chip"
-                  :class="{ selected: category === cat.value }"
-                  @click="category = category === cat.value ? null : cat.value"
+                  class="star-btn"
+                  :class="{ filled: n <= (hoverRating || rating) }"
+                  @mouseenter="hoverRating = n"
+                  @mouseleave="hoverRating = 0"
+                  @click="rating = n"
                 >
-                  <v-icon :icon="cat.icon" size="13" />
-                  {{ cat.label }}
+                  <v-icon
+                    :icon="n <= (hoverRating || rating) ? 'mdi-star' : 'mdi-star-outline'"
+                    size="40"
+                  />
                 </button>
               </div>
-            </div>
+
+              <transition name="label-fade">
+                <div v-if="rating || hoverRating" class="star-label">
+                  {{ ratingLabel }}
+                </div>
+                <div v-else class="star-label placeholder">Selecione uma avaliação</div>
+              </transition>
+
+              <!-- Tipo -->
+              <div class="fb-section">
+                <span class="fb-label">
+                  Tipo
+                  <span class="optional">— opcional</span>
+                </span>
+                <div class="chips-row">
+                  <button
+                    v-for="cat in categories"
+                    :key="cat.value"
+                    type="button"
+                    class="fb-chip"
+                    :class="{ selected: category === cat.value }"
+                    @click="category = category === cat.value ? null : cat.value"
+                  >
+                    <v-icon :icon="cat.icon" size="13" />
+                    {{ cat.label }}
+                  </button>
+                </div>
+              </div>
+            </template>
 
             <!-- Contato -->
             <div class="fb-section">
@@ -127,12 +130,12 @@
             <v-btn
               color="primary"
               rounded="lg"
-              :disabled="!rating || loading"
+              :disabled="(!module && !rating) || loading"
               :loading="loading"
               @click="submit"
               class="submit-btn"
             >
-              Enviar feedback
+              {{ module ? 'Enviar interesse' : 'Enviar feedback' }}
             </v-btn>
           </div>
         </div>
@@ -147,6 +150,7 @@ export default {
   name: 'FeedbackDialog',
   props: {
     modelValue: { type: Boolean, default: false },
+    module: { type: String, default: null },
   },
   emits: ['update:modelValue'],
   data: () => ({
@@ -180,19 +184,24 @@ export default {
       this.loading = true
       this.submitError = null
       try {
+        const payload = {
+          email: this.currentUser?.email || this.currentUser?.user_name || 'desconhecido',
+          contato: this.contact || 'não informado',
+          rating: this.rating || 'não avaliado',
+          category: this.category || 'não informado',
+          message: this.message || '(sem mensagem)',
+        }
+        if (this.module) {
+          payload.modulo_interesse = this.module
+          payload.message = `[Interesse no módulo: ${this.module}]${this.message ? ' ' + this.message : ''}`
+        }
         const res = await fetch('https://formspree.io/f/xbdeyjwj', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
-          body: JSON.stringify({
-            email: this.currentUser?.email || this.currentUser?.user_name || 'desconhecido',
-            contato: this.contact || 'não informado',
-            rating: this.rating,
-            category: this.category || 'não informado',
-            message: this.message || '(sem mensagem)',
-          }),
+          body: JSON.stringify(payload),
         })
         if (!res.ok) throw new Error('Erro ao enviar')
         this.submitted = true
