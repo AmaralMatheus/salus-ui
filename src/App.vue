@@ -40,27 +40,47 @@
             </v-breadcrumbs>
             <v-list class="bg-transparent d-flex ga-4 flex-column" density="compact" nav v-if="currentUser">
               <v-list-item active-class="text-white bg-theme" value="home" :active="path === undefined" @click="$router.push('/home')">
-                <div class="d-flex ga-4 align-center">
-                  <img class="cursor-pointer" :class="path === undefined ? 'active' : ''" :src="require('./assets/home-6-line.svg')"/>
-                  <div>Home</div>
+                <div class="nav-row">
+                  <img class="nav-icon cursor-pointer" :class="path === undefined ? 'active' : ''" :src="require('./assets/home-6-line.svg')"/>
+                  <div class="nav-label">Home</div>
                 </div>
               </v-list-item>
               <v-list-item active-class="text-white bg-theme" value="pacientes" :active="path && path.toString().includes('client')" @click="$router.push('/pacientes')">
-                <div class="d-flex ga-4 align-center">
-                  <img class="cursor-pointer" :class="path && path.toString().includes('client') ? 'active' : ''" :src="require('./assets/clientes.svg')"/>
-                  <div>Pacientes</div>
+                <div class="nav-row">
+                  <img class="nav-icon cursor-pointer" :class="path && path.toString().includes('client') ? 'active' : ''" :src="require('./assets/clientes.svg')"/>
+                  <div class="nav-label">Pacientes</div>
                 </div>
               </v-list-item>
               <v-list-item active-class="text-white bg-theme" value="agenda" :active="path ==='agenda'" @click="$router.push('/agenda')">
-                <div class="d-flex ga-4 align-center">
-                  <img class="cursor-pointer" :class="path ==='agenda' ? 'active' : ''" :src="require('./assets/calendar-event-fill.svg')"/>
-                  <div>Agenda</div>
+                <div class="nav-row">
+                  <img class="nav-icon cursor-pointer" :class="path ==='agenda' ? 'active' : ''" :src="require('./assets/calendar-event-fill.svg')"/>
+                  <div class="nav-label">Agenda</div>
                 </div>
               </v-list-item>
+              <v-list-item class="coming-soon-item" @click="openModuleFeedback('Financeiro')">
+                <div class="nav-row">
+                  <img :src="require('./assets/coins-line.svg')" class="nav-disabled-icon" />
+                  <div class="nav-label nav-label--col">
+                    <span>Financeiro</span>
+                    <span class="soon-tag">em breve</span>
+                  </div>
+                </div>
+              </v-list-item>
+
+              <v-list-item class="coming-soon-item" @click="openModuleFeedback('IA')">
+                <div class="nav-row">
+                  <v-icon icon="mdi-creation-outline" class="nav-disabled-icon" />
+                  <div class="nav-label nav-label--col">
+                    <span>IA</span>
+                    <span class="soon-tag">em breve</span>
+                  </div>
+                </div>
+              </v-list-item>
+
               <v-list-item v-if="currentUser && currentUser.type === 1" active-class="text-white bg-theme" value="ajustes" :active="path && path.toString().includes('user')" @click="$router.push('/ajustes')">
-                <div class="d-flex ga-4 align-center">
-                  <img class="cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
-                  <div>Configurações</div>
+                <div class="nav-row">
+                  <img class="nav-icon cursor-pointer" :class="path && path.toString().includes('user') ? 'active' : ''" :src="require('./assets/settings-3-line.svg')"/>
+                  <div class="nav-label">Configurações</div>
                 </div>
               </v-list-item>
             </v-list>
@@ -69,16 +89,16 @@
           <div class="nav-bottom">
             <v-list class="bg-transparent" density="compact" nav>
               <v-list-item class="feedback-nav-item" @click="feedbackDialog = true">
-                <div class="d-flex ga-4 align-center">
+                <div class="nav-row">
                   <img :src="require('./assets/feedback-line.svg')" class="feedback-nav-icon" />
-                  <div>Feedback</div>
+                  <div class="nav-label">Feedback</div>
                 </div>
               </v-list-item>
             </v-list>
           </div>
         </div>
 
-        <feedback-dialog v-model="feedbackDialog" />
+        <feedback-dialog :model-value="feedbackDialog" :module="feedbackModule" @update:model-value="onFeedbackClose" />
         <div class="w-100">
           <v-breadcrumbs v-if="currentUser" :items="route.fullPath.split('/').map((link) => {
             if (link !== '') {
@@ -107,6 +127,7 @@ export default {
     return {
       expanded: false,
       feedbackDialog: false,
+      feedbackModule: null,
     }
   },
   created() {
@@ -145,7 +166,15 @@ export default {
     logOut() {
       this.$router.push('/login')
       this.$store.dispatch('auth/logout')
-    }
+    },
+    openModuleFeedback(module) {
+      this.feedbackModule = module
+      this.feedbackDialog = true
+    },
+    onFeedbackClose(val) {
+      this.feedbackDialog = val
+      if (!val) this.feedbackModule = null
+    },
   }
 }
 </script>
@@ -280,6 +309,38 @@ td {
   opacity: 1;
 }
 
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  filter: brightness(0) saturate(100%) opacity(0.75);
+}
+
+.coming-soon-item {
+  cursor: pointer;
+}
+
+.nav-disabled-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  filter: brightness(0) saturate(0%) opacity(0.3);
+  font-size: 20px;
+}
+
+.soon-tag {
+  font-size: 9px;
+  font-weight: 700;
+  color: #C62424;
+  background: #FFF0F0;
+  border-radius: 4px;
+  padding: 2px 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  display: inline-block;
+}
+
 @media (max-width: 959px) {
   .custom-navbar {
     display: none !important;
@@ -288,6 +349,41 @@ td {
 
 .custom-navbar:hover {
   width: 220px;
+}
+
+.nav-row {
+  display: flex;
+  align-items: center;
+}
+
+.custom-navbar .nav-label {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  padding-left: 0;
+  white-space: nowrap;
+  transition: max-width 0.2s ease-in-out, opacity 0.15s ease-in-out, padding-left 0.2s ease-in-out;
+}
+
+.custom-navbar:hover .nav-label {
+  max-width: 180px;
+  opacity: 1;
+  padding-left: 16px;
+}
+
+.nav-label--col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.custom-navbar:not(:hover) .v-list-item--nav {
+  padding-inline: 0 !important;
+}
+
+.custom-navbar:not(:hover) .v-list-item__content {
+  display: flex;
+  justify-content: center;
 }
 
 .v-list-item__spacer {
