@@ -78,7 +78,7 @@
               label="Estado"
               :items="states"
               item-title="sigla"
-              item-value="id"
+              item-value="sigla"
               v-model="company.state"
               :disabled="loading || blockState"
               :rules="required"
@@ -91,7 +91,7 @@
               label="Cidade"
               :items="cities"
               item-title="nome"
-              item-value="id"
+              item-value="nome"
               v-model="company.city"
               :disabled="loading || blockCity || !company.state"
               :rules="required"
@@ -342,13 +342,13 @@ export default {
       if (this.company.cep?.length === 9) {
         locationService.getAddress(this.company.cep.replace('-', '')).then((response) => {
           if (response.data.uf) {
-            this.company.state = this.states.filter((s) => s.sigla === response.data.uf)[0]?.id
+            this.company.state = response.data.uf
             this.blockState = true
             const returnedCity = response.data.localidade
             locationService.getCities(this.company.state).then((response) => {
               this.cities = response.data
               if (returnedCity) {
-                this.company.city = this.cities.find((c) => c.nome === returnedCity)?.id ?? null
+                this.company.city = this.cities.find((c) => c.nome === returnedCity)?.nome ?? null
                 this.blockCity = true
               }
             })
