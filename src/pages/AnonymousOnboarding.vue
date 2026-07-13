@@ -74,32 +74,34 @@
               hide-details="auto"
               class="field-full"
             />
-            <v-autocomplete
-              label="Estado"
-              :items="states"
-              item-title="sigla"
-              item-value="sigla"
-              v-model="company.state"
-              :disabled="loading || blockState"
-              :rules="required"
-              variant="outlined"
-              density="compact"
-              hide-details="auto"
-              @update:modelValue="getCities"
-            />
-            <v-autocomplete
-              label="Cidade"
-              :items="cities"
-              item-title="nome"
-              item-value="nome"
-              v-model="company.city"
-              :disabled="loading || blockCity || !company.state"
-              :rules="required"
-              no-data-text="Selecione um estado antes"
-              variant="outlined"
-              density="compact"
-              hide-details="auto"
-            />
+            <div class="state-city-row">
+              <v-autocomplete
+                label="Estado"
+                :items="states"
+                item-title="sigla"
+                item-value="sigla"
+                v-model="company.state"
+                :disabled="loading || blockState"
+                :rules="required"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+                @update:modelValue="getCities"
+              />
+              <v-autocomplete
+                label="Cidade"
+                :items="cities"
+                item-title="nome"
+                item-value="nome"
+                v-model="company.city"
+                :disabled="loading || blockCity || !company.state"
+                :rules="required"
+                no-data-text="Selecione um estado antes"
+                variant="outlined"
+                density="compact"
+                hide-details="auto"
+              />
+            </div>
           </div>
 
           <div class="checkboxes-area">
@@ -593,14 +595,60 @@ export default {
   line-height: 1.3;
 }
 
-/* On screens narrower than the left panel + some right content, hide the right panel */
+/* Desktop: wrapper transparente — Estado e Cidade caem direto na grid pai */
+.state-city-row {
+  display: contents;
+}
+
 @media (max-width: 700px) {
+  /* Full screen — sem card, sem padding externo */
+  .page-wrapper {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .onboarding-container {
+    border-radius: 0;
+    box-shadow: none;
+    height: 100dvh;
+    max-width: 100%;
+  }
+
   .right-panel {
     display: none;
   }
+
   .left-panel {
     width: 100%;
-    border-radius: 20px;
+    border-radius: 0;
+    padding: 1.5rem 1.25rem 2rem;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+
+  /* Grid de 1 coluna — todos os inputs empilhados */
+  .fields-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Faz tudo virar full width (sobrescreve o field-full e o padrão de 2 colunas) */
+  .fields-grid > * {
+    grid-column: 1 / -1;
+  }
+
+  /* Estado e Cidade: flex lado a lado, estado menor */
+  .state-city-row {
+    display: flex;
+    gap: 0.75rem;
+    grid-column: 1 / -1;
+  }
+
+  .state-city-row > :first-child {
+    flex: 0 0 30%;
+  }
+
+  .state-city-row > :last-child {
+    flex: 1;
   }
 }
 </style>
